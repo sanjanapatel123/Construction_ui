@@ -1,0 +1,3024 @@
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+const Navbar = ({ toggleSidebar }) => {
+  const [roledata, setRoleData]= useState("")
+    console.log(roledata)
+  useEffect(()=>{
+    const Role= localStorage.getItem("userRole")
+     if(Role){
+     setRoleData(Role)
+     }else{
+      setRoleData()
+     }
+  },[])
+   
+  return (
+   <>
+    <nav className="navbar">
+      <div className="navbar-right">
+        <button onClick={toggleSidebar} className="toggle-button d-block d-md-none">
+          <i className="fas fa-bars"></i>
+        </button>
+        <div className="d-none d-md-block">
+          <button className="profile-button">
+            <i className="fas fa-user"></i>
+            <span className="ms-2">{roledata}</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+   </>
+  )
+}
+
+export default Navbar
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useState } from 'react';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js';
+import { Line, Doughnut } from 'react-chartjs-2';
+import { BsPlusCircle, BsUpload, BsPersonPlus } from 'react-icons/bs';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+function Dashboard() {
+  // State for managing tasks and alerts
+  const [alerts, setAlerts] = useState([
+    {
+      id: 1,
+      title: 'Safety Incident Reported',
+      description: 'Site A: Equipment malfunction',
+      type: 'danger',
+      time: '15m ago'
+    },
+    {
+      id: 2,
+      title: 'Project Deadline Approaching',
+      description: 'Downtown Project - Due in 3 days',
+      type: 'warning',
+      time: '25m ago'
+    },
+    {
+      id: 3,
+      title: 'Document Approved',
+      description: 'Site Safety Protocol v2.1',
+      type: 'success',
+      time: '45m ago'
+    }
+  ]);
+
+  const stats = [
+    {
+      number: "12",
+      title: "Active Projects",
+      subtitle: "4 this week",
+      color: "dark"
+    },
+    {
+      number: "28",
+      title: "Open Tasks",
+      subtitle: "8 high priority",
+      color: "warning"
+    },
+    {
+      number: "3",
+      title: "Safety Incidents",
+      subtitle: "1 needs immediate action",
+      color: "danger"
+    },
+    {
+      number: "15",
+      title: "Monthly Reports",
+      subtitle: "2 pending review",
+      color: "success"
+    }
+  ];
+
+  // Updated chart data to match the image
+  const safetyData = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+    datasets: [
+      {
+        label: 'Incidents',
+        data: [5, 4, 3, 2, 1],
+        borderColor: '#2196f3',
+        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+        tension: 0.4,
+        pointRadius: 4,
+        pointBackgroundColor: '#2196f3',
+        borderWidth: 2,
+        fill: true
+      },
+      {
+        label: 'Near Misses',
+        data: [6, 5, 4, 3, 2],
+        borderColor: '#f44336',
+        backgroundColor: 'rgba(244, 67, 54, 0.1)',
+        tension: 0.4,
+        pointRadius: 4,
+        pointBackgroundColor: '#f44336',
+        borderWidth: 2,
+        fill: true
+      }
+    ]
+  };
+
+  const defectData = {
+    labels: ['Critical', 'High', 'In Progress', 'Resolved', 'Closed'],
+    datasets: [{
+      data: [30, 25, 20, 15, 10],
+      backgroundColor: [
+        'rgba(244, 67, 54, 0.8)',
+        'rgba(255, 152, 0, 0.8)',
+        'rgba(33, 150, 243, 0.8)',
+        'rgba(76, 175, 80, 0.8)',
+        'rgba(158, 158, 158, 0.8)'
+      ],
+      hoverBackgroundColor: [
+        '#f44336',
+        '#ff9800',
+        '#2196f3',
+        '#4caf50',
+        '#9e9e9e'
+      ],
+      borderWidth: 2,
+      borderColor: '#ffffff'
+    }]
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 8,
+        grid: {
+          color: 'rgba(0, 0, 0, 0.1)',
+          drawBorder: false,
+          borderDash: [5, 5]
+        },
+        ticks: {
+          stepSize: 2,
+          font: {
+            size: 12
+          },
+          color: '#666'
+        },
+        title: {
+          display: true,
+          text: 'Number of Incidents',
+          color: '#666',
+          font: {
+            size: 14,
+            weight: 'bold'
+          }
+        }
+      },
+      x: {
+        grid: {
+          display: false
+        },
+        ticks: {
+          font: {
+            size: 12
+          },
+          color: '#666'
+        }
+      }
+    },
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+        align: 'start',
+        labels: {
+          padding: 20,
+          font: {
+            size: 12
+          },
+          usePointStyle: true,
+          pointStyle: 'circle'
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        titleColor: '#333',
+        bodyColor: '#666',
+        borderColor: 'rgba(0, 0, 0, 0.1)',
+        borderWidth: 1,
+        padding: 12,
+        displayColors: true,
+        mode: 'index',
+        intersect: false
+      }
+    }
+  };
+
+  const doughnutOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '75%',
+    plugins: {
+      legend: {
+        position: 'right',
+        labels: {
+          padding: 20,
+          font: {
+            size: 12
+          },
+          usePointStyle: true,
+          pointStyle: 'circle'
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        titleColor: '#333',
+        bodyColor: '#666',
+        borderColor: 'rgba(0, 0, 0, 0.1)',
+        borderWidth: 1,
+        padding: 12,
+        callbacks: {
+          label: function(context) {
+            const label = context.label || '';
+            const value = context.formattedValue;
+            return `${label}: ${value}%`;
+          }
+        }
+      }
+    }
+  };
+
+  // Handler functions
+  const handleAddTask = () => {
+    // Add task implementation
+    console.log("Adding new task");
+  };
+
+  const handleUploadDocument = () => {
+    // Upload document implementation
+    console.log("Uploading document");
+  };
+
+  const handleAssignUser = () => {
+    // Assign user implementation
+    console.log("Assigning user");
+  };
+
+  return (
+    <div className="container-fluid p-4">
+           <div className="row g-3 mb-4">
+        {stats.map((stat, index) => (
+          <div className="col-md-3" key={index}>
+            <div className={`stats-card p-4 shadow-sm border-start border-4 border-${stat.color} rounded-3 bg-white h-100 transition-all hover-shadow`}>
+              <div className="d-flex align-items-start gap-3">
+                <div className={`stats-number h2 mb-0 fw-bold text-${stat.color}`}>{stat.number}</div>
+                <div>
+                  <div className="stats-title h6 mb-1 text-dark">{stat.title}</div>
+                  <div className="stats-subtitle small text-muted">{stat.subtitle}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+          <div className="stats-card p-3 mb-4 shadow-sm rounded-3 bg-white">
+            <h6 className="mb-3">Quick Actions</h6>
+            <div className="d-flex flex-column gap-3">
+              <button className="btn btn-light d-flex align-items-center gap-2 shadow-sm p-3 rounded-3" onClick={handleAddTask}>
+                <BsPlusCircle className="text-primary" />
+                <span>Add New Task</span>
+              </button>
+              <button className="btn btn-light d-flex align-items-center gap-2 shadow-sm p-3 rounded-3" onClick={handleUploadDocument}>
+                <BsUpload className="text-warning" />
+                <span>Upload Document</span>
+              </button>
+              <button className="btn btn-light d-flex align-items-center gap-2 shadow-sm p-3 rounded-3" onClick={handleAssignUser}>
+                <BsPersonPlus className="text-success" />
+                <span>Assign User</span>
+              </button>
+            </div>
+          </div>
+
+      <div className="stats-card p-3 mb-4 shadow-sm rounded-3 bg-white">
+        <h6 className="mb-3">Recent Alerts</h6>
+        <div className="d-flex flex-column gap-3">
+          {alerts.map(alert => (
+            <div key={alert.id} className={`alert alert-${alert.type} d-flex align-items-start gap-3 mb-0 p-3 shadow-sm rounded-3`}>
+              <div className="flex-grow-1">
+                <div className="alert-title fw-semibold mb-1">{alert.title}</div>
+                <div className="alert-description small text-muted mb-1">{alert.description}</div>
+                <div className="alert-time small opacity-75">{alert.time}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="row">
+        <div className="col-lg-8 mb-4">
+          <div className="chart-container p-4 shadow-sm rounded-3 bg-white">
+            <h6 className="mb-4">Safety Performance</h6>
+            <div style={{ height: '250px' }}>
+              <Line data={safetyData} options={chartOptions} />
+            </div>
+          </div>
+        </div>
+        <div className="col-lg-4">
+          <div className="chart-container p-4 shadow-sm rounded-3 bg-white">
+            <h6 className="mb-4">Defect Status</h6>
+            <div style={{ height: '250px' }}>
+              <Doughnut data={defectData} options={doughnutOptions} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Dashboard;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useState } from 'react';
+import { Container, Row, Col, Card, Form, Button, Table, Badge } from 'react-bootstrap';
+import { FaEdit, FaEye, FaTrash, FaDownload, FaShare } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { FaPlus, FaUpload, FaUserPlus, FaExclamationTriangle, FaShieldAlt, FaSlidersH, FaCheckCircle } from 'react-icons/fa';
+
+
+
+
+import { BsPlusCircle, BsUpload, BsPersonPlus } from 'react-icons/bs';
+function SWMS() {
+  const swmsData = [
+    {
+      title: 'Scaffold Installation',
+      project: 'Project A',
+      status: 'Approved',
+      lastUpdated: '2024-01-20',
+      id: 1
+    },
+    {
+      title: 'Concrete Pouring',
+      project: 'Project B',
+      status: 'Pending Approval',
+      lastUpdated: '2024-01-19',
+      id: 2
+    },
+    {
+      title: 'Electrical Wiring',
+      project: 'Project A',
+      status: 'Draft',
+      lastUpdated: '2024-01-18',
+      id: 3
+    }
+  ];
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedProject, setSelectedProject] = useState('All Projects');
+  const [selectedStatus, setSelectedStatus] = useState('All Status');
+  const [filteredData, setFilteredData] = useState(swmsData);
+
+  const templates = [
+    {
+      title: 'Working at Heights',
+      description: 'Standard template for height-related tasks',
+      id: 1
+    },
+    {
+      title: 'Electrical Work',
+      description: 'Safety procedures for electrical operations',
+      id: 2
+    },
+    {
+      title: 'Heavy Machinery',
+      description: 'Guidelines for operating heavy equipment',
+      id: 3
+    }
+  ];
+
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'Approved':
+        return <Badge bg="success" style={{ backgroundColor: '#198754', padding: '6px 10px', borderRadius: '4px' }}>Approved</Badge>;
+      case 'Pending Approval':
+        return <Badge bg="warning" style={{ backgroundColor: '#ffc107', color: '#000', padding: '6px 10px', borderRadius: '4px' }}>Pending Approval</Badge>;
+      case 'Draft':
+        return <Badge bg="secondary" style={{ backgroundColor: '#6c757d', padding: '6px 10px', borderRadius: '4px' }}>Draft</Badge>;
+      default:
+        return <Badge bg="info">{status}</Badge>;
+    }
+  };
+
+  const filterData = () => {
+    return swmsData.filter(swms => {
+      const matchesSearch = swms.title.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesProject = selectedProject === 'All Projects' || swms.project === selectedProject;
+      const matchesStatus = selectedStatus === 'All Status' || swms.status === selectedStatus;
+      return matchesSearch && matchesProject && matchesStatus;
+    });
+  };
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setFilteredData(filterData());
+  };
+
+  const handleProjectFilter = (e) => {
+    setSelectedProject(e.target.value);
+    setFilteredData(filterData());
+  };
+
+  const handleStatusFilter = (e) => {
+    setSelectedStatus(e.target.value);
+    setFilteredData(filterData());
+  };
+
+
+
+  const handleUseTemplate = (templateId) => {
+    const template = templates.find(t => t.id === templateId);
+    alert(`Creating new SWMS using template: ${template.title}`);
+  };
+
+  const handleEdit = (id) => {
+    alert(`Editing SWMS ${id}`);
+  };
+
+  const handleView = (id) => {
+    alert(`Viewing SWMS ${id}`);
+  };
+
+  const handleDownload = (id) => {
+    alert(`Downloading SWMS ${id}`);
+  };
+
+  const handleShare = (id) => {
+    alert(`Sharing SWMS ${id}`);
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to delete this SWMS?')) {
+      alert(`Deleting SWMS ${id}`);
+    }
+  };
+
+
+
+  // ///////////
+  const safetyScoreData = [
+    { month: 'Jan', score: 72 },
+    { month: 'Feb', score: 75 },
+    { month: 'Mar', score: 78 },
+    { month: 'Apr', score: 82 },
+    { month: 'May', score: 85 },
+    { month: 'Jun', score: 72 }
+  ];
+
+  const complianceData = [
+    { month: 'Jan', value: 30 },
+    { month: 'Feb', value: 40 },
+    { month: 'Mar', value: 50 },
+    { month: 'Apr', value: 65 },
+    { month: 'May', value: 75 },
+    { month: 'Jun', value: 85 }
+  ];
+
+  const workflowData = [
+    { stage: 'Initiated', value: 15 },
+    { stage: 'Active', value: 25 },
+    { stage: 'In Review', value: 35 },
+    { stage: 'Approved', value: 45 }
+  ];
+
+    // Handler functions
+    const handleAddTask = () => {
+      // Add task implementation
+      console.log("Adding new task");
+    };
+    
+  const handleUploadDocument = () => {
+    // Upload document implementation
+    console.log("Uploading document");
+  };
+
+  const handleAssignUser = () => {
+    // Assign user implementation
+    console.log("Assigning user");
+  };
+  return (
+    <Container fluid className="p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+       <div className="dashboard-container">
+         <div className="dashboard-header">
+           <h3>Safe Work Method Statements (SWMS)</h3>
+           <p>Manage and monitor your safety documentation</p>
+         </div>
+
+         <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '20px' }}>
+           <div className="stat-card" style={{ 
+             backgroundColor: '#ffffff',
+             borderRadius: '8px',
+             padding: '16px',
+             boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+             transition: 'transform 0.2s ease',
+             cursor: 'pointer',
+             ':hover': {
+               transform: 'translateY(-3px)',
+               boxShadow: '0 4px 12px rgba(0,0,0,0.12)'
+             }
+           }}>
+             <div className="stat-content">
+               <div className="stat-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                 <h6 style={{ margin: 0, fontSize: '0.875rem', color: '#6B7280', fontWeight: '600' }}>Total SWMS</h6>
+                 <FaSlidersH style={{ fontSize: '1rem', color: '#4B5563' }} />
+               </div>
+               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
+                 <h2 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#111827', margin: '0' }}>{swmsData.length}</h2>
+                 <Link to="#" style={{ 
+                   display: 'inline-block',
+                   padding: '6px 12px',
+                   backgroundColor: '#EEF2FF',
+                   color: '#4F46E5',
+                   borderRadius: '4px',
+                   textDecoration: 'none',
+                   fontWeight: '500',
+                   fontSize: '0.75rem',
+                   transition: 'background-color 0.2s ease'
+                 }}>View All</Link>
+               </div>
+             </div>
+           </div>
+
+           <div className="stat-card" style={{ 
+             backgroundColor: '#ffffff',
+             borderRadius: '8px',
+             padding: '16px',
+             boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+             transition: 'transform 0.2s ease',
+             cursor: 'pointer',
+             ':hover': {
+               transform: 'translateY(-3px)',
+               boxShadow: '0 4px 12px rgba(0,0,0,0.12)'
+             }
+           }}>
+             <div className="stat-content">
+               <div className="stat-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                 <h6 style={{ margin: 0, fontSize: '0.875rem', color: '#6B7280', fontWeight: '600' }}>Pending Reviews</h6>
+                 <FaExclamationTriangle style={{ fontSize: '1.2rem', color: '#F59E0B' }} />
+               </div>
+               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
+                 <h2 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#111827', margin: '0' }}>{swmsData.filter(s => s.status === 'Pending Approval').length}</h2>
+                 <Link to="#" style={{ 
+                   display: 'inline-block',
+                   padding: '6px 12px',
+                   backgroundColor: '#FEF3C7',
+                   color: '#D97706',
+                   borderRadius: '4px',
+                   textDecoration: 'none',
+                   fontWeight: '500',
+                   fontSize: '0.75rem',
+                   transition: 'background-color 0.2s ease'
+                 }}>Review Now</Link>
+               </div>
+             </div>
+           </div>
+
+           <div className="stat-card" style={{ 
+             backgroundColor: '#ffffff',
+             borderRadius: '8px',
+             padding: '16px',
+             boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+             transition: 'transform 0.2s ease',
+             cursor: 'pointer',
+             ':hover': {
+               transform: 'translateY(-3px)',
+               boxShadow: '0 4px 12px rgba(0,0,0,0.12)'
+             }
+           }}>
+             <div className="stat-content">
+               <div className="stat-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                 <h6 style={{ margin: 0, fontSize: '0.875rem', color: '#6B7280', fontWeight: '600' }}>Approved SWMS</h6>
+                 <FaCheckCircle style={{ fontSize: '1.2rem', color: '#10B981' }} />
+               </div>
+               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
+                 <h2 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#111827', margin: '0' }}>{swmsData.filter(s => s.status === 'Approved').length}</h2>
+                 <Link to="#" style={{ 
+                   display: 'inline-block',
+                   padding: '6px 12px',
+                   backgroundColor: '#D1FAE5',
+                   color: '#059669',
+                   borderRadius: '4px',
+                   textDecoration: 'none',
+                   fontWeight: '500',
+                   fontSize: '0.75rem',
+                   transition: 'background-color 0.2s ease'
+                 }}>View Approved</Link>
+               </div>
+             </div>
+           </div>
+         </div>
+
+         <div className="stats-card p-3 mb-4 shadow-sm rounded-3 bg-white">
+            <h6 className="mb-3">Quick Actions</h6>
+            <div className="d-flex flex-column gap-3">
+              <button className="btn btn-light d-flex align-items-center gap-2 shadow-sm p-3 rounded-3" onClick={handleAddTask}>
+                <BsPlusCircle className="text-primary" />
+                <span>Add New Task</span>
+              </button>
+              <button className="btn btn-light d-flex align-items-center gap-2 shadow-sm p-3 rounded-3" onClick={handleUploadDocument}>
+                <BsUpload className="text-warning" />
+                <span>Upload Document</span>
+              </button>
+              <button className="btn btn-light d-flex align-items-center gap-2 shadow-sm p-3 rounded-3" onClick={handleAssignUser}>
+                <BsPersonPlus className="text-success" />
+                <span>Assign User</span>
+              </button>
+            </div>
+          </div>
+
+
+         <div className="categories-section">
+           <div className="section-header">
+             <h6>SWMS Categories</h6>
+             <Link to="#" className="explore-link">Explore All</Link>
+           </div>
+           <div className="categories-grid">
+             <div className="category-card" style={{ backgroundColor: '#ffffff', borderRadius: '6px', boxShadow: '0 2px 4px rgba(0,0,0,0.08)', padding: '12px', marginBottom: '12px', textAlign: 'center' }}>
+               <FaExclamationTriangle className="category-icon risk" />
+               <h6>High Risk</h6>
+             </div>
+             <div className="category-card" style={{ backgroundColor: '#ffffff', borderRadius: '6px', boxShadow: '0 2px 4px rgba(0,0,0,0.08)', padding: '12px', marginBottom: '12px', textAlign: 'center' }}>
+               <FaShieldAlt className="category-icon safety" />
+               <h6>Safety Critical</h6>
+             </div>
+             <div className="category-card" style={{ backgroundColor: '#ffffff', borderRadius: '6px', boxShadow: '0 2px 4px rgba(0,0,0,0.08)', padding: '12px', marginBottom: '12px', textAlign: 'center' }}>
+               <FaSlidersH className="category-icon control" />
+               <h6>Control Measures</h6>
+             </div>
+             <div className="category-card" style={{ backgroundColor: '#ffffff', borderRadius: '6px', boxShadow: '0 2px 4px rgba(0,0,0,0.08)', padding: '12px', marginBottom: '12px', textAlign: 'center' }}>
+               <FaCheckCircle className="category-icon compliance" />
+               <h6>Compliance</h6>
+             </div>
+           </div>
+         </div>
+
+         <div className="analytics-section">
+           <div className="analytics-grid">
+             <div className="analytics-card" style={{ backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', padding: '20px', marginBottom: '20px' }}>
+               <div className="analytics-header">
+                 <h6>Safety Score Trend</h6>
+                 <select className="period-select">
+                   <option>Last 6 Months</option>
+                   <option>Last 3 Months</option>
+                   <option>Last Month</option>
+                 </select>
+               </div>
+               <div className="chart-container">
+                 <ResponsiveContainer width="100%" height={300}>
+                   <LineChart data={safetyScoreData}>
+                     <CartesianGrid strokeDasharray="3 3" />
+                     <XAxis dataKey="month" />
+                     <YAxis />
+                     <Tooltip />
+                     <Line type="monotone" dataKey="score" stroke="#0d6efd" strokeWidth={2} />
+                   </LineChart>
+                 </ResponsiveContainer>
+               </div>
+             </div>
+
+             <div className="analytics-card" style={{ backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', padding: '20px', marginBottom: '20px' }}>
+               <div className="analytics-header">
+                 <h6>Compliance Overview</h6>
+                 <div className="flag-badge">3 Flags</div>
+               </div>
+               <div className="chart-container">
+                 <ResponsiveContainer width="100%" height={300}>
+                   <BarChart data={complianceData}>
+                     <CartesianGrid strokeDasharray="3 3" />
+                     <XAxis dataKey="month" />
+                     <YAxis />
+                     <Tooltip />
+                     <Bar dataKey="value" fill="#0d6efd" />
+                   </BarChart>
+                 </ResponsiveContainer>
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+       {/* Header Section */}
+       <Row className="mb-4 align-items-center g-3">
+       <h3>SMS Induction </h3>
+         <Col sm={12} md={3}>
+           <Form.Control
+             type="search"
+             placeholder="Search SWMS..."
+             value={searchTerm}
+             onChange={handleSearch}
+             style={{ borderRadius: '4px', border: '1px solid #dee2e6' }}
+           />
+         </Col>
+         <Col sm={12} md={2}>
+           <Form.Select 
+             value={selectedProject} 
+             onChange={handleProjectFilter}
+             style={{ borderRadius: '4px', border: '1px solid #dee2e6' }}
+           >
+             <option>All Projects</option>
+             <option>Project A</option>
+             <option>Project B</option>
+           </Form.Select>
+         </Col>
+         <Col sm={12} md={2}>
+           <Form.Select 
+             value={selectedStatus} 
+             onChange={handleStatusFilter}
+             style={{ borderRadius: '4px', border: '1px solid #dee2e6' }}
+           >
+             <option>All Status</option>
+             <option>Draft</option>
+             <option>Pending Approval</option>
+             <option>Approved</option>
+           </Form.Select>
+         </Col>
+         <Col sm={12} md="auto" className="ms-md-auto">
+        <Link to={"/AddnewSms"} >  <Button 
+             variant="primary" 
+             style={{ 
+               backgroundColor: '#0d6efd',
+               border: 'none',
+               borderRadius: '6px',
+               padding: '10px 20px',
+               boxShadow: '0 2px 4px rgba(13,110,253,0.2)',
+               fontWeight: '500'
+             }}
+           >
+             + Create New SWMS
+           </Button></Link>
+         </Col>
+       </Row>
+
+       {/* Templates Section */}
+       <h5 className="mb-3" style={{ fontSize: '1rem', fontWeight: '500' }}>Pre-Populated Templates</h5>
+       <Row className="mb-4 g-3">
+         {templates.map((template) => (
+           <Col sm={12} md={4} key={template.id}>
+             <Card className="h-100" style={{ border: '1px solid #dee2e6', borderRadius: '4px' }}>
+               <Card.Body>
+                 <Card.Title style={{ fontSize: '1rem', fontWeight: '500' }}>{template.title}</Card.Title>
+                 <Card.Text style={{ color: '#6c757d', fontSize: '0.875rem' }}>{template.description}</Card.Text>
+                 <Button
+                   variant="link"
+                   className="p-0"
+                   style={{ color: '#0d6efd', textDecoration: 'none', fontSize: '0.875rem' }}
+                   onClick={() => handleUseTemplate(template.id)}
+                 >
+                   Use Template
+                 </Button>
+               </Card.Body>
+             </Card>
+           </Col>
+         ))}
+       </Row>
+
+       {/* SWMS Table */}
+       <div className="swms-table-container">
+         <div className="table-header">
+           <div className="search-filters">
+             <Form.Control
+               type="text"
+               placeholder="Search SWMS..."
+               value={searchTerm}
+               onChange={handleSearch}
+               className="search-input"
+             />
+             <Form.Select
+               value={selectedProject}
+               onChange={handleProjectFilter}
+               className="filter-select"
+             >
+               <option>All Projects</option>
+               <option>Project A</option>
+               <option>Project B</option>
+             </Form.Select>
+             <Form.Select
+               value={selectedStatus}
+               onChange={handleStatusFilter}
+               className="filter-select"
+             >
+               <option>All Status</option>
+               <option>Approved</option>
+               <option>Pending Approval</option>
+               <option>Draft</option>
+             </Form.Select>
+           </div>
+         </div>
+
+         <div className="table-responsive">
+           <Table className="modern-table" style={{ backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '20px' }}>
+             <thead>
+               <tr>
+                 <th>Title</th>
+                 <th>Project</th>
+                 <th>Status</th>
+                 <th>Last Updated</th>
+                 <th>Actions</th>
+               </tr>
+             </thead>
+             <tbody>
+               {filteredData.map((swms) => (
+                 <tr key={swms.id}>
+                   <td className="title-cell">{swms.title}</td>
+                   <td>{swms.project}</td>
+                   <td>{getStatusBadge(swms.status)}</td>
+                   <td>{swms.lastUpdated}</td>
+                   <td>
+                     <div className="action-buttons-container">
+                       <Button
+                         variant="link"
+                         className="action-btn"
+                         onClick={() => handleEdit(swms.id)}
+                       >
+                         <FaEdit />
+                       </Button>
+                       <Button
+                         variant="link"
+                         className="action-btn"
+                         onClick={() => handleView(swms.id)}
+                       >
+                         <FaEye />
+                       </Button>
+                       <Button
+                         variant="link"
+                         className="action-btn"
+                         onClick={() => handleDownload(swms.id)}
+                       >
+                         <FaDownload />
+                       </Button>
+                       <Button
+                         variant="link"
+                         className="action-btn"
+                         onClick={() => handleShare(swms.id)}
+                       >
+                         <FaShare />
+                       </Button>
+                       <Button
+                         variant="link"
+                         className="action-btn delete"
+                         onClick={() => handleDelete(swms.id)}
+                       >
+                         <FaTrash />
+                       </Button>
+                     </div>
+                   </td>
+                 </tr>
+               ))}
+             </tbody>
+           </Table>
+         </div>
+       </div>
+     </Container>
+   );
+}
+
+export default SWMS;
+
+
+
+
+
+
+
+
+import React from "react";
+import { Link } from "react-router-dom";
+import { FiEdit, FiUser, FiCheckCircle, FiDownload } from "react-icons/fi";
+
+function Checklists() {
+  return (
+    <div className="container-fluid px-4 py-4">
+      <div className="bg-white p-4 rounded shadow-sm">
+       <div className="d-flex">
+       <h5 className="fw-bold mb-4 fs-3">All Checklists</h5>
+        <div className="col-12 col-sm-auto ms-sm-auto">
+            <Link to={"/AddChecklists"} className="text-decoration-none">
+              <button id="btn_itp" className="btn btn-dark  fs-9">
+                + Create New Checklist
+              </button>
+            </Link>
+          </div>
+       </div>
+        {/* Filters & Button */}
+        <div className="d-flex flex-wrap gap-3 mb-4 align-items-center">
+          <div className="col-12 col-sm-auto">
+            <input
+              type="text"
+              className="form-control form-control-lg fs-9"
+              placeholder="Search Checklists..."
+            />
+          </div>
+          <div className="col-12 col-sm-auto">
+            <select className="form-select form-select-lg fs-9">
+              <option>All Projects</option>
+            </select>
+          </div>
+          <div className="col-12 col-sm-auto">
+            <input
+              type="date"
+              className="form-control form-control-lg fs-9"
+            />
+          </div>
+          <div className="col-12 col-sm-auto">
+            <select className="form-select form-select-lg fs-9">
+              <option>All Status</option>
+            </select>
+          </div>
+
+       
+        </div>
+
+        {/* Table */}
+        <div className="table-responsive">
+          <table className="table align-middle mb-0">
+            <thead className="table-light">
+              <tr>
+                <th className="fw-medium fs-5">Checklist Name</th>
+                <th className="fw-medium fs-5">Project</th>
+                <th className="fw-medium fs-5">Assigned To</th>
+                <th className="fw-medium fs-5">Status</th>
+                <th className="fw-medium fs-5">Last Updated</th>
+                <th className="fw-medium fs-5">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[1, 2].map((_, idx) => (
+                <tr key={idx}>
+                  <td className="fw-semibold fs-9">Site Safety Inspection</td>
+                  <td className="text-muted fs-9">Project Alpha</td>
+                  <td className="text-muted fs-9">John Smith</td>
+                  <td>
+                    <span className="badge bg-warning text-dark fs-6">
+                      In Progress
+                    </span>
+                  </td>
+                  <td className="text-muted fs-6">2024-02-19</td>
+                  <td>
+                    <div className="d-flex align-items-center gap-3">
+                      <FiEdit className="text-dark fs-5" role="button" title="Edit" />
+                      <FiUser className="text-info fs-5" role="button" title="Assign" />
+                      <FiCheckCircle className="text-success fs-5" role="button" title="Mark Complete" />
+                      <FiDownload className="text-secondary fs-5" role="button" title="Download" />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Checklists
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useState } from 'react';
+import { Link, Links } from 'react-router-dom';
+
+function PlantMachinery() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSite, setSelectedSite] = useState('Main Construction Site');
+  const [status, setStatus] = useState('All Status');
+  const [activeTab, setActiveTab] = useState('Tool Registry');
+
+  // Sample data for tools
+  const tools = [
+    {
+      id: 'T001',
+      name: 'Power Drill - DeWalt',
+      status: 'Available',
+      currentUser: '',
+      checkoutDate: '',
+      expectedReturn: '',
+    },
+    {
+      id: 'T002',
+      name: 'Circular Saw - Makita',
+      status: 'In Use',
+      currentUser: 'John Smith',
+      checkoutDate: '2024-02-20',
+      expectedReturn: '2024-02-22',
+    },
+  ];
+
+  // Sample data for equipment
+  const equipment = [
+    {
+      id: 'E001',
+      name: 'Excavator - CAT',
+      status: 'Active',
+      operator: 'Mike Johnson',
+      location: 'Site A',
+      nextMaintenance: '2024-03-15',
+    },
+    {
+      id: 'E002',
+      name: 'Crane - Liebherr',
+      status: 'Maintenance',
+      operator: '',
+      location: 'Workshop',
+      nextMaintenance: '2024-02-25',
+    },
+  ];
+
+  // Sample data for services
+  const services = [
+    {
+      id: 'S001',
+      name: 'Equipment Maintenance',
+      provider: 'TechServ Inc.',
+      schedule: 'Weekly',
+      lastService: '2024-02-15',
+      nextService: '2024-02-22',
+    },
+    {
+      id: 'S002',
+      name: 'Safety Inspection',
+      provider: 'SafetyFirst Ltd.',
+      schedule: 'Monthly',
+      lastService: '2024-02-01',
+      nextService: '2024-03-01',
+    },
+  ];
+
+  const renderEquipmentSection = () => (
+    <div className="bg-white p-4 rounded shadow-sm">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h6 className="fw-semibold mb-0">Equipment Management</h6>
+        <Link to={"/AddEquipment"}> <button id='btn_itp' className="btn btn-dark">+ Add Equipment</button></Link>
+      </div>
+      <div className="d-flex gap-2 mb-4">
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Search equipment..."
+          style={{ maxWidth: '250px' }}
+        />
+        <select
+          className="form-select"
+          
+          style={{ width: '150px' }}
+       
+        >
+          <option >All Status</option>
+          <option>Active</option>
+          <option>Maintenance</option>
+          <option>Out of Service</option>
+        </select>
+      </div>
+      <div className="table-responsive">
+        <table className="table table-hover align-middle mb-0">
+          <thead className="bg-light">
+            <tr>
+              <th>Equipment ID</th>
+              <th>Equipment Name</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Location</th>
+              <th>Last Inspection</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {equipment.map((item) => (
+              <tr key={item.id}>
+                <td>{item.id}</td>
+                <td>{item.name}</td>
+                <td>Heavy Equipment</td>
+                <td>
+                  <span className={`badge ${item.status === 'Active' ? 'bg-success' : 'bg-warning text-dark'}`}>
+                    {item.status}
+                  </span>
+                </td>
+                <td>{item.location}</td>
+                <td>{item.nextMaintenance}</td>
+                <td>
+                  <div className="d-flex gap-2">
+                    <button className="btn btn-sm btn-outline-dark">Details</button>
+                    <button id='btn_itp' className="btn btn-sm btn-dark">Schedule</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  const renderServicesSection = () => (
+    <div className="bg-white p-4 rounded shadow-sm">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h6 className="fw-semibold mb-0">Service Schedule</h6>
+      <Link to={"/AddServices"}>  <button id='btn_itp' className="btn btn-dark">+ Schedule Service</button></Link>
+      </div>
+      <div className="d-flex gap-2 mb-4">
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Search services..."
+          style={{ maxWidth: '250px' }}
+        />
+        <select
+          className="form-select"
+          style={{ width: '150px' }}
+        >
+          <option>All Services</option>
+          <option>Maintenance</option>
+          <option>Inspection</option>
+          <option>Repair</option>
+        </select>
+      </div>
+      <div className="table-responsive">
+        <table className="table table-hover align-middle mb-0">
+          <thead className="bg-light">
+            <tr>
+              <th>ID</th>
+              <th>Service Name</th>
+              <th>Provider</th>
+              <th>Schedule</th>
+              <th>Last Service</th>
+              <th>Next Service</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {services.map((service) => (
+              <tr key={service.id}>
+                <td>{service.id}</td>
+                <td>{service.name}</td>
+                <td>{service.provider}</td>
+                <td>{service.schedule}</td>
+                <td>{service.lastService}</td>
+                <td>{service.nextService}</td>
+                <td>
+                  <div className="d-flex gap-2">
+                    <button className="btn btn-sm btn-outline-dark">View</button>
+                    <button id='btn_itp' className="btn btn-sm btn-dark">Reschedule</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'Equipment':
+        return renderEquipmentSection();
+      case 'Services':
+        return renderServicesSection();
+      default:
+        return (
+          <div className="bg-white p-4 rounded shadow-sm">
+            <div  className="d-flex justify-content-between align-items-center mb-4">
+              <h6 className="">Tool Registry</h6>
+              <div className="d-flex gap-2">
+                <select
+                  className="form-select"
+                  value={selectedSite}
+                  onChange={(e) => setSelectedSite(e.target.value)}
+                  style={{ width: '200px' }}
+                >
+                  <option>Main Construction Site</option>
+                  <option>Secondary Site</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Search and Filters */}
+            <div className="d-flex gap-2 mb-4">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search tools..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{ maxWidth: '250px' }}
+              />
+              <select
+                className="form-select"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                style={{ width: '150px' }}
+              >
+                <option>All Status</option>
+                <option>Available</option>
+                <option>In Use</option>
+                <option>Maintenance</option>
+              </select>
+          
+          <Link to={"/AddToolRegistry"} >   <button id='btn_itp' className="btn btn-dark ms-auto">
+                + Add New Tool
+              </button></Link>
+            </div>
+
+            {/* Tools Table */}
+            <div className="table-responsive">
+              <table className="table table-hover align-middle mb-0">
+                <thead className="bg-light">
+                  <tr>
+                    <th>Tool ID</th>
+                    <th>Tool Name</th>
+                    <th>Status</th>
+                    <th>Current User</th>
+                    <th>Check-out Date</th>
+                    <th>Expected Return</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tools.map((tool) => (
+                    <tr key={tool.id}>
+                      <td>{tool.id}</td>
+                      <td>{tool.name}</td>
+                      <td>
+                        <span
+                          className={`badge ${tool.status === 'Available' ? 'bg-success' : 'bg-warning text-dark'}`}
+                        >
+                          {tool.status}
+                        </span>
+                      </td>
+                      <td>{tool.currentUser || '-'}</td>
+                      <td>{tool.checkoutDate || '-'}</td>
+                      <td>{tool.expectedReturn || '-'}</td>
+                      <td>
+                        <div className="d-flex gap-2">
+                          {tool.status === 'Available' ? (
+                            <button id='btn_itp' className="btn btn-sm btn-dark">Check Out</button>
+                          ) : (
+                            <button className="btn btn-sm btn-outline-dark">Return</button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            <div className="d-flex justify-content-between align-items-center mt-4">
+              <div className="text-muted small">
+                Showing 1 to 2 of 2 results
+              </div>
+              <nav>
+                <ul className="pagination pagination-sm mb-0">
+                  <li className="page-item">
+                    <span className="page-link">1</span>
+                  </li>
+                  <li className="page-item">
+                    <span className="page-link">2</span>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="container-fluid px-4 py-4">
+      {/* Statistics Overview */}
+      <div className="row g-3 mb-4">
+        <div className="col-md-3">
+          <div className="bg-white p-3 rounded shadow-sm">
+            <div className="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 className="text-muted mb-1">Total Equipment</h6>
+                <h3 className="mb-0">248</h3>
+              </div>
+              <div className="bg-light rounded p-2">
+                <i className="fas fa-tools fa-lg text-dark"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-3">
+          <div className="bg-white p-3 rounded shadow-sm">
+            <div className="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 className="text-muted mb-1">Active Equipment</h6>
+                <h3 className="mb-0">186</h3>
+              </div>
+              <div className="bg-light rounded p-2">
+                <i className="fas fa-check-circle fa-lg text-success"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-3">
+          <div className="bg-white p-3 rounded shadow-sm">
+            <div className="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 className="text-muted mb-1">Total Tools</h6>
+                <h3 className="mb-0">127</h3>
+              </div>
+              <div className="bg-light rounded p-2">
+                <i className="fas fa-wrench fa-lg text-warning"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-3">
+          <div className="bg-white p-3 rounded shadow-sm">
+            <div className="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 className="text-muted mb-1">Checked Out</h6>
+                <h3 className="mb-0">30</h3>
+              </div>
+              <div className="bg-light rounded p-2">
+                <i className="fas fa-sign-out-alt fa-lg text-primary"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+{/* Tab Navigation */}
+<div className="nav nav-tabs mb-4">
+        <button
+          className={`nav-link ${activeTab === 'Tool Registry' ? 'active' : ''}`}
+          onClick={() => setActiveTab('Tool Registry')}
+        >
+          Tool Registry
+        </button>
+        <button
+          className={`nav-link ${activeTab === 'Equipment' ? 'active' : ''}`}
+          onClick={() => setActiveTab('Equipment')}
+        >
+          Equipment
+        </button>
+        <button
+          className={`nav-link ${activeTab === 'Services' ? 'active' : ''}`}
+          onClick={() => setActiveTab('Services')}
+          
+        >
+          Services
+        </button>
+      </div>
+
+  {/* Dynamic Content */}
+  {renderContent()}
+    </div>
+  );
+}
+
+export default PlantMachinery;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function ITPs() {
+ 
+
+  return (
+    <div className="p-4">
+      <h5 className="mb-4 fw-normal">ITP Analytics Overview</h5>
+      <div className="row g-4">
+        {/* Total ITPs */}
+        <div className="col-md-4">
+          <div className="card border-0 h-100 bg-primary bg-opacity-10">
+            <div className="card-body p-1">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h6 className="mb-2 text-muted fw-normal">Total ITPs</h6>
+                  <h2 className="mb-0 fw-bold text-primary fs-1">
+                    {analytics.totalITPs.current}
+                  </h2>
+                </div>
+                <div className="rounded-circle p-3 bg-primary bg-opacity-25">
+                  <i className="fas fa-file-alt text-primary fs-4"></i>
+                </div>
+              </div>
+              <div className="text-muted small">
+                vs last month: {analytics.totalITPs.lastMonth}
+                <span className="ms-2">
+                  <i
+                    className={`fas fa-arrow-${
+                      analytics.totalITPs.percentageChange >= 0
+                        ? 'up text-success'
+                        : 'down text-danger'
+                    }`}
+                  ></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Approval Rate */}
+        <div className="col-md-4">
+          <div className="card border-0 h-100 bg-success bg-opacity-10">
+            <div className="card-body p-4">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h6 className="mb-2 text-muted fw-normal">Approval Rate</h6>
+                  <h2 className="mb-0 fw-bold text-success fs-1">
+                    {analytics.approvalRate.current}%
+                  </h2>
+                </div>
+                <div className="rounded-circle p-3 bg-success bg-opacity-25">
+                  <i className="fas fa-check-circle text-success fs-4"></i>
+                </div>
+              </div>
+              <div className="text-muted small">
+                vs last month: {analytics.approvalRate.lastMonth}%
+                <span className="ms-2">
+                  <i
+                    className={`fas fa-arrow-${
+                      analytics.approvalRate.percentageChange >= 0
+                        ? 'up text-success'
+                        : 'down text-danger'
+                    }`}
+                  ></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Pending ITPs */}
+        <div className="col-md-4">
+          <div className="card border-0 h-100 bg-warning bg-opacity-10">
+            <div className="card-body p-4">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h6 className="mb-2 text-muted fw-normal">Pending ITPs</h6>
+                  <h2 className="mb-0 fw-bold text-warning fs-1">
+                    {analytics.pendingITPs.current}
+                  </h2>
+                </div>
+                <div className="rounded-circle p-3 bg-warning bg-opacity-25">
+                  <i className="fas fa-clock text-warning fs-4"></i>
+                </div>
+              </div>
+              <div className="text-muted small">
+                vs last month: {analytics.pendingITPs.lastMonth}
+                <span className="ms-2">
+                  <i
+                    className={`fas fa-arrow-${
+                      analytics.pendingITPs.percentageChange >= 0
+                        ? 'up text-success'
+                        : 'down text-danger'
+                    }`}
+                  ></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default ITPs;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useState, useMemo } from 'react';
+import './ITPs.css';
+
+function ITPs() {
+
+  const analytics = {
+    totalITPs: {
+      current: 42,
+      lastMonth: 38,
+      percentageChange: 10,
+    },
+    approvalRate: {
+      current: 68,
+      lastMonth: 62,
+      percentageChange: 6,
+    },
+    pendingITPs: {
+      current: 15,
+      lastMonth: 18,
+      percentageChange: -3,
+    },
+  };
+
+  const itemsPerPage = 6;
+  const [itpData] = useState([
+    {
+      id: 1,
+      documentName: 'Concrete Strength Test',
+      status: 'Approved',
+      assignedTo: { name: 'John Smith', initials: 'JS' },
+      submissionDate: 'Apr 10, 2025',
+      dueDate: 'Apr 25, 2025',
+      comments: 'All test parameters are within acceptable ranges.',
+    },
+    {
+      id: 2,
+      documentName: 'Structural Steel Inspection',
+      status: 'Pending',
+      assignedTo: { name: 'Emily Johnson', initials: 'EJ' },
+      submissionDate: 'Apr 12, 2025',
+      dueDate: 'Apr 27, 2025',
+      comments: 'Waiting for additional documentation from contractor.',
+    },
+    {
+      id: 3,
+      documentName: 'Electrical Systems Test',
+      status: 'Under Review',
+      assignedTo: { name: 'Michael Chen', initials: 'MC' },
+      submissionDate: 'Apr 15, 2025',
+      dueDate: 'Apr 22, 2025',
+      comments: 'Some inconsistencies found in the test results.',
+    },
+    {
+      id: 4,
+      documentName: 'HVAC Performance Test',
+      status: 'Approved',
+      assignedTo: { name: 'Sarah Williams', initials: 'SW' },
+      submissionDate: 'Apr 8, 2025',
+      dueDate: 'Apr 20, 2025',
+      comments: 'All systems functioning as per specifications.',
+    },
+    {
+      id: 5,
+      documentName: 'Plumbing Pressure Test',
+      status: 'Pending',
+      assignedTo: { name: 'Robert Davis', initials: 'RD' },
+      submissionDate: 'Apr 14, 2025',
+      dueDate: 'Apr 28, 2025',
+      comments: 'Awaiting final pressure test results.',
+    },
+    {
+      id: 6,
+      documentName: 'Fire Safety Inspection',
+      status: 'Under Review',
+      assignedTo: { name: 'Jennifer Lee', initials: 'JL' },
+      submissionDate: 'Apr 16, 2025',
+      dueDate: 'Apr 23, 2025',
+      comments: 'Some fire extinguishers need replacement.',
+    },
+  ]);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedStatus, setSelectedStatus] = useState('All Statuses');
+  const [selectedAssignee, setSelectedAssignee] = useState('All Assignees');
+
+  const filteredData = useMemo(() => {
+    return itpData.filter(item => {
+      const matchesSearch =
+        item.documentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.comments.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus =
+        selectedStatus === 'All Statuses' || item.status === selectedStatus;
+      const matchesAssignee =
+        selectedAssignee === 'All Assignees' || item.assignedTo.name === selectedAssignee;
+      return matchesSearch && matchesStatus && matchesAssignee;
+    });
+  }, [itpData, searchQuery, selectedStatus, selectedAssignee]);
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
+
+  const getStatusBadgeClass = (status) => {
+    switch (status) {
+      case 'Approved':
+        return 'bg-success';
+      case 'Pending':
+        return 'bg-warning text-dark';
+      case 'Under Review':
+        return 'bg-primary';
+      default:
+        return 'bg-secondary';
+    }
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(Math.min(Math.max(1, page), totalPages));
+  };
+
+  const renderPaginationItems = () => {
+    const items = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    if (startPage > 1) {
+      items.push(
+        <li key="first" className="page-item">
+          <button className="page-link" onClick={() => handlePageChange(1)}>
+            1
+          </button>
+        </li>
+      );
+      if (startPage > 2) {
+        items.push(
+          <li key="dots-1" className="page-item disabled">
+            <button className="page-link">...</button>
+          </li>
+        );
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      items.push(
+        <li key={i} className={`page-item ${currentPage === i ? 'active' : ''}`}>
+          <button className="page-link" onClick={() => handlePageChange(i)}>
+            {i}
+          </button>
+        </li>
+      );
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        items.push(
+          <li key="dots-2" className="page-item disabled">
+            <button className="page-link">...</button>
+          </li>
+        );
+      }
+      items.push(
+        <li key="last" className="page-item">
+          <button className="page-link" onClick={() => handlePageChange(totalPages)}>
+            {totalPages}
+          </button>
+        </li>
+      );
+    }
+
+    return items;
+  };
+
+  return (
+    <div className="p-4">
+      <h5 className="mb-4 fw-normal">ITP Analytics Overview</h5>
+      <div className="row g-4">
+        {/* Total ITPs */}
+        <div className="col-md-4">
+          <div className="card border-0 h-100 bg-primary bg-opacity-10">
+            <div className="card-body p-4 " >
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h6 className="mb-2 text-muted fw-normal">Total ITPs</h6>
+                  <h2 className="mb-0 fw-bold text-primary fs-1">
+                    {analytics.totalITPs.current}
+                  </h2>
+                </div>
+                <div className="rounded-circle p-3 bg-primary bg-opacity-25">
+                  <i className="fas fa-file-alt text-primary fs-4"></i>
+                </div>
+              </div>
+              <div className="text-muted small">
+                vs last month: {analytics.totalITPs.lastMonth}
+                <span className="ms-2">
+                  <i
+                    className={`fas fa-arrow-${
+                      analytics.totalITPs.percentageChange >= 0
+                        ? 'up text-success'
+                        : 'down text-danger'
+                    }`}
+                  ></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Approval Rate */}
+        <div className="col-md-4">
+          <div className="card border-0 h-100 bg-success bg-opacity-10">
+            <div className="card-body p-4">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h6 className="mb-2 text-muted fw-normal">Approval Rate</h6>
+                  <h2 className="mb-0 fw-bold text-success fs-1">
+                    {analytics.approvalRate.current}%
+                  </h2>
+                </div>
+                <div className="rounded-circle p-3 bg-success bg-opacity-25">
+                  <i className="fas fa-check-circle text-success fs-4"></i>
+                </div>
+              </div>
+              <div className="text-muted small">
+                vs last month: {analytics.approvalRate.lastMonth}%
+                <span className="ms-2">
+                  <i
+                    className={`fas fa-arrow-${
+                      analytics.approvalRate.percentageChange >= 0
+                        ? 'up text-success'
+                        : 'down text-danger'
+                    }`}
+                  ></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Pending ITPs */}
+        <div className="col-md-4">
+          <div className="card border-0 h-100 bg-warning bg-opacity-10">
+            <div className="card-body p-4">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h6 className="mb-2 text-muted fw-normal">Pending ITPs</h6>
+                  <h2 className="mb-0 fw-bold text-warning fs-1">
+                    {analytics.pendingITPs.current}
+                  </h2>
+                </div>
+                <div className="rounded-circle p-3 bg-warning bg-opacity-25">
+                  <i className="fas fa-clock text-warning fs-4"></i>
+                </div>
+              </div>
+              <div className="text-muted small">
+                vs last month: {analytics.pendingITPs.lastMonth}
+                <span className="ms-2">
+                  <i
+                    className={`fas fa-arrow-${
+                      analytics.pendingITPs.percentageChange >= 0
+                        ? 'up text-success'
+                        : 'down text-danger'
+                    }`}
+                  ></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+      {/* ITP Records Table */}
+      <div className="mt-4">
+        <div className="filters-section">
+          <input
+            type="text"
+            className="form-control search-box"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <div className="filters-group">
+            <select
+              className="form-select"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+            >
+              <option>All Statuses</option>
+              <option>Approved</option>
+              <option>Pending</option>
+              <option>Under Review</option>
+            </select>
+            <select
+              className="form-select"
+              value={selectedAssignee}
+              onChange={(e) => setSelectedAssignee(e.target.value)}
+            >
+              <option>All Assignees</option>
+              <option>John Smith</option>
+              <option>Emily Johnson</option>
+              <option>Michael Chen</option>
+              <option>Sarah Williams</option>
+              <option>Robert Davis</option>
+              <option>Jennifer Lee</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="table-responsive">
+          <table className="table table-hover align-middle border-top">
+            <thead>
+              <tr>
+                <th>DOCUMENT NAME</th>
+                <th>STATUS</th>
+                <th>ASSIGNED TO</th>
+                <th>SUBMISSION DATE</th>
+                <th>DUE DATE</th>
+                <th>COMMENTS</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedData.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.documentName}</td>
+                  <td>
+                    <span className={`badge ${getStatusBadgeClass(item.status)}`}>
+                      {item.status}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="d-flex align-items-center gap-2">
+                      <div className="avatar-circle">
+                        {item.assignedTo.initials}
+                      </div>
+                      <span className="text-body">{item.assignedTo.name}</span>
+                    </div>
+                  </td>
+                  <td>{item.submissionDate}</td>
+                  <td className={item.dueDate.includes('20') ? 'text-warning' : ''}>
+                    {item.dueDate}
+                  </td>
+                  <td className="text-muted">{item.comments}</td>
+                  <td>
+                    <div className="action-buttons">
+                      <button className="btn btn-sm btn-outline-primary">
+                        <i className="fas fa-eye"></i>
+                      </button>
+                      <button className="btn btn-sm btn-outline-secondary">
+                        <i className="fas fa-edit"></i>
+                      </button>
+                      <button className="btn btn-sm btn-outline-danger">
+                        <i className="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="d-flex justify-content-between align-items-center mt-3">
+          <div className="results-counter">
+            Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredData.length)} of{' '}
+            {filteredData.length} results
+          </div>
+          <nav>
+            <ul className="pagination mb-0">
+              <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                <button className="page-link" onClick={() => handlePageChange(currentPage - 1)}>
+                  &laquo;
+                </button>
+              </li>
+              {renderPaginationItems()}
+              <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                <button className="page-link" onClick={() => handlePageChange(currentPage + 1)}>
+                  &raquo;
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default ITPs;
+
+
+
+
+const pieChartData = [
+  { name: "< 24 hrs", value: 40, color: "#3366CC" },
+  { name: "1-3 days", value: 30, color: "#109618" },
+  { name: "3-7 days", value: 20, color: "#FF9900" },
+  { name: "> 7 days", value: 10, color: "#DC3912" },
+];
+
+
+
+
+import {
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Cell,
+} from "recharts";
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useState, useMemo } from 'react';
+import './ITPs.css';
+
+function ITPs() {
+
+  const analytics = {
+    totalITPs: {
+      current: 42,
+      lastMonth: 38,
+      percentageChange: 10,
+    },
+    approvalRate: {
+      current: 68,
+      lastMonth: 62,
+      percentageChange: 6,
+    },
+    pendingITPs: {
+      current: 15,
+      lastMonth: 18,
+      percentageChange: -3,
+    },
+    submissionMetrics: {
+      averageTime: {
+        current: 4.2,
+        previous: 4.5,
+      },
+      lateSubmissions: {
+        current: 7,
+        previous: 9,
+      },
+      onTimeRate: 93,
+    },
+  };
+
+  const itemsPerPage = 6;
+  const [itpData] = useState([
+    {
+      id: 1,
+      documentName: 'Concrete Strength Test',
+      status: 'Approved',
+      assignedTo: { name: 'John Smith', initials: 'JS' },
+      submissionDate: 'Apr 10, 2025',
+      dueDate: 'Apr 25, 2025',
+      comments: 'All test parameters are within acceptable ranges.',
+    },
+    {
+      id: 2,
+      documentName: 'Structural Steel Inspection',
+      status: 'Pending',
+      assignedTo: { name: 'Emily Johnson', initials: 'EJ' },
+      submissionDate: 'Apr 12, 2025',
+      dueDate: 'Apr 27, 2025',
+      comments: 'Waiting for additional documentation from contractor.',
+    },
+    {
+      id: 3,
+      documentName: 'Electrical Systems Test',
+      status: 'Under Review',
+      assignedTo: { name: 'Michael Chen', initials: 'MC' },
+      submissionDate: 'Apr 15, 2025',
+      dueDate: 'Apr 22, 2025',
+      comments: 'Some inconsistencies found in the test results.',
+    },
+    {
+      id: 4,
+      documentName: 'HVAC Performance Test',
+      status: 'Approved',
+      assignedTo: { name: 'Sarah Williams', initials: 'SW' },
+      submissionDate: 'Apr 8, 2025',
+      dueDate: 'Apr 20, 2025',
+      comments: 'All systems functioning as per specifications.',
+    },
+    {
+      id: 5,
+      documentName: 'Plumbing Pressure Test',
+      status: 'Pending',
+      assignedTo: { name: 'Robert Davis', initials: 'RD' },
+      submissionDate: 'Apr 14, 2025',
+      dueDate: 'Apr 28, 2025',
+      comments: 'Awaiting final pressure test results.',
+    },
+    {
+      id: 6,
+      documentName: 'Fire Safety Inspection',
+      status: 'Under Review',
+      assignedTo: { name: 'Jennifer Lee', initials: 'JL' },
+      submissionDate: 'Apr 16, 2025',
+      dueDate: 'Apr 23, 2025',
+      comments: 'Some fire extinguishers need replacement.',
+    },
+  ]);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedStatus, setSelectedStatus] = useState('All Statuses');
+  const [selectedAssignee, setSelectedAssignee] = useState('All Assignees');
+
+  const filteredData = useMemo(() => {
+    return itpData.filter(item => {
+      const matchesSearch =
+        item.documentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.comments.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus =
+        selectedStatus === 'All Statuses' || item.status === selectedStatus;
+      const matchesAssignee =
+        selectedAssignee === 'All Assignees' || item.assignedTo.name === selectedAssignee;
+      return matchesSearch && matchesStatus && matchesAssignee;
+    });
+  }, [itpData, searchQuery, selectedStatus, selectedAssignee]);
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
+
+  const getStatusBadgeClass = (status) => {
+    switch (status) {
+      case 'Approved':
+        return 'bg-success';
+      case 'Pending':
+        return 'bg-warning text-dark';
+      case 'Under Review':
+        return 'bg-primary';
+      default:
+        return 'bg-secondary';
+    }
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(Math.min(Math.max(1, page), totalPages));
+  };
+
+  const renderPaginationItems = () => {
+    const items = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    if (startPage > 1) {
+      items.push(
+        <li key="first" className="page-item">
+          <button className="page-link" onClick={() => handlePageChange(1)}>
+            1
+          </button>
+        </li>
+      );
+      if (startPage > 2) {
+        items.push(
+          <li key="dots-1" className="page-item disabled">
+            <button className="page-link">...</button>
+          </li>
+        );
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      items.push(
+        <li key={i} className={`page-item ${currentPage === i ? 'active' : ''}`}>
+          <button className="page-link" onClick={() => handlePageChange(i)}>
+            {i}
+          </button>
+        </li>
+      );
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        items.push(
+          <li key="dots-2" className="page-item disabled">
+            <button className="page-link">...</button>
+          </li>
+        );
+      }
+      items.push(
+        <li key="last" className="page-item">
+          <button className="page-link" onClick={() => handlePageChange(totalPages)}>
+            {totalPages}
+          </button>
+        </li>
+      );
+    }
+
+    return items;
+  };
+
+  return (
+    <div className="p-4">
+      <h5 className="mb-4 fw-normal">ITP Analytics Overview</h5>
+      <div className="row g-4">
+        {/* Total ITPs */}
+        <div className="col-md-4">
+          <div className="card border-0 h-100 bg-primary bg-opacity-10">
+            <div className="card-body p-4 " >
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h6 className="mb-2 text-muted fw-normal">Total ITPs</h6>
+                  <h2 className="mb-0 fw-bold text-primary fs-1">
+                    {analytics.totalITPs.current}
+                  </h2>
+                </div>
+                <div className="rounded-circle p-3 bg-primary bg-opacity-25">
+                  <i className="fas fa-file-alt text-primary fs-4"></i>
+                </div>
+              </div>
+              <div className="text-muted small">
+                vs last month: {analytics.totalITPs.lastMonth}
+                <span className="ms-2">
+                  <i
+                    className={`fas fa-arrow-${
+                      analytics.totalITPs.percentageChange >= 0
+                        ? 'up text-success'
+                        : 'down text-danger'
+                    }`}
+                  ></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Approval Rate */}
+     <div className="col-md-4">
+  <div className="card border-0 h-100 bg-light">
+    <div className="card-body p-4">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h6 className="mb-2 text-muted fw-normal">Approval Rate</h6>
+          <h2 className="mb-0 fw-bold text-primary fs-1">
+            {analytics.approvalRate.current}%
+          </h2>
+        </div>
+        <div className="rounded-circle p-3 bg-primary bg-opacity-25">
+          <i className="fas fa-check-circle text-primary fs-4"></i>
+        </div>
+      </div>
+      <div className="text-muted small">
+        vs last month: {analytics.approvalRate.lastMonth}%
+        <span className="ms-2">
+          <i
+            className={`fas fa-arrow-${
+              analytics.approvalRate.percentageChange >= 0
+                ? 'up text-success'
+                : 'down text-danger'
+            }`}
+          ></i>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+        {/* Pending ITPs */}
+        <div className="col-md-4">
+          <div className="card border-0 h-100 bg-warning bg-opacity-10">
+            <div className="card-body p-4">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h6 className="mb-2 text-muted fw-normal">Pending ITPs</h6>
+                  <h2 className="mb-0 fw-bold text-warning fs-1">
+                    {analytics.pendingITPs.current}
+                  </h2>
+                </div>
+                <div className="rounded-circle p-3 bg-warning bg-opacity-25">
+                  <i className="fas fa-clock text-warning fs-4"></i>
+                </div>
+              </div>
+              <div className="text-muted small">
+                vs last month: {analytics.pendingITPs.lastMonth}
+                <span className="ms-2">
+                  <i
+                    className={`fas fa-arrow-${
+                      analytics.pendingITPs.percentageChange >= 0
+                        ? 'up text-success'
+                        : 'down text-danger'
+                    }`}
+                  ></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Approval Rate and Submission Metrics */}
+      <div className="row mt-4 g-4">
+        <div className="col-md-6">
+          <div className="card border-0 h-100">
+            <div className="card-body p-4">
+              <h6 className="mb-4 fw-normal">Approval Rate</h6>
+              <div className="text-center">
+                <h2 className="display-4 fw-bold mb-3">{analytics.approvalRate.current}%</h2>
+                <p className="text-muted mb-0">{analytics.approvalRate.current}% of ITPs have been approved, compared to {analytics.approvalRate.lastMonth}% last month.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-md-6">
+          <div className="card border-0 h-100">
+            <div className="card-body p-4">
+              <h6 className="mb-4 fw-normal">Submission Metrics</h6>
+              <div className="mb-4">
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                  <span className="text-muted">Average Submission Time</span>
+                  <span className="text-success">
+                    <i className="fas fa-arrow-up me-1"></i>
+                    Previous: {analytics.submissionMetrics.averageTime.previous} days
+                  </span>
+                </div>
+                <h3 className="mb-0 fw-bold">{analytics.submissionMetrics.averageTime.current} days</h3>
+              </div>
+
+              <div className="mb-4">
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                  <span className="text-muted">Late Submissions</span>
+                  <span className="text-success">
+                    <i className="fas fa-arrow-up me-1"></i>
+                    Previous: {analytics.submissionMetrics.lateSubmissions.previous}
+                  </span>
+                </div>
+                <h3 className="mb-0 fw-bold">{analytics.submissionMetrics.lateSubmissions.current}</h3>
+              </div>
+
+              <div>
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                  <span className="text-muted">On-time Submission Rate</span>
+                  <span className="fw-bold">{analytics.submissionMetrics.onTimeRate}%</span>
+                </div>
+                <div className="progress" style={{ height: '8px' }}>
+                  <div
+                    className="progress-bar bg-primary"
+                    role="progressbar"
+                    style={{ width: `${analytics.submissionMetrics.onTimeRate}%` }}
+                    aria-valuenow={analytics.submissionMetrics.onTimeRate}
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ITP Records Table */}
+      <div className="mt-4">
+        <div className="filters-section">
+          <input
+            type="text"
+            className="form-control search-box"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <div className="filters-group">
+            <select
+              className="form-select"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+            >
+              <option>All Statuses</option>
+              <option>Approved</option>
+              <option>Pending</option>
+              <option>Under Review</option>
+            </select>
+            <select
+              className="form-select"
+              value={selectedAssignee}
+              onChange={(e) => setSelectedAssignee(e.target.value)}
+            >
+              <option>All Assignees</option>
+              <option>John Smith</option>
+              <option>Emily Johnson</option>
+              <option>Michael Chen</option>
+              <option>Sarah Williams</option>
+              <option>Robert Davis</option>
+              <option>Jennifer Lee</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="table-responsive">
+          <table className="table table-hover align-middle border-top">
+            <thead>
+              <tr>
+                <th>DOCUMENT NAME</th>
+                <th>STATUS</th>
+                <th>ASSIGNED TO</th>
+                <th>SUBMISSION DATE</th>
+                <th>DUE DATE</th>
+                <th>COMMENTS</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedData.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.documentName}</td>
+                  <td>
+                    <span className={`badge ${getStatusBadgeClass(item.status)}`}>
+                      {item.status}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="d-flex align-items-center gap-2">
+                      <div className="avatar-circle">
+                        {item.assignedTo.initials}
+                      </div>
+                      <span className="text-body">{item.assignedTo.name}</span>
+                    </div>
+                  </td>
+                  <td>{item.submissionDate}</td>
+                  <td className={item.dueDate.includes('20') ? 'text-warning' : ''}>
+                    {item.dueDate}
+                  </td>
+                  <td className="text-muted">{item.comments}</td>
+                  <td>
+                    <div className="action-buttons">
+                      <button className="btn btn-sm btn-outline-primary">
+                        <i className="fas fa-eye"></i>
+                      </button>
+                      <button className="btn btn-sm btn-outline-secondary">
+                        <i className="fas fa-edit"></i>
+                      </button>
+                      <button className="btn btn-sm btn-outline-danger">
+                        <i className="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="d-flex justify-content-between align-items-center mt-3">
+          <div className="results-counter">
+            Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredData.length)} of{' '}
+            {filteredData.length} results
+          </div>
+          <nav>
+            <ul className="pagination mb-0">
+              <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                <button className="page-link" onClick={() => handlePageChange(currentPage - 1)}>
+                  &laquo;
+                </button>
+              </li>
+              {renderPaginationItems()}
+              <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                <button className="page-link" onClick={() => handlePageChange(currentPage + 1)}>
+                  &raquo;
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default ITPs;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ////////////
+import React, { useState, useMemo } from 'react';
+import './ITPs.css';
+
+import {
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Cell,
+} from "recharts";
+import {
+  FaClipboard,
+  FaClock,
+  FaCheckCircle,
+  FaExclamationCircle,
+} from "react-icons/fa";
+
+
+const lineChartData = [
+  { month: "Jan", Submitted: 20, Resolved: 18 },
+  { month: "Feb", Submitted: 30, Resolved: 25 },
+  { month: "Mar", Submitted: 40, Resolved: 38 },
+  { month: "Apr", Submitted: 50, Resolved: 48 },
+  { month: "May", Submitted: 45, Resolved: 42 },
+  { month: "Jun", Submitted: 30, Resolved: 28 },
+];
+
+const pieChartData = [
+  { name: "< 24 hrs", value: 40, color: "#3366CC" },
+  { name: "1-3 days", value: 30, color: "#109618" },
+  { name: "3-7 days", value: 20, color: "#FF9900" },
+  { name: "> 7 days", value: 10, color: "#DC3912" },
+];
+
+function ITPs() {
+
+  const analytics = {
+    totalITPs: {
+      current: 42,
+      lastMonth: 38,
+      percentageChange: 10,
+    },
+    approvalRate: {
+      current: 68,
+      lastMonth: 62,
+      percentageChange: 6,
+    },
+    pendingITPs: {
+      current: 15,
+      lastMonth: 18,
+      percentageChange: -3,
+    },
+  };
+
+  const itemsPerPage = 6;
+  const [itpData] = useState([
+    {
+      id: 1,
+      documentName: 'Concrete Strength Test',
+      status: 'Approved',
+      assignedTo: { name: 'John Smith', initials: 'JS' },
+      submissionDate: 'Apr 10, 2025',
+      dueDate: 'Apr 25, 2025',
+      comments: 'All test parameters are within acceptable ranges.',
+    },
+    {
+      id: 2,
+      documentName: 'Structural Steel Inspection',
+      status: 'Pending',
+      assignedTo: { name: 'Emily Johnson', initials: 'EJ' },
+      submissionDate: 'Apr 12, 2025',
+      dueDate: 'Apr 27, 2025',
+      comments: 'Waiting for additional documentation from contractor.',
+    },
+    {
+      id: 3,
+      documentName: 'Electrical Systems Test',
+      status: 'Under Review',
+      assignedTo: { name: 'Michael Chen', initials: 'MC' },
+      submissionDate: 'Apr 15, 2025',
+      dueDate: 'Apr 22, 2025',
+      comments: 'Some inconsistencies found in the test results.',
+    },
+    {
+      id: 4,
+      documentName: 'HVAC Performance Test',
+      status: 'Approved',
+      assignedTo: { name: 'Sarah Williams', initials: 'SW' },
+      submissionDate: 'Apr 8, 2025',
+      dueDate: 'Apr 20, 2025',
+      comments: 'All systems functioning as per specifications.',
+    },
+    {
+      id: 5,
+      documentName: 'Plumbing Pressure Test',
+      status: 'Pending',
+      assignedTo: { name: 'Robert Davis', initials: 'RD' },
+      submissionDate: 'Apr 14, 2025',
+      dueDate: 'Apr 28, 2025',
+      comments: 'Awaiting final pressure test results.',
+    },
+    {
+      id: 6,
+      documentName: 'Fire Safety Inspection',
+      status: 'Under Review',
+      assignedTo: { name: 'Jennifer Lee', initials: 'JL' },
+      submissionDate: 'Apr 16, 2025',
+      dueDate: 'Apr 23, 2025',
+      comments: 'Some fire extinguishers need replacement.',
+    },
+  ]);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedStatus, setSelectedStatus] = useState('All Statuses');
+  const [selectedAssignee, setSelectedAssignee] = useState('All Assignees');
+
+  const filteredData = useMemo(() => {
+    return itpData.filter(item => {
+      const matchesSearch =
+        item.documentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.comments.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus =
+        selectedStatus === 'All Statuses' || item.status === selectedStatus;
+      const matchesAssignee =
+        selectedAssignee === 'All Assignees' || item.assignedTo.name === selectedAssignee;
+      return matchesSearch && matchesStatus && matchesAssignee;
+    });
+  }, [itpData, searchQuery, selectedStatus, selectedAssignee]);
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
+
+  const getStatusBadgeClass = (status) => {
+    switch (status) {
+      case 'Approved':
+        return 'bg-success';
+      case 'Pending':
+        return 'bg-warning text-dark';
+      case 'Under Review':
+        return 'bg-primary';
+      default:
+        return 'bg-secondary';
+    }
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(Math.min(Math.max(1, page), totalPages));
+  };
+
+  const renderPaginationItems = () => {
+    const items = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    if (startPage > 1) {
+      items.push(
+        <li key="first" className="page-item">
+          <button className="page-link" onClick={() => handlePageChange(1)}>
+            1
+          </button>
+        </li>
+      );
+      if (startPage > 2) {
+        items.push(
+          <li key="dots-1" className="page-item disabled">
+            <button className="page-link">...</button>
+          </li>
+        );
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      items.push(
+        <li key={i} className={`page-item ${currentPage === i ? 'active' : ''}`}>
+          <button className="page-link" onClick={() => handlePageChange(i)}>
+            {i}
+          </button>
+        </li>
+      );
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        items.push(
+          <li key="dots-2" className="page-item disabled">
+            <button className="page-link">...</button>
+          </li>
+        );
+      }
+      items.push(
+        <li key="last" className="page-item">
+          <button className="page-link" onClick={() => handlePageChange(totalPages)}>
+            {totalPages}
+          </button>
+        </li>
+      );
+    }
+
+    return items;
+  };
+
+  return (
+    <div className="p-4">
+      <h5 className="mb-4 fw-normal">ITP Analytics Overview</h5>
+      <div className="row g-4">
+        {/* Total ITPs */}
+        <div className="col-md-4">
+          <div className="card border-0 h-100 bg-primary bg-opacity-10">
+            <div className="card-body p-4 " >
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h6 className="mb-2 text-muted fw-normal">Total ITPs</h6>
+                  <h2 className="mb-0 fw-bold text-primary fs-1">
+                    {analytics.totalITPs.current}
+                  </h2>
+                </div>
+                <div className="rounded-circle p-3 bg-primary bg-opacity-25">
+                  <i className="fas fa-file-alt text-primary fs-4"></i>
+                </div>
+              </div>
+              <div className="text-muted small">
+                vs last month: {analytics.totalITPs.lastMonth}
+                <span className="ms-2">
+                  <i
+                    className={`fas fa-arrow-${
+                      analytics.totalITPs.percentageChange >= 0
+                        ? 'up text-success'
+                        : 'down text-danger'
+                    }`}
+                  ></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+    {/* Charts Section */}
+    <div className="row mb-4 g-4">
+          <div className="col-md-8">
+            <div className="card p-3 shadow-sm">
+              <h5 className="mb-4">RFI Trends</h5>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={lineChartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="Submitted"
+                    stroke="#3366CC"
+                    strokeWidth={2}
+                    activeDot={{ r: 6 }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="Resolved"
+                    stroke="#109618"
+                    strokeWidth={2}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+          <div className="col-md-4">
+            <div className="card p-3 shadow-sm">
+              <h5 className="mb-4">Resolution Time</h5>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={pieChartData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={90}
+                    innerRadius={50}
+                    label
+                  >
+                    {pieChartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+        {/* Approval Rate */}
+        <div className="col-md-4">
+          <div className="card border-0 h-100 bg-success bg-opacity-10">
+            <div className="card-body p-4">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h6 className="mb-2 text-muted fw-normal">Approval Rate</h6>
+                  <h2 className="mb-0 fw-bold text-success fs-1">
+                    {analytics.approvalRate.current}%
+                  </h2>
+                </div>
+                <div className="rounded-circle p-3 bg-success bg-opacity-25">
+                  <i className="fas fa-check-circle text-success fs-4"></i>
+                </div>
+              </div>
+              <div className="text-muted small">
+                vs last month: {analytics.approvalRate.lastMonth}%
+                <span className="ms-2">
+                  <i
+                    className={`fas fa-arrow-${
+                      analytics.approvalRate.percentageChange >= 0
+                        ? 'up text-success'
+                        : 'down text-danger'
+                    }`}
+                  ></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Pending ITPs */}
+        <div className="col-md-4">
+          <div className="card border-0 h-100 bg-warning bg-opacity-10">
+            <div className="card-body p-4">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h6 className="mb-2 text-muted fw-normal">Pending ITPs</h6>
+                  <h2 className="mb-0 fw-bold text-warning fs-1">
+                    {analytics.pendingITPs.current}
+                  </h2>
+                </div>
+                <div className="rounded-circle p-3 bg-warning bg-opacity-25">
+                  <i className="fas fa-clock text-warning fs-4"></i>
+                </div>
+              </div>
+              <div className="text-muted small">
+                vs last month: {analytics.pendingITPs.lastMonth}
+                <span className="ms-2">
+                  <i
+                    className={`fas fa-arrow-${
+                      analytics.pendingITPs.percentageChange >= 0
+                        ? 'up text-success'
+                        : 'down text-danger'
+                    }`}
+                  ></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+      {/* ITP Records Table */}
+      <div className="mt-4">
+        <div className="filters-section">
+          <input
+            type="text"
+            className="form-control search-box"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <div className="filters-group">
+            <select
+              className="form-select"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+            >
+              <option>All Statuses</option>
+              <option>Approved</option>
+              <option>Pending</option>
+              <option>Under Review</option>
+            </select>
+            <select
+              className="form-select"
+              value={selectedAssignee}
+              onChange={(e) => setSelectedAssignee(e.target.value)}
+            >
+              <option>All Assignees</option>
+              <option>John Smith</option>
+              <option>Emily Johnson</option>
+              <option>Michael Chen</option>
+              <option>Sarah Williams</option>
+              <option>Robert Davis</option>
+              <option>Jennifer Lee</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="table-responsive">
+          <table className="table table-hover align-middle border-top">
+            <thead>
+              <tr>
+                <th>DOCUMENT NAME</th>
+                <th>STATUS</th>
+                <th>ASSIGNED TO</th>
+                <th>SUBMISSION DATE</th>
+                <th>DUE DATE</th>
+                <th>COMMENTS</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedData.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.documentName}</td>
+                  <td>
+                    <span className={`badge ${getStatusBadgeClass(item.status)}`}>
+                      {item.status}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="d-flex align-items-center gap-2">
+                      <div className="avatar-circle">
+                        {item.assignedTo.initials}
+                      </div>
+                      <span className="text-body">{item.assignedTo.name}</span>
+                    </div>
+                  </td>
+                  <td>{item.submissionDate}</td>
+                  <td className={item.dueDate.includes('20') ? 'text-warning' : ''}>
+                    {item.dueDate}
+                  </td>
+                  <td className="text-muted">{item.comments}</td>
+                  <td>
+                    <div className="action-buttons">
+                      <button className="btn btn-sm btn-outline-primary">
+                        <i className="fas fa-eye"></i>
+                      </button>
+                      <button className="btn btn-sm btn-outline-secondary">
+                        <i className="fas fa-edit"></i>
+                      </button>
+                      <button className="btn btn-sm btn-outline-danger">
+                        <i className="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="d-flex justify-content-between align-items-center mt-3">
+          <div className="results-counter">
+            Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredData.length)} of{' '}
+            {filteredData.length} results
+          </div>
+          <nav>
+            <ul className="pagination mb-0">
+              <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                <button className="page-link" onClick={() => handlePageChange(currentPage - 1)}>
+                  &laquo;
+                </button>
+              </li>
+              {renderPaginationItems()}
+              <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                <button className="page-link" onClick={() => handlePageChange(currentPage + 1)}>
+                  &raquo;
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default ITPs;
+
+
