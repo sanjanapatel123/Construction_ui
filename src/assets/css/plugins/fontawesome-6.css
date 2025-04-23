@@ -1,0 +1,17 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css');
+
+/* Font Awesome Icon Styles */
+.fas {
+  display: inline-block;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.toggle-button .fas {
+  color: #64748b;
+}
+
+/* Hover effect */
+.toggle-button:hover .fas {
+  color: #1e293b;
+}
