@@ -78,6 +78,9 @@ import PlanPackage from "./components/SuperAdmin/PlanPackage";
 import PlanRequest from "./components/SuperAdmin/PlanRequest";
 import UserInfo from "./components/SuperAdmin/UserInfo";
 import SuperadminSetting from "./components/SuperAdmin/SuperadminSetting";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
   const toggleSidebar = () => {
@@ -90,6 +93,7 @@ function App() {
 
   return (
     <div className="Main-App">
+      <ToastContainer position="top-right" autoClose={3000} />
       {!hideLayout && <Navbar toggleSidebar={toggleSidebar} />}
       <div className={`Main-App-container ${hideLayout ? "no-sidebar" : ""}`}>
         {!hideLayout && (

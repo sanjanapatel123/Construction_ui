@@ -12,7 +12,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import ViewProjectModal from "./ViewProjectModal";
-import { fetchProjects } from "../../redux/projectSlice";
+import { fetchProjects } from "../../../redux/projectSlice";
 import axios from "axios";
 import EditProjectModal from "./EditProjectModal";
 

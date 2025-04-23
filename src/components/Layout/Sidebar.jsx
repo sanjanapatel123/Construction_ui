@@ -23,6 +23,7 @@ import {
   MdAnnouncement,
 } from "react-icons/md";
 
+
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [openMenuIndex, setOpenMenuIndex] = useState(null);
   const [activeMenuIndex, setActiveMenuIndex] = useState(null);
@@ -212,6 +213,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       }
       return true;
     } else if (roledata === "worker") {
+      // Worker can only see a specific set of items
       const workerMenuItems = [
         "Dashboard",
         "Active Projects",
@@ -306,6 +308,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </li>
         ))}
       </ul>
+
     </div>
   );
 };
