@@ -73,6 +73,7 @@ import AddNewWorker from "./components/AdminComponents/ComplianceDashboard/AddNe
 import SiteEntry from "./components/AdminComponents/SiteEntry/SiteEntry";
 import SiteEntryTable from "./components/AdminComponents/SiteEntry/SiteEntryTable";
 import FullSiteMap from "./components/AdminComponents/Dashbord/FullSiteMap";
+// import Chatbot from "./components/Layout/Chatbot";
 function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
   const toggleSidebar = () => {
@@ -314,6 +315,7 @@ function App() {
             <Route path="/Settings" element={<Settings />} />
           </Routes>
         </div>
+        {/* <Chatbot /> */}
       </div>
     </div>
   );
