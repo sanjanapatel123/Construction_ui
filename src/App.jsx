@@ -318,6 +318,7 @@ function App() {
             <Route path="/Settings" element={<Settings />} />
           </Routes>
         </div>
+        {/* <Chatbot /> */}
       </div>
     </div>
   );

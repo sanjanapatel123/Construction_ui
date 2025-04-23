@@ -22,6 +22,7 @@ import {
   MdAnnouncement,
 } from "react-icons/md";
 
+
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [openMenuIndex, setOpenMenuIndex] = useState(null);
   const [activeMenuIndex, setActiveMenuIndex] = useState(null);
@@ -133,6 +134,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       icon: <FaLifeRing className="menu-icon" />,
       path: "/helpSupport",
     },
+
   ];
 
   const navigate = useNavigate();
@@ -270,6 +272,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </li>
         ))}
       </ul>
+
     </div>
   );
 };

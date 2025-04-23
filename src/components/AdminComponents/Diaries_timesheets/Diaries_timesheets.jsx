@@ -12,11 +12,17 @@ import {
   Modal,
 } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProjects } from "../../redux/projectSlice";
-import { fetchDiaries } from "../../redux/diarySlice";
-import { fetchTimesheets } from "../../redux/timesheetSlice";
+import TimesheetEditModal from "./TimesheetEditModal";
+import {
+  fetchTimesheets,
+  deleteTimesheet,
+} from "../../../redux/timesheetSlice";
+import { fetchProjects } from "../../../redux/projectSlice";
+import { fetchDiaries } from "../../../redux/diarySlice";
+import TimesheetDetailsModal from "./TimesheetDetailsModal";
 import { Line } from "react-chartjs-2";
 import EditDiaryModal from "./EditDiaryModal";
+import BASE_URL from "../../../utils/config";
 import DiaryDetailsModal from "./DiaryDetailsModal";
 import { toast } from "react-toastify";
 import {
@@ -48,12 +54,24 @@ export default function DiariesTimesheets() {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedDiaryId, setSelectedDiaryId] = useState(null);
   const [selectedDiary, setSelectedDiary] = useState(null);
-
+  const [showTimeSheetDetailsModal, setShowTimeSheetDetailsModal] = useState(
+    false
+  );
+  const [selectedTimesheetId, setSelectedTimesheetId] = useState("");
+  const [showTimeSheetEditModal, setShowTimeSheetEditModal] = useState(false);
   const [showTimesheetModal, setShowTimesheetModal] = useState(false);
   const handleCloseTimesheet = () => setShowTimesheetModal(false);
   const handleShowTimesheet = () => setShowTimesheetModal(true);
 
   const dispatch = useDispatch();
+
+  const [filters, setFilters] = useState({
+    project: "",
+    date: "",
+    worker: "",
+    search: "",
+  });
+
   const projects = useSelector((state) => state.projects.data);
   const { data, loading, error } = useSelector((state) => state.diaries);
   const { data: timesheets, loadingstate, errorstate } = useSelector(
@@ -67,6 +85,39 @@ export default function DiariesTimesheets() {
     workPerformed: "",
     issuesDelays: "",
   });
+
+  const [editData, setEditData] = useState({
+    _id: "",
+    date: "",
+    worker: "",
+    project: "",
+    hoursWorked: "",
+    overtime: "",
+    status: "Pending",
+  });
+
+  const handleTimeSheetEditClick = async (id) => {
+    const res = await axios.get(`${BASE_URL}/timesheet/${id}`);
+    setEditData(res.data);
+    setShowTimeSheetEditModal(true);
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleUpdateTimesheet = async () => {
+    try {
+      await axios.put(`${BASE_URL}/timesheet/${editData._id}`, editData);
+      toast.success("Timesheet updated!");
+      dispatch(fetchTimesheets());
+      setShowTimeSheetEditModal(false);
+    } catch (error) {
+      console.error(error);
+      toast.error("Update failed.");
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchProjects());
@@ -94,11 +145,9 @@ export default function DiariesTimesheets() {
   const handleSubmitDiary = async () => {
     // const selectedProject = projects.find((p) => p._id === selectedProjectId);
     try {
-      await axios.post(
-        "https://contructionbackend.onrender.com/api/diaries",
-        diaryForm
-      );
+      await axios.post(`${BASE_URL}/diaries`, diaryForm);
       alert("Diary entry saved successfully!");
+      dispatch(fetchDiaries());
       handleClose(); // close the modal
       setDiaryForm({
         // reset form
@@ -112,8 +161,15 @@ export default function DiariesTimesheets() {
       });
     } catch (err) {
       console.error("Error submitting diary:", err);
-      alert("Failed to submit diary. Please try again.");
+      toast.error("Failed to save diary entry.");
     }
+  };
+
+  const handleDelete = (id) => {
+    dispatch(deleteTimesheet(id))
+      .unwrap()
+      .then(() => toast.success("Timesheet deleted successfully!"))
+      .catch(() => toast.error("Failed to delete timesheet."));
   };
 
   const [timesheetData, setTimesheetData] = useState({
@@ -132,11 +188,9 @@ export default function DiariesTimesheets() {
 
   const handleSubmitTimeSheet = async () => {
     try {
-      await axios.post(
-        "https://contructionbackend.onrender.com/api/timesheet",
-        timesheetData
-      );
+      await axios.post(`${BASE_URL}/timesheet`, timesheetData);
       toast.success("Timesheet entry added successfully!");
+      dispatch(fetchTimesheets());
       handleCloseTimesheet(); // Close modal
       setTimesheetData({
         // Reset form
@@ -153,24 +207,50 @@ export default function DiariesTimesheets() {
     }
   };
 
-  const timesheetsData = [
-    {
-      date: "2024-02-20",
-      worker: "John Smith",
-      project: "Central Tower",
-      hours: 8.5,
-      overtime: 1.5,
-      status: "Pending",
-    },
-    {
-      date: "2024-02-19",
-      worker: "Sarah Johnson",
-      project: "Riverside Complex",
-      hours: 7.5,
-      overtime: 0.0,
-      status: "Approved",
-    },
-  ];
+  const handleShowDetails = (id) => {
+    setSelectedTimesheetId(id);
+    setShowTimeSheetDetailsModal(true);
+  };
+
+  const filteredTimesheets = timesheets.filter((entry) => {
+    return (
+      (filters.project === "" || entry.project === filters.project) &&
+      (filters.date === "" || entry.date.startsWith(filters.date)) &&
+      (filters.worker === "" || entry.worker === filters.worker) &&
+      (filters.search === "" ||
+        entry.project.toLowerCase().includes(filters.search.toLowerCase()) ||
+        entry.worker.toLowerCase().includes(filters.search.toLowerCase()))
+    );
+  });
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const indexOfLastItem = (currentPage - 1) * itemsPerPage;
+  // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredTimesheets.slice(
+    indexOfLastItem,
+    indexOfLastItem + itemsPerPage
+  );
+
+  const filteredDiaries = data.filter((entry) => {
+    return (
+      (filters.project === "" || entry.projectName === filters.project) &&
+      (filters.date === "" || entry.date.startsWith(filters.date)) &&
+      (filters.worker === "" || entry.supervisorName === filters.worker) &&
+      (filters.search === "" ||
+        entry.project.toLowerCase().includes(filters.search.toLowerCase()) ||
+        entry.worker.toLowerCase().includes(filters.search.toLowerCase()))
+    );
+  });
+
+  const paginatedDiaries = filteredDiaries.slice(
+    indexOfLastItem,
+    indexOfLastItem + itemsPerPage
+  );
+
+  const totalPages = Math.ceil(filteredDiaries.length / itemsPerPage);
+
   const lineData = {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri"],
     datasets: [
@@ -290,17 +370,41 @@ export default function DiariesTimesheets() {
           </div>
 
           <Form className="mb-3 d-flex gap-2">
-            <FormControl placeholder="Search entries..." />
-            <Form.Select>
-              <option>All Projects</option>
-              <option>Central Tower</option>
-              <option>Riverside Complex</option>
+            <FormControl
+              placeholder="Search entries..."
+              value={filters.search}
+              onChange={(e) =>
+                setFilters({ ...filters, search: e.target.value })
+              }
+            />
+            <Form.Select
+              onChange={(e) =>
+                setFilters({ ...filters, project: e.target.value })
+              }
+            >
+              <option value="">All Projects</option>
+              {projects.map((project) => (
+                <option key={project._id} value={project.name}>
+                  {project.name}
+                </option>
+              ))}
             </Form.Select>
-            <Form.Control type="date" />
-            <Form.Select>
-              <option>All Workers</option>
-              <option>John Smith</option>
-              <option>Sarah Johnson</option>
+            <Form.Control
+              type="date"
+              value={filters.date}
+              onChange={(e) => setFilters({ ...filters, date: e.target.value })}
+            />
+            <Form.Select
+              onChange={(e) =>
+                setFilters({ ...filters, worker: e.target.value })
+              }
+            >
+              <option value="">All Workers</option>
+              {[...new Set(timesheets.map((t) => t.worker))].map((worker) => (
+                <option key={worker} value={worker}>
+                  {worker}
+                </option>
+              ))}
             </Form.Select>
           </Form>
           <div
@@ -320,7 +424,7 @@ export default function DiariesTimesheets() {
                 </tr>
               </thead>
               <tbody>
-                {data.map((entry, idx) => (
+                {paginatedDiaries.map((entry, idx) => (
                   <tr key={idx} className="py-3">
                     <td className="ps-4 py-3">{entry.date}</td>
                     <td className="py-3">{entry.projectName}</td>
@@ -385,17 +489,41 @@ export default function DiariesTimesheets() {
             </button>
           </div>
           <Form className="mb-3 d-flex gap-2">
-            <FormControl placeholder="Search entries..." />
-            <Form.Select>
-              <option>All Projects</option>
-              <option>Central Tower</option>
-              <option>Riverside Complex</option>
+            <FormControl
+              placeholder="Search entries..."
+              value={filters.search}
+              onChange={(e) =>
+                setFilters({ ...filters, search: e.target.value })
+              }
+            />
+            <Form.Select
+              onChange={(e) =>
+                setFilters({ ...filters, project: e.target.value })
+              }
+            >
+              <option value="">All Projects</option>
+              {projects.map((project) => (
+                <option key={project._id} value={project.name}>
+                  {project.name}
+                </option>
+              ))}
             </Form.Select>
-            <Form.Control type="date" />
-            <Form.Select>
-              <option>All Workers</option>
-              <option>John Smith</option>
-              <option>Sarah Johnson</option>
+            <Form.Control
+              type="date"
+              value={filters.date}
+              onChange={(e) => setFilters({ ...filters, date: e.target.value })}
+            />
+            <Form.Select
+              onChange={(e) =>
+                setFilters({ ...filters, worker: e.target.value })
+              }
+            >
+              <option value="">All Workers</option>
+              {[...new Set(timesheets.map((t) => t.worker))].map((worker) => (
+                <option key={worker} value={worker}>
+                  {worker}
+                </option>
+              ))}
             </Form.Select>
           </Form>
           <div
@@ -420,7 +548,7 @@ export default function DiariesTimesheets() {
                 ) : errorstate ? (
                   <p>Error:{error}</p>
                 ) : (
-                  timesheets.map((entry, idx) => (
+                  currentItems.map((entry, idx) => (
                     <tr key={idx} className="bg-white py-3">
                       <td className="ps-4 py-3">{entry.date}</td>
                       <td className="py-3">{entry.worker}</td>
@@ -442,18 +570,28 @@ export default function DiariesTimesheets() {
                         <div className="d-flex align-items-center gap-2">
                           <i
                             className="fas fa-eye text-info"
-                            title="Assign"
+                            title="details"
                             style={{ cursor: "pointer", fontSize: "15px" }}
+                            onClick={() => handleShowDetails(entry._id)}
                           ></i>
+
                           <i
                             className="fas fa-edit text-primary"
                             title="Edit"
                             style={{ cursor: "pointer", fontSize: "15px" }}
+                            onClick={() => handleTimeSheetEditClick(entry._id)}
                           ></i>
                           <i
                             className="fa-solid fa-circle-check text-success"
                             title="Resolve"
                             style={{ cursor: "pointer", fontSize: "15px" }}
+                          ></i>
+
+                          <i
+                            className="fas fa-trash text-danger"
+                            title="danger"
+                            style={{ cursor: "pointer", fontSize: "15px" }}
+                            onClick={() => handleDelete(entry._id)}
                           ></i>
                         </div>
                       </td>
@@ -462,9 +600,43 @@ export default function DiariesTimesheets() {
                 )}
               </tbody>
             </Table>
+            <TimesheetEditModal
+              show={showTimeSheetEditModal}
+              onClose={() => setShowTimeSheetEditModal(false)}
+              editData={editData}
+              onChange={handleEditChange}
+              onSubmit={handleUpdateTimesheet}
+            />
+            <TimesheetDetailsModal
+              show={showTimeSheetDetailsModal}
+              handleClose={() => setShowTimeSheetDetailsModal(false)}
+              timesheetId={selectedTimesheetId}
+            />
           </div>
         </Tab>
       </Tabs>
+
+      <div className="d-flex justify-content-end mt-3">
+        <Button
+          variant="outline-primary"
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage(currentPage - 1)}
+          className="me-2"
+        >
+          Previous
+        </Button>
+        <span className="align-self-center">
+          Page {currentPage} of {totalPages}
+        </span>
+        <Button
+          variant="outline-primary"
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage(currentPage + 1)}
+          className="ms-2"
+        >
+          Next
+        </Button>
+      </div>
 
       <Modal
         show={showModal}
