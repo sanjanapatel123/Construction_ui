@@ -12,11 +12,12 @@ import {
   Modal,
 } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProjects } from "../../redux/projectSlice";
-import { fetchDiaries } from "../../redux/diarySlice";
+import { fetchProjects } from "../../../redux/projectSlice";
+import { fetchDiaries } from "../../../redux/diarySlice";
 import { Line } from "react-chartjs-2";
 import EditDiaryModal from "./EditDiaryModal";
 import DiaryDetailsModal from "./DiaryDetailsModal";
+import { toast } from "react-toastify";
 import {
   Chart as ChartJS,
   LineElement,
@@ -110,25 +111,42 @@ export default function DiariesTimesheets() {
     }
   };
 
-  const dailyDiariesData = [
-    {
-      date: "2024-02-20",
-      project: "Central Tower",
-      supervisor: "John Smith",
-      weather: "☀️ Sunny",
-      work:
-        "Completed foundation work for Block A. Started wall framework installation.",
-      issues: "Minor delay due to material delivery",
-    },
-    {
-      date: "2024-02-19",
-      project: "Riverside Complex",
-      supervisor: "Sarah Johnson",
-      weather: "🌧️ Rainy",
-      work: "Equipment maintenance and site preparation",
-      issues: "Weather-related delays",
-    },
-  ];
+  const [timesheetData, setTimesheetData] = useState({
+    date: "",
+    worker: "",
+    project: "",
+    hoursWorked: "",
+    Overtime: "",
+    status: "Pending",
+  });
+
+  const handleTimeSheetChange = (e) => {
+    const { name, value } = e.target;
+    setTimesheetData({ ...timesheetData, [name]: value });
+  };
+
+  const handleSubmitTimeSheet = async () => {
+    try {
+      await axios.post(
+        "https://contructionbackend.onrender.com/api/timesheet",
+        timesheetData
+      );
+      toast.success("Timesheet entry added successfully!");
+      handleCloseTimesheet(); // Close modal
+      setTimesheetData({
+        // Reset form
+        date: "",
+        worker: "",
+        project: "",
+        hoursWorked: "",
+        Overtime: "",
+        status: "Pending",
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to submit timesheet.");
+    }
+  };
 
   const timesheetsData = [
     {
@@ -543,38 +561,75 @@ export default function DiariesTimesheets() {
           <Form>
             <Form.Group className="mb-3">
               <Form.Label>Date</Form.Label>
-              <Form.Control type="date" />
+              <Form.Control
+                type="date"
+                name="date"
+                value={timesheetData.date}
+                onChange={handleTimeSheetChange}
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Worker</Form.Label>
-              <Form.Control type="text" placeholder="Enter worker name" />
+              <Form.Control
+                type="text"
+                placeholder="Enter worker name"
+                value={timesheetData.worker}
+                onChange={handleTimeSheetChange}
+                name="worker"
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Project</Form.Label>
-              <Form.Select>
-                <option>Select Project</option>
-                <option>Central Tower</option>
-                <option>Riverside Complex</option>
+              <Form.Label>Project Name</Form.Label>
+              <Form.Select
+                name="project"
+                value={timesheetData.project}
+                onChange={handleTimeSheetChange}
+                required
+              >
+                <option value="">Select a project</option>
+                {projects.map((project) => (
+                  <option key={project._id} value={project.name}>
+                    {project.name}
+                  </option>
+                ))}
               </Form.Select>
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Hours Worked</Form.Label>
-              <Form.Control type="number" min="0" step="0.1" />
+              <Form.Control
+                type="number"
+                min="0"
+                step="0.1"
+                name="hoursWorked"
+                value={timesheetData.hoursWorked}
+                onChange={handleTimeSheetChange}
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Overtime</Form.Label>
-              <Form.Control type="number" min="0" step="0.1" />
+              <Form.Control
+                type="number"
+                name="Overtime"
+                min="0"
+                step="0.1"
+                value={timesheetData.Overtime}
+                onChange={handleTimeSheetChange}
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Status</Form.Label>
-              <Form.Select>
-                <option>Pending</option>
-                <option>Approved</option>
+              <Form.Select
+                name="status"
+                value={timesheetData.status}
+                onChange={handleTimeSheetChange}
+              >
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
               </Form.Select>
             </Form.Group>
           </Form>
@@ -583,7 +638,7 @@ export default function DiariesTimesheets() {
           <Button variant="secondary" onClick={handleCloseTimesheet}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleSubmitDiary}>
+          <Button variant="primary" onClick={handleSubmitTimeSheet}>
             Save Entry
           </Button>
         </Modal.Footer>
