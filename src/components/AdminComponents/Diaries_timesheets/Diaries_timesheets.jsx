@@ -14,6 +14,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProjects } from "../../redux/projectSlice";
 import { fetchDiaries } from "../../redux/diarySlice";
+import { fetchTimesheets } from "../../redux/timesheetSlice";
 import { Line } from "react-chartjs-2";
 import EditDiaryModal from "./EditDiaryModal";
 import DiaryDetailsModal from "./DiaryDetailsModal";
@@ -55,6 +56,9 @@ export default function DiariesTimesheets() {
   const dispatch = useDispatch();
   const projects = useSelector((state) => state.projects.data);
   const { data, loading, error } = useSelector((state) => state.diaries);
+  const { data: timesheets, loadingstate, errorstate } = useSelector(
+    (state) => state.timesheets
+  );
   const [diaryForm, setDiaryForm] = useState({
     date: "",
     projectName: "",
@@ -67,6 +71,7 @@ export default function DiariesTimesheets() {
   useEffect(() => {
     dispatch(fetchProjects());
     dispatch(fetchDiaries());
+    dispatch(fetchTimesheets());
   }, [dispatch]);
 
   const handleEditClick = (diary) => {
@@ -410,45 +415,51 @@ export default function DiariesTimesheets() {
                 </tr>
               </thead>
               <tbody>
-                {timesheetsData.map((entry, idx) => (
-                  <tr key={idx} className="bg-white py-3">
-                    <td className="ps-4 py-3">{entry.date}</td>
-                    <td className="py-3">{entry.worker}</td>
-                    <td className="py-3">{entry.project}</td>
-                    <td className="py-3">{entry.hours}</td>
-                    <td className="py-3">{entry.overtime}</td>
-                    <td className="py-3">
-                      <span
-                        className={`badge ${
-                          entry.status === "Approved"
-                            ? "bg-success"
-                            : "bg-warning text-dark"
-                        }`}
-                      >
-                        {entry.status}
-                      </span>
-                    </td>
-                    <td className="pe-4 py-3">
-                      <div className="d-flex align-items-center gap-2">
-                        <i
-                          className="fas fa-eye text-info"
-                          title="Assign"
-                          style={{ cursor: "pointer", fontSize: "15px" }}
-                        ></i>
-                        <i
-                          className="fas fa-edit text-primary"
-                          title="Edit"
-                          style={{ cursor: "pointer", fontSize: "15px" }}
-                        ></i>
-                        <i
-                          className="fa-solid fa-circle-check text-success"
-                          title="Resolve"
-                          style={{ cursor: "pointer", fontSize: "15px" }}
-                        ></i>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {loadingstate ? (
+                  <p>Loading..</p>
+                ) : errorstate ? (
+                  <p>Error:{error}</p>
+                ) : (
+                  timesheets.map((entry, idx) => (
+                    <tr key={idx} className="bg-white py-3">
+                      <td className="ps-4 py-3">{entry.date}</td>
+                      <td className="py-3">{entry.worker}</td>
+                      <td className="py-3">{entry.project}</td>
+                      <td className="py-3">{entry.hoursWorked}</td>
+                      <td className="py-3">{entry.Overtime}</td>
+                      <td className="py-3">
+                        <span
+                          className={`badge ${
+                            entry.status === "Approved"
+                              ? "bg-success"
+                              : "bg-warning text-dark"
+                          }`}
+                        >
+                          {entry.status}
+                        </span>
+                      </td>
+                      <td className="pe-4 py-3">
+                        <div className="d-flex align-items-center gap-2">
+                          <i
+                            className="fas fa-eye text-info"
+                            title="Assign"
+                            style={{ cursor: "pointer", fontSize: "15px" }}
+                          ></i>
+                          <i
+                            className="fas fa-edit text-primary"
+                            title="Edit"
+                            style={{ cursor: "pointer", fontSize: "15px" }}
+                          ></i>
+                          <i
+                            className="fa-solid fa-circle-check text-success"
+                            title="Resolve"
+                            style={{ cursor: "pointer", fontSize: "15px" }}
+                          ></i>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </Table>
           </div>
