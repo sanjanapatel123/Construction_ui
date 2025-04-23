@@ -13,7 +13,10 @@ import {
 } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProjects } from "../../redux/projectSlice";
+import { fetchDiaries } from "../../redux/diarySlice";
 import { Line } from "react-chartjs-2";
+import EditDiaryModal from "./EditDiaryModal";
+import DiaryDetailsModal from "./DiaryDetailsModal";
 import {
   Chart as ChartJS,
   LineElement,
@@ -39,6 +42,10 @@ export default function DiariesTimesheets() {
   const [showModal, setShowModal] = useState(false);
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedDiaryId, setSelectedDiaryId] = useState(null);
+  const [selectedDiary, setSelectedDiary] = useState(null);
 
   const [showTimesheetModal, setShowTimesheetModal] = useState(false);
   const handleCloseTimesheet = () => setShowTimesheetModal(false);
@@ -46,8 +53,7 @@ export default function DiariesTimesheets() {
 
   const dispatch = useDispatch();
   const projects = useSelector((state) => state.projects.data);
-  console.log(projects);
-  const [selectedProjectId, setSelectedProjectId] = useState("");
+  const { data, loading, error } = useSelector((state) => state.diaries);
   const [diaryForm, setDiaryForm] = useState({
     date: "",
     projectName: "",
@@ -59,7 +65,18 @@ export default function DiariesTimesheets() {
 
   useEffect(() => {
     dispatch(fetchProjects());
+    dispatch(fetchDiaries());
   }, [dispatch]);
+
+  const handleEditClick = (diary) => {
+    setSelectedDiary(diary);
+    setShowEditModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowEditModal(false);
+    setSelectedDiary(null);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -155,6 +172,8 @@ export default function DiariesTimesheets() {
     },
   };
 
+  if (loading) return <p>Loading diaries...</p>;
+  if (error) return <p>Error: {error}</p>;
   return (
     <Container fluid className="p-4 bg-light">
       <h4 className="mb-4">Diaries & Timesheets</h4>
@@ -278,25 +297,31 @@ export default function DiariesTimesheets() {
                 </tr>
               </thead>
               <tbody>
-                {dailyDiariesData.map((entry, idx) => (
+                {data.map((entry, idx) => (
                   <tr key={idx} className="py-3">
                     <td className="ps-4 py-3">{entry.date}</td>
-                    <td className="py-3">{entry.project}</td>
-                    <td className="py-3">{entry.supervisor}</td>
+                    <td className="py-3">{entry.projectName}</td>
+                    <td className="py-3">{entry.supervisorName}</td>
                     <td className="py-3">{entry.weather}</td>
-                    <td className="py-3">{entry.work}</td>
-                    <td className="py-3">{entry.issues}</td>
+                    <td className="py-3">{entry.workPerformed}</td>
+                    <td className="py-3">{entry.issuesDelays}</td>
                     <td className="pe-4 py-3">
                       <div className="d-flex align-items-center gap-2">
                         <i
                           className="fas fa-eye text-info"
-                          title="Assign"
+                          title="Details"
                           style={{ cursor: "pointer", fontSize: "15px" }}
+                          onClick={() => {
+                            setSelectedDiaryId(entry._id);
+                            setShowDetailsModal(true);
+                          }}
                         ></i>
+
                         <i
                           className="fas fa-edit text-primary"
                           title="Edit"
                           style={{ cursor: "pointer", fontSize: "15px" }}
+                          onClick={() => handleEditClick(entry)}
                         ></i>
                         <i
                           className="fa-solid fa-circle-check text-success"
@@ -309,6 +334,19 @@ export default function DiariesTimesheets() {
                 ))}
               </tbody>
             </Table>
+
+            <EditDiaryModal
+              show={showEditModal}
+              handleClose={handleCloseModal}
+              selectedDiary={selectedDiary}
+              onUpdate={() => dispatch(fetchDiaries())}
+            />
+
+            <DiaryDetailsModal
+              show={showDetailsModal}
+              handleClose={() => setShowDetailsModal(false)}
+              diaryId={selectedDiaryId}
+            />
           </div>
         </Tab>
 
