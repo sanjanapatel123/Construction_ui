@@ -242,7 +242,7 @@ function App() {
             <Route path="/upload-new" element={<UploadNew />} />
             <Route path="/architure" element={<Architure />} />
             <Route path="/open-bim" element={<OpenBim />} />
-            <Route path="/view-swms" element={<ViewSmws />} />
+            <Route path="/view-swms/:id" element={<ViewSmws />} />
             <Route path="/View-Inductions" element={<ViewInductions />} />
             <Route path="/add-document-from" element={<AddDocumentFrom />} />
             <Route path="/DrawingRegister" element={<DrawingRegister />} />

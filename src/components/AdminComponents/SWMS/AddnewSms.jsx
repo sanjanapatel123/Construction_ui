@@ -8,11 +8,10 @@ import { createSwms } from "../../../redux/swmsSlice";
 function AddnewSms() {
   const navigate = useNavigate();
   const dispatchEvent = useDispatch();
-  // const { projects, loading } = useSelector((state) => state.projects);
-    // const { data, loading, error } = useSelector((state) => state.projects);
+
       const projects = useSelector((state) => state.projects.data);
 
-  console.log(projects);
+ 
 
 
   const [formData, setFormData] = useState({
@@ -120,7 +119,7 @@ function AddnewSms() {
                     >
                       <option value="">Select Project</option>
                       { projects && projects.map((project) => (
-                        <option key={project._id} value={project.name}>
+                        <option key={project._id} value={project._id}>
                           { console.log(project._id)}
                           {project.name}
                         </option>

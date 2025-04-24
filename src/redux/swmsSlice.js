@@ -18,7 +18,34 @@ export const createSwms = createAsyncThunk(
     }
 );
 
+export const getallSwms = createAsyncThunk("swms/getallSwms", 
+    async (_,thunkAPI)  => {
+        try{
+            const response = await axiosInstance.get(`${apiUrl}/swms`);
+            return response.data;
+        }
+        catch(error) {
+            console.error("Fetch swms Error:", error.response);
+            return thunkAPI.rejectWithValue(error.response?.data || "Unauthorized access");
+        }
+    }
+)
+
+export const getswmsbyId = createAsyncThunk("swms/getswmsbyId", 
+    async(id, thunkAPI) => {
+        try {
+            const response = await axiosInstance.get(`${apiUrl}/swms/${id}`)
+            return response.data;
+        }
+        catch(error){
+            console.log("getswmsbyId Error",error.response)
+            return thunkAPI.rejectWithValue(error.response?.data || "No SWMS found for given id")
+        }
+    }
+)
+
 const initialState = { swms: [],
+    singleSwms: null,
      loading: false,
       error: null
      };
@@ -41,7 +68,34 @@ const swmsSlice = createSlice({
             .addCase(createSwms.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-            });
+            })
+
+            .addCase(getallSwms.pending, (state) => {
+                state.loading= true;
+                state.error= null;
+            })
+            .addCase(getallSwms.fulfilled, (state,action) => {
+                state.loading = false;
+                state.swms = action.payload;
+            })
+            .addCase(getallSwms.rejected, (state) => {
+                state.loading = false;
+                state.error =action.payload;
+            })
+
+            .addCase(getswmsbyId.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+    })
+    .addCase(getswmsbyId.fulfilled, (state,action) => {
+        state.loading = false;
+        state.singleSwms = action.payload;
+
+    })
+    .addCase(getswmsbyId.rejected, (state) => {
+        state.loading = false;
+        state.error = action.payload
+    })
     },
 });
 
