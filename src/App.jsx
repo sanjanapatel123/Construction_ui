@@ -243,7 +243,7 @@ function App() {
             <Route path="/architure" element={<Architure />} />
             <Route path="/open-bim" element={<OpenBim />} />
             <Route path="/view-swms/:id" element={<ViewSmws />} />
-            <Route path="/View-Inductions" element={<ViewInductions />} />
+            <Route path="/View-Inductions/:id" element={<ViewInductions />} />
             <Route path="/add-document-from" element={<AddDocumentFrom />} />
             <Route path="/DrawingRegister" element={<DrawingRegister />} />
             <Route path="/Doc3DBeamModeling" element={<Doc3DBeamModeling />} />

@@ -1,31 +1,34 @@
+import React, { useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { fetchInductions } from '../../../redux/slices/inductionSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
-import React from 'react';
-import { Link } from 'react-router-dom';
 const ViewInductions = () => {
-  const inductionData = {
-    fullName: 'John Doe',
-    contactNumber: '1234567890',
-    emailAddress: 'john@example.com',
-    whiteCardNumber: 'WC123456',
-    siteLocation: 'Site 1',
-    siteSupervisor: 'Supervisor 1',
-    inductionDate: '2025-04-18',
-    siteAccessHours: '7:00 AM - 5:00 PM',
-    acknowledgements: {
-      siteSafetyPlan: true,
-      operatingHours: true,
-      emergencyProcedures: true,
-    },
-    uploadedFileUrl: '#',
-  };
+  const dispatch = useDispatch();
+  const { id } = useParams();
+  const { inductions } = useSelector((state) => state.inductions);
+
+  useEffect(() => {
+    dispatch(fetchInductions());
+  }, [dispatch]);
+
+  const inductionData = inductions.find((item) => item._id === id);
+
+  if (!inductionData) {
+    return (
+      <div className="container py-4">
+        <h4>Loading induction details...</h4>
+      </div>
+    );
+  }
 
   return (
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Induction Details</h2>
-      <Link to="/inductions">  <button className="btn btn-link text-secondary">
-          ← Back
-        </button></Link>
+        <Link to="/inductions">
+          <button className="btn btn-link text-secondary">← Back</button>
+        </Link>
       </div>
 
       <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px' }}>
@@ -49,30 +52,23 @@ const ViewInductions = () => {
             <p><strong>Site Supervisor:</strong> {inductionData.siteSupervisor}</p>
           </div>
           <div className="col-md-6">
-            <p><strong>Induction Date:</strong> {inductionData.inductionDate}</p>
+            <p><strong>Induction Date:</strong> {new Date(inductionData.inductionDate).toLocaleDateString()}</p>
           </div>
           <div className="col-md-6">
-            <p><strong>Site Access Hours:</strong> {inductionData.siteAccessHours}</p>
+            <p><strong>Site Access Hours:</strong> {inductionData.accessStartTime} - {inductionData.accessEndTime}</p>
           </div>
         </div>
 
-        <div className="mt-4">
-          <h5 className="mb-3">Acknowledgements</h5>
-          <ul className="list-unstyled">
-            <li>
-              <i className={`fas fa-${inductionData.acknowledgements.siteSafetyPlan ? 'check-circle text-success' : 'times-circle text-danger'}`}></i>
-              <span className="ms-2">Reviewed site safety plan</span>
-            </li>
-            <li>
-              <i className={`fas fa-${inductionData.acknowledgements.operatingHours ? 'check-circle text-success' : 'times-circle text-danger'}`}></i>
-              <span className="ms-2">Agreed to operating hours</span>
-            </li>
-            <li>
-              <i className={`fas fa-${inductionData.acknowledgements.emergencyProcedures ? 'check-circle text-success' : 'times-circle text-danger'}`}></i>
-              <span className="ms-2">Understands emergency procedures</span>
-            </li>
-          </ul>
-        </div>
+        {inductionData.image && inductionData.image.length > 0 && (
+          <div className="mt-4">
+            <h5 className="mb-3">Uploaded Files</h5>
+            {inductionData.image.map((img, index) => (
+              <div key={index}>
+                <a href={img} target="_blank" rel="noopener noreferrer">View File {index + 1}</a>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

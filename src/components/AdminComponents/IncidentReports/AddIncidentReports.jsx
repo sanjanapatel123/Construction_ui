@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
+import { createIncidentReport } from "../../../redux/slices/incidentReportSlice";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 function AddIncidentReports() {
   const [formData, setFormData] = useState({
     incidentType: "",
@@ -11,47 +14,67 @@ function AddIncidentReports() {
     severity: "",
     witnesses: "",
     immediateActions: "",
-    evidence: null,
+    evidence: null
   });
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      evidence: e.target.files[0],
-    }));
+    setFormData((prev) => ({ ...prev, evidence: e.target.files[0] }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Add API call here to submit the form data
+    const submissionData = new FormData();
+    submissionData.append("incidentType", formData.incidentType);
+    submissionData.append("dateTime", formData.dateTime);
+    submissionData.append("location", formData.location);
+    submissionData.append("description", formData.description);
+    submissionData.append("severityLevel", formData.severity);
+    submissionData.append("witnesses", formData.witnesses);
+    submissionData.append("immediateActions", formData.immediateActions);
+    if (formData.evidence) {
+      submissionData.append("image", formData.evidence);
+    }
+
+    dispatch(createIncidentReport(submissionData))
+    .unwrap()
+    .then(() => {
+      toast.success("Incident Report Created Successfully!");
+      navigate("/incidentReports");
+    })
+    .catch((error) => {
+      toast.error("Failed to create incident report: " + error);
+    });
   };
-  const navigate = useNavigate();
 
   return (
-    <div className="container py-4">
+    <>
+    <ToastContainer/>
+       <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h3>New Incident Report</h3>
         <button
           onClick={() => navigate(-1)}
-          className="btn " style={{backgroundColor:"#0d6efd",color:"white"}}
+          className="btn"
+          style={{ backgroundColor: "#0d6efd", color: "white" }}
         >
-          <i class="fa-solid fa-arrow-left"></i> Back to Overview
+          <i className="fa-solid fa-arrow-left"></i> Back to Overview
         </button>
       </div>
+
       <Form onSubmit={handleSubmit}>
         <div className="bg-white p-4 rounded shadow-sm">
+
           <div className="row mb-3">
             <div className="col-md-6">
-              <Form.Group className="mb-3">
+              <Form.Group>
                 <Form.Label>Incident Type</Form.Label>
                 <Form.Select
                   name="incidentType"
@@ -64,11 +87,13 @@ function AddIncidentReports() {
                   <option value="property-damage">Property Damage</option>
                   <option value="near-miss">Near Miss</option>
                   <option value="environmental">Environmental</option>
+                  <option value="fire">Fire</option>
                 </Form.Select>
               </Form.Group>
             </div>
+
             <div className="col-md-6">
-              <Form.Group className="mb-3">
+              <Form.Group>
                 <Form.Label>Date & Time</Form.Label>
                 <Form.Control
                   type="datetime-local"
@@ -108,7 +133,7 @@ function AddIncidentReports() {
 
           <div className="row mb-3">
             <div className="col-md-6">
-              <Form.Group className="mb-3">
+              <Form.Group>
                 <Form.Label>Severity Level</Form.Label>
                 <Form.Select
                   name="severity"
@@ -124,8 +149,9 @@ function AddIncidentReports() {
                 </Form.Select>
               </Form.Group>
             </div>
+
             <div className="col-md-6">
-              <Form.Group className="mb-3">
+              <Form.Group>
                 <Form.Label>Witnesses</Form.Label>
                 <Form.Control
                   type="text"
@@ -167,14 +193,15 @@ function AddIncidentReports() {
           </Form.Group>
 
           <div className="d-flex justify-content-end gap-2">
-            <Button variant="secondary">Cancel</Button>
-            <Button variant="primary" type="submit">
-              Submit Report
-            </Button>
+            <Button variant="secondary" onClick={() => navigate(-1)}>Cancel</Button>
+            <Button variant="primary" type="submit">Submit Report</Button>
           </div>
+
         </div>
       </Form>
     </div>
+    </>
+ 
   );
 }
 
