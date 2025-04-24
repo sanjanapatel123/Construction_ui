@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import BASE_URL from "../utils/config";
+import BASE_URL from "../../utils/config";
 
 // Async thunk for fetching timesheets
 export const fetchTimesheets = createAsyncThunk(

@@ -1,9 +1,9 @@
 // src/redux/store.js
 import { configureStore } from '@reduxjs/toolkit';
-import projectReducer from './projectSlice';
-import diaryReducer from './diarySlice';
-import timesheetReducer from "./timesheetSlice"; 
-import swmsReducer from "./swmsSlice";
+import projectReducer from './slices/projectSlice';
+import diaryReducer from './slices/diarySlice';
+import timesheetReducer from "./slices/timesheetSlice"; 
+import swmsReducer from "./slices/swmsSlice";
 
 export const store = configureStore({
   reducer: {
