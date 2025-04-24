@@ -33,19 +33,14 @@ import { Link } from 'react-router-dom'
   <div className="row g-4">
     {/* Left Column */}
     <div className="col-md-8">
-      <div
-        className="p-3 bg-white rounded"
-        style={{
-          boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
-        }}
-      >
+      <div  className="p-3 bg-white rounded"
+        style={{  boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",}}>
         <h4 style={{ fontWeight: 600 }}>Audit Information</h4>
         <div className="row mt-4">
           <div className="col-md-6">
             <div className="form-group">
               <label htmlFor="auditDate">Date of Audit</label>
-              <input
-                type="date"
+              <input type="date"
                 className="form-control"
                 id="auditDate"
                 required

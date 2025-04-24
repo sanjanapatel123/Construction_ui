@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
-
   // State for email, password, and selected role
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +29,6 @@ const roleCredentials = {
     if (selectedRole) {
       localStorage.setItem("userRole", selectedRole);
       alert(`Logged in as ${selectedRole}`);
-  
       // Navigate based on role
       if (selectedRole === "superadmin") {
         navigate("/super-admin-dashboard");
@@ -51,17 +49,14 @@ const roleCredentials = {
           <button
             className="social-signup btn w-100 mb-3 d-flex align-items-center justify-content-center"
             style={{
-              backgroundColor: "#ffffff",
-              color: "#5F6368",
-              border: "1px solid #dadce0",
+              backgroundColor: "#ffffff", color: "#5F6368", border: "1px solid #dadce0",
               fontSize: "14px",
               fontWeight: "500",
               padding: "10px 0",
               borderRadius: "4px",
               transition: "all 0.3s ease", }}>
             <i className="fab fa-google me-2"
-              style={{ fontSize: "18px",color: "#4285F4",}}/>
-            Continue with Google </button>
+              style={{ fontSize: "18px",color: "#4285F4",}}/> Continue with Google </button>
 
           <div className="divider position-relative text-center my-4">
             <hr />
@@ -83,8 +78,7 @@ const roleCredentials = {
             </div>
             <div className="form-floating mb-3">
               <input type="password" className="form-control"
-                id="password"
-                placeholder="Password"
+                id="password"  placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required/>
@@ -95,8 +89,7 @@ const roleCredentials = {
                 <input  className="form-check-input"
                   type="checkbox"
                   id="remember"/>
-                <label
-                  className="form-check-label text-secondary"
+                <label  className="form-check-label text-secondary"
                   htmlFor="remember">
                   Remember me
                 </label>
@@ -131,8 +124,7 @@ const roleCredentials = {
 
   {/* Superadmin Button */}
   <div className="col-12">
-    <button type="button" className={`btn w-100 text-white ${   selectedRole === "superadmin" ? "border border-2 border-dark" : ""
-   }`} style={{ backgroundColor: "#0e4966", fontWeight: 500 }}  onClick={() => handleRoleSelect("superadmin")} >
+    <button type="button" className={`btn w-100 text-white ${   selectedRole === "superadmin" ? "border border-2 border-dark" : ""}`} style={{ backgroundColor: "#0e4966", fontWeight: 500 }}  onClick={() => handleRoleSelect("superadmin")} >
       Superadmin
     </button>
   </div>
