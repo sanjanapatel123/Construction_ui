@@ -10,7 +10,7 @@ import {
   Badge,
 } from "react-bootstrap";
 import { FaEdit, FaEye, FaTrash, FaDownload, FaShare } from "react-icons/fa";
-import { getallSwms } from "../../../redux/swmsSlice";
+import { getallSwms } from "../../../redux/slices/swmsSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -18,12 +18,29 @@ import { Link } from "react-router-dom";
 
 function SWMS() {
 
+  const [search, setSearch] = useState("");
+
   const dispatch = useDispatch();
 
   const { swms , loading ,error } = useSelector((state) => state.swms )
 
   console.log("sWMS" ,swms)
   const navigate = useNavigate();
+
+  useEffect(() => {
+    dispatch(getallSwms());
+  }, [dispatch]);
+  
+
+  const SwmsList = Array.isArray(swms) ? swms : [];
+
+  const handleSearchChange = (e) => setSearch(e.target.value)
+
+
+  const filteredSwms = SwmsList.filter((swms) =>
+    swms.title.toLowerCase().includes(search.toLowerCase()) 
+  );
+
   const templates = [
     {
       id: 1,
@@ -81,11 +98,10 @@ function SWMS() {
     },
   ];
 
+
  
 
-  useEffect(() => {
-    dispatch(getallSwms());
-  }, [dispatch]);
+
 
   const handleUseTemplate = (title) => {
     navigate(`/template`, { state: { title } });
@@ -110,6 +126,8 @@ function SWMS() {
         <Col sm={12} md={3}>
           <Form.Control
             type="search"
+            value={search}
+            onChange={handleSearchChange}
             placeholder="Search SWMS..."
             style={{ borderRadius: "4px", border: "1px solid #dee2e6" }}
           />
@@ -201,7 +219,7 @@ function SWMS() {
 
         {
 
-        (swms && swms.map((item,index) => (
+        (filteredSwms && filteredSwms.map((item,index) => (
           <tr key={index}>
           <td className="ps-4">
             <div className="d-flex align-items-center gap-3">
@@ -213,15 +231,15 @@ function SWMS() {
               </div>
               <div>
                 <div className="fw-medium">{item?.title}</div>
-                <small className="text-muted">
+                {/* <small className="text-muted">
                   Created by: mike.j@example.com
-                </small>
+                </small> */}
               </div>
             </div>
           </td>
           <td>{item?.project}</td>
           <td>{item?.workArea}</td>
-          <td>{item?.createdAt}</td>
+          <td> {new Date(item?.createdAt).toLocaleString()}</td>
           <td className="pe-4">
             <div className="d-flex gap-3">
               <Link to={`/view-swms/${item?._id}`}>

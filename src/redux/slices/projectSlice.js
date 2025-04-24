@@ -1,16 +1,18 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { apiUrl } from '../../utils/config';
+import axiosInstance from '../../utils/axiosInstance.jsx'
 
 
 export const fetchProjects = createAsyncThunk('projects/fetchProjects', async () => {
-  const response = await axios.get("https://contructionbackend.onrender.com/api/projects/");
+  const response = await axiosInstance.get(`${apiUrl}/projects/`);
   return response.data;
 });
 
 export const deleteProject = createAsyncThunk('projects/deleteProject', async (projectId, { dispatch, rejectWithValue }) => {
   try {
-    const response = await axios.delete(`https://contructionbackend.onrender.com/api/projects/${projectId}`);
+    const response = await axiosInstance.delete(`${apiUrl}/projects/${projectId}`);
     toast.success("Project deleted successfully!");
     dispatch(fetchProjects()); // re-fetch list
     return response.data;
@@ -20,14 +22,27 @@ export const deleteProject = createAsyncThunk('projects/deleteProject', async (p
   }
 });
 
+export const getSingleProject = createAsyncThunk(
+  'projects/getSingleProject',
+  async (projectId) => {
+    const response = await axiosInstance.get(`${apiUrl}/projects/${projectId}`);
+    return response.data;
+  }
+);
+
 const projectSlice = createSlice({
   name: 'projects',
   initialState: {
     data: [],
     loading: false,
+    selectedProject: null, 
     error: null
   },
-  reducers: {},
+  reducers: { 
+    clearSelectedProject: (state) => {
+      state.selectedProject = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchProjects.pending, (state) => {
@@ -52,8 +67,21 @@ const projectSlice = createSlice({
       .addCase(deleteProject.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+        .addCase(getSingleProject.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getSingleProject.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedProject = action.payload;
+      })
+      .addCase(getSingleProject.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
       });
   }
 });
 
+export const { clearSelectedProject } = projectSlice.actions;
 export default projectSlice.reducer;

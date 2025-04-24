@@ -11,11 +11,15 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import ViewProjectModal from "./ViewProjectModal";
-import { fetchProjects, deleteProject } from "../../../redux/projectSlice";
-import axios from "axios";
+import {
+  fetchProjects,
+  deleteProject,
+  getSingleProject,
+} from "../../../redux/slices/projectSlice";
 import EditProjectModal from "./EditProjectModal";
 import { apiUrl } from "../../../utils/config";
 import { toast } from "react-toastify";
+import axiosInstance from "../../../utils/axiosInstance";
 
 const ProjectDashboard = () => {
   const [showModal, setShowModal] = useState(false);
@@ -27,7 +31,9 @@ const ProjectDashboard = () => {
 
   const handleShowModal = async (projectId) => {
     try {
-      const response = await axios.get(`${apiUrl}/projects/${projectId}`);
+      const response = await axiosInstance.get(
+        `${apiUrl}/projects/${projectId}`
+      );
       setSelectedProject(response.data);
       setShowModal(true);
     } catch (error) {
@@ -43,21 +49,6 @@ const ProjectDashboard = () => {
     setShowModal(false);
     setSelectedProject(null);
   };
-
-  // const deleteProject = async (projectId) => {
-  //   try {
-  //     console.log(projectId);
-  //     const response = await axios.delete(`${apiUrl}/projects/${projectId}`);
-  //     console.log("Project deleted:", response.data);
-  //     dispatch(fetchProjects());
-  //     toast.success("Project deleted successfully!");
-  //   } catch (error) {
-  //     console.error("Error deleting project:", error);
-  //     toast.error(
-  //       error?.response?.data?.message || "Failed to delete project!"
-  //     );
-  //   }
-  // };
 
   const handleDelete = (projectId) => {
     dispatch(deleteProject(projectId));

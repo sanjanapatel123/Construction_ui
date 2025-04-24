@@ -4,7 +4,7 @@ import axios from "axios";
 import BASE_URL from "../../../utils/config";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { fetchProjects } from "../../../redux/projectSlice"; // Adjust the import path as necessary
+import { fetchProjects } from "../../../redux/slices/projectSlice"; // Adjust the import path as necessary
 
 const EditProjectModal = ({ show, handleClose, project, refreshData }) => {
   const [formData, setFormData] = useState({});
