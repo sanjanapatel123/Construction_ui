@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import BIMViewer from './BimViewer';
 const OpenBim = () => {
   const [activeModelTab, setActiveModelTab] = useState('building');
   const [activeSidePanel, setActiveSidePanel] = useState('details');
@@ -262,11 +263,12 @@ const OpenBim = () => {
           <div className="absolute inset-0">
             {activeModelTab === 'building' && (
               <div className="w-full h-full flex items-center justify-center">
-                <img
+                {/* <img
                   src="https://readdy.ai/api/search-image?query=3D%20rendering%20of%20a%20modern%20office%20building%20with%20glass%20facade%2C%20architectural%20visualization%2C%20detailed%20BIM%20model%20with%20visible%20structural%20elements%2C%20professional%203D%20model%20visualization%2C%20high%20quality%20rendering%2C%20neutral%20lighting%2C%20construction%20visualization&width=800&height=600&seq=1&orientation=landscape"
                   alt="Building Model"
                   className="w-full h-full object-cover opacity-90"
-                />
+                /> */}
+                <BIMViewer modelUrl={'./1.glb'}/>
               </div>
             )}
             {activeModelTab === 'mep' && (
