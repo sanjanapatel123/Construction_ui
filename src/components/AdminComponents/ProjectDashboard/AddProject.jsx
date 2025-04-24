@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import { Button, Form, Col, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import  BASE_URL  from "../../../utils/config"; // Adjust the import path as necessary
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { fetchProjects } from "../../../redux/projectSlice"; // Adjust the import path as necessary
 
 const AddProject = () => {
   // State to handle form inputs
@@ -18,6 +22,8 @@ const AddProject = () => {
   });
 
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
 
   // Handle input changes
   const handleChange = (e) => {
@@ -39,15 +45,14 @@ const AddProject = () => {
   // Handle form submission
   const handleSubmit = async () => {
     try {
-      const response = await axios.post(
-        "https://contructionbackend.onrender.com/api/projects",
-        formData
-      );
+      const response = await axios.post(`${BASE_URL}/projects`, formData);
       console.log("Project Created:", response.data);
-      alert("Project created successfully!");
+      toast.success("Project created successfully!");
+      dispatch(fetchProjects()); // Fetch updated projects list
+      navigate("/ProjectDashboard"); // Redirect to the projects overview page
     } catch (error) {
       console.error("Error creating project:", error);
-      alert("Failed to create project!");
+      toast.error("Failed to create project!");
     }
   };
 
