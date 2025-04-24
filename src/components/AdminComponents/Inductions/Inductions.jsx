@@ -1,26 +1,51 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Button, Form, ProgressBar } from 'react-bootstrap';
 import './Inductions.css';
 import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { Pie, Bar } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
-
+import { deleteInduction, fetchInductions } from '../../../redux/slices/inductionSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import Swal from 'sweetalert2'
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 function Inductions() {
-  const [formData, setFormData] = useState({
-    fullName: '',
-    employeeNumber: '',
-    department: '',
-    inductionDate: '',
-    safetyRisk: '',
-    acknowledgements: {
-      safety: false,
-      confidentiality: false,
-      emergency: false
+   const dispatch= useDispatch()
+  //  fetchInductions
+  const [searchQuery, setSearchQuery] = useState("");
+  const {inductions} = useSelector((state)=>state.inductions)
+  console.log(inductions)
+  useEffect(()=>{
+  dispatch(fetchInductions())
+  },[])
+
+// Filtered Inductions
+const filteredInductions = inductions?.filter((induction) =>
+  induction?.fullName?.toLowerCase()?.includes(searchQuery.toLowerCase())
+);
+// delete Inductions
+const HandleDelete = (id) => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "You won't be able to revert this!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      dispatch(deleteInduction(id));
+      Swal.fire(
+        'Deleted!',
+        'Induction has been deleted.',
+        'success'
+      )
     }
-  });
-  const [loading, setLoading] = useState(false);
+  })
+}
+
+
   const pieChartData = {
     labels: ['Completed', 'Pending', 'In Progress'],
     datasets: [{
@@ -47,7 +72,6 @@ function Inductions() {
       backgroundColor: '#4dabf7'
     }]
   };
-
   return (
     <Container fluid className="py-4">
      <div className="d-flex align-items-center justify-content-between mb-4">
@@ -114,12 +138,6 @@ function Inductions() {
       </Button>
     </Link>
   </Col>
-  {/* <Col md={4} className="text-center">
-    <Button variant="light" className="w-100 border-0 shadow py-3">
-      <i className="fas fa-upload me-2"></i>
-      Upload Compliance Documents
-    </Button>
-  </Col> */}
   <Col md={6} className="text-center">
     <Button variant="light" className="w-100 border-0 shadow py-3">
       <i className="fas fa-robot me-2"></i>
@@ -136,16 +154,18 @@ function Inductions() {
     <div className="col-12 col-md-4">
       <h5 className="mb-0 fw-semibold text-center text-md-start">Inductions Overview</h5>
     </div>
-
     {/* Search + Button Group */}
     <div className="col-12 col-md-8">
       <div className="d-flex flex-column flex-sm-row justify-content-center justify-content-md-end align-items-stretch gap-2">
-        <Form.Control
-          type="text"
-          placeholder="Search inductions..."
-          className="form-control-sm p-3"
-          style={{ backgroundColor: '#f4f5f7', maxWidth: "240px" }}
-        />
+      <Form.Control
+  type="text"
+  placeholder="Search inductions..."
+  className="form-control-sm p-3"
+  style={{ backgroundColor: '#f4f5f7', maxWidth: "240px" }}
+  value={searchQuery}
+  onChange={(e) => setSearchQuery(e.target.value)}
+/>
+
         <Link to="/AddnewInduction">
           <Button
             variant="primary"
@@ -162,70 +182,81 @@ function Inductions() {
   </div>
 </Card.Header>
 
-
-  <Card.Body className="p-2">
-    <div className='table-responsive'>
+<Card.Body className="p-2">
+  <div className='table-responsive'>
     <table className="table table-hover mb-0">
       <thead className="bg-light">
         <tr>
           <th className="ps-4">Name</th>
-          <th>Role</th>
+          <th>Contact Number</th>
           <th>Induction Date</th>
-          <th>Status</th>
+          <th>siteLocation</th>
+          <th>Access Time</th>
           <th className="pe-4">Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td className="ps-4">
-            <div className="d-flex align-items-center gap-3">
-              <div className="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center" style={{ width: '36px', height: '36px' }}>MJ</div>
-              <div>
-                <div className="fw-medium">Mike Johnson</div>
-                <small className="text-muted">mike.j@example.com</small>
-              </div>
-            </div>
-          </td>
-          <td>Site Worker</td>
-          <td>2024-02-15</td>
-          <td><span className="badge bg-success">Approved</span></td>
-          <td className="pe-4">
-            <div className="d-flex gap-3">
-           <Link to="/View-Inductions">  <Button variant="link" className="text-primary p-0"><i class="fa-solid fa-eye"></i></Button></Link> 
-              <Button variant="link" className="text-primary p-0"><i class="fa-solid fa-download"></i></Button>
-            </div>
-          </td> 
-        </tr>
-        <tr>
-          <td className="ps-4">
-            <div className="d-flex align-items-center gap-3">
-              <div className="bg-warning text-white rounded-circle d-flex justify-content-center align-items-center" style={{ width: '36px', height: '36px' }}>SW</div>
-              <div>
-                <div className="fw-medium">Sarah Wilson</div>
-                <small className="text-muted">sarah.w@example.com</small>
-              </div>
-            </div>
-          </td>
-          <td>Electrician</td>
-          <td>2024-02-14</td>
-          <td><span className="badge bg-warning">Pending</span></td>
-          <td className="pe-4">
-            <div className="d-flex gap-3">
-            <Link to="/View-Inductions">  <Button variant="link" className="text-primary p-0"><i class="fa-solid fa-eye"></i></Button></Link> 
-              <Button variant="link" className="text-primary p-0"><i class="fa-solid fa-download"></i></Button>
-            </div>
-          </td>
-        </tr>
+        {filteredInductions  && filteredInductions ?.length > 0 ? (
+          filteredInductions ?.map((induction, index) => (
+            <tr key={index}>
+              <td className="ps-4">
+                <div className="d-flex align-items-center gap-3">
+                  <div className="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center"
+                   style={{ width: '36px', height: '36px' }}>
+                    {induction.fullName.slice(0, 2).toUpperCase()}
+                  </div>
+                  <div>
+                    <div className="fw-medium">{induction?.fullName}</div>
+                    <small className="text-muted">{induction?.emailAddress}</small>
+                  </div>
+                </div>
+              </td>
+              <td>{induction?.contactNumber}</td>
+              <td>{new Date(induction.inductionDate).toLocaleDateString()}</td>
+              <td>{induction?.siteLocation
+              }</td>
+              <td>
+                {induction.accessStartTime} - {induction.accessEndTime}
+              </td>
+              <td className="pe-4">
+                <div className="d-flex gap-3">
+                  <Link to={`/View-Inductions/${induction._id}`}>
+                    <Button variant="link" className="text-primary p-0">
+                      <i className="fa-solid fa-eye"></i>
+                    </Button>
+                  </Link>
+                  <a href={induction?.image[0]} target="_blank" rel="noopener noreferrer">
+                    <Button variant="link" className="text-primary p-0">
+                      <i className="fa-solid fa-download"></i>
+                    </Button>
+                  </a> 
+                    <Button variant="link" className="text-primary p-0" onClick={()=>HandleDelete(induction._id)}>
+                    <i className="fas fa-trash  text-danger"></i> 
+                    </Button>
+                </div>
+              </td>
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td colSpan="5" className="text-center py-4">
+              No inductions found.
+            </td>
+          </tr>
+        )}
       </tbody>
     </table>
-    </div>
-    <div className="d-flex justify-content-end mb-2 mt-2 ">
-                <Button size="sm" variant="outline-secondary" className="me-2">Previous</Button>
-                <Button size="sm" variant="primary" className="ms-2">1</Button>
-                <Button size="sm" variant="outline-secondary" className="ms-2">2</Button>
-                <Button size="sm" variant="outline-secondary" className="ms-2">Next</Button>
-              </div>
-  </Card.Body>
+  </div>
+
+  {/* Pagination */}
+  <div className="d-flex justify-content-end mb-2 mt-2 ">
+    <Button size="sm" variant="outline-secondary" className="me-2">Previous</Button>
+    <Button size="sm" variant="primary" className="ms-2">1</Button>
+    <Button size="sm" variant="outline-secondary" className="ms-2">2</Button>
+    <Button size="sm" variant="outline-secondary" className="ms-2">Next</Button>
+  </div>
+</Card.Body>
+
 </Card>
 
 {/* Safety Compliance Overview */}

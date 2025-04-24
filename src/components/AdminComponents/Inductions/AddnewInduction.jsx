@@ -1,9 +1,16 @@
 
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { createInduction } from '../../../redux/slices/inductionSlice';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+// Inside your App component:
 
 function AddnewInduction() {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [formData, setFormData] = useState({
         fullName: '',
         contactNumber: '',
@@ -12,14 +19,16 @@ function AddnewInduction() {
         siteLocation: '',
         siteSupervisor: '',
         inductionDate: '',
-        siteAccessHours: '',
+        accessStartTime: '',
+        accessEndTime: '',
         acknowledgements: {
             siteSafetyPlan: false,
-            operatingHours: false,
+            complyOperatingHours: false,
             emergencyProcedures: false
         },
-        documents: null
+        image: [] // should be array as per your data structure
     });
+    
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -41,27 +50,57 @@ function AddnewInduction() {
     };
 
     const handleFileUpload = (e) => {
+        const files = Array.from(e.target.files);
         setFormData(prev => ({
             ...prev,
-            documents: e.target.files[0]
+            image: [...prev.image, ...files]
         }));
     };
+    
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Validate form
+      
         if (!formData.fullName || !formData.emailAddress || !formData.contactNumber) {
-            alert('Please fill in all required fields');
-            return;
+          alert('Please fill in all required fields');
+          return;
         }
-        // Log form data
-        console.log('Form submitted:', formData);
-        // You can add your API call here
-    };
+      
+        const submissionData = new FormData();
+        submissionData.append("fullName", formData.fullName);
+        submissionData.append("contactNumber", formData.contactNumber);
+        submissionData.append("emailAddress", formData.emailAddress);
+        submissionData.append("whiteCardNumber", formData.whiteCardNumber);
+        submissionData.append("siteLocation", formData.siteLocation);
+        submissionData.append("siteSupervisor", formData.siteSupervisor);
+        submissionData.append("inductionDate", formData.inductionDate);
+        submissionData.append("accessStartTime", formData.accessStartTime);
+        submissionData.append("accessEndTime", formData.accessEndTime);
+        submissionData.append("acknowledgements", JSON.stringify(formData.acknowledgements));
+      
+        if (formData.image.length > 0) {
+          formData.image.forEach((file) => {
+            submissionData.append("image", file);
+          });
+        }
+      
+        try {
+          await dispatch(createInduction(submissionData)).unwrap();
+          toast .success("Induction created successfully!");
+          navigate("/inductions");
+        } catch (error) {
+          toast.error("Failed to create induction. Please try again.");
+          console.error(error);
+        }
+      };
+      
+      
 
     // ... rest of your component remains the same ...
     return (
-        <div className="container py-4">
+        <>
+        <ToastContainer />
+         <div className="container py-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2>Add New Induction</h2>
                 <button onClick={() => navigate(-1)} className="btn text-white" style={{backgroundColor:"#0d6efd"}}>
@@ -74,13 +113,13 @@ function AddnewInduction() {
                     <div className="col-md-6">
                         <div className="form-group">
                             <label className="form-label">Full Name</label>
-                            <input
-                                type="text"
+                            <input  type="text"
                                 className="form-control"
                                 name="fullName"
                                 placeholder="Enter full name"
                                 value={formData.fullName}
                                 onChange={handleInputChange}
+                                required
                             />
                         </div>
                     </div>
@@ -94,6 +133,7 @@ function AddnewInduction() {
                                 placeholder="Enter contact number"
                                 value={formData.contactNumber}
                                 onChange={handleInputChange}
+                                required
                             />
                         </div>
                     </div>
@@ -107,6 +147,7 @@ function AddnewInduction() {
                                 placeholder="Enter email address"
                                 value={formData.emailAddress}
                                 onChange={handleInputChange}
+                                required
                             />
                         </div>
                     </div>
@@ -120,6 +161,7 @@ function AddnewInduction() {
                                 placeholder="Enter white card number"
                                 value={formData.whiteCardNumber}
                                 onChange={handleInputChange}
+                                required
                             />
                         </div>
                     </div>
@@ -162,22 +204,35 @@ function AddnewInduction() {
                                 name="inductionDate"
                                 value={formData.inductionDate}
                                 onChange={handleInputChange}
+                                required
                             />
                         </div>
                     </div>
                     <div className="col-md-6">
-                        <div className="form-group">
-                            <label className="form-label">Site Access Hours</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="siteAccessHours"
-                                placeholder="e.g. 7:00 AM - 5:00 PM"
-                                value={formData.siteAccessHours}
-                                onChange={handleInputChange}
-                            />
-                        </div>
-                    </div>
+    <div className="form-group">
+        <label className="form-label">Site Access Hours</label>
+        <div className="d-flex gap-2">
+            <input
+                type="time"
+                className="form-control"
+                name="accessStartTime"
+                value={formData.accessStartTime}
+                onChange={handleInputChange}
+                required
+            />
+            <span className="align-self-center">to</span>
+            <input
+                type="time"
+                className="form-control"
+                name="accessEndTime"
+                value={formData.accessEndTime}
+                onChange={handleInputChange}
+                required
+            />
+        </div>
+    </div>
+</div>
+
                 </div>
 
                 <div className="mt-4">
@@ -189,6 +244,7 @@ function AddnewInduction() {
                             name="siteSafetyPlan"
                             checked={formData.acknowledgements.siteSafetyPlan}
                             onChange={handleCheckboxChange}
+                            required
                         />
                         <label className="form-check-label">
                             I have reviewed and understand the site safety plan
@@ -223,13 +279,15 @@ function AddnewInduction() {
                 <div className="mt-4">
                     <h3 className="h5 mb-3">Upload Documents</h3>
                     <div className="upload-box border rounded p-4 text-center">
-                        <input
-                            type="file"
-                            onChange={handleFileUpload}
-                            accept=".pdf,.png,.jpg,.jpeg"
-                            className="form-control"
-                            style={{ opacity: 0, position: 'absolute' }}
-                        />
+                    <input
+    type="file"
+    onChange={handleFileUpload}
+    accept=".pdf,.png,.jpg,.jpeg"
+    multiple  // ← allow multiple files
+    className="form-control"
+    style={{ opacity: 0, position: 'absolute' }}
+/>
+
                         <div className="py-3">
                             <i className="fas fa-cloud-upload-alt fa-2x mb-2"></i>
                             <p className="mb-1">Upload a file (drag and drop)</p>
@@ -252,6 +310,8 @@ function AddnewInduction() {
                 </div>
             </form>
         </div>
+        </>
+       
     );
 }
 

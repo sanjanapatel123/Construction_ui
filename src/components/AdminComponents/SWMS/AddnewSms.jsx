@@ -8,18 +8,13 @@ import { createSwms } from "../../../redux/slices/swmsSlice";
 function AddnewSms() {
   const navigate = useNavigate();
   const dispatchEvent = useDispatch();
-
-      const projects = useSelector((state) => state.projects.data);
-
- 
-
-
+  const projects = useSelector((state) => state.projects.data);
   const [formData, setFormData] = useState({
     title: '',
     workArea: '',
-  project: '',
-  description: '',
-  hazardsandControls: [{
+    project: '',
+    description: '',
+    hazardsandControls: [{
     hazardDescription: '',
       riskLevel: 'Low',
       controlMeasures: ''

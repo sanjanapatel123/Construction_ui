@@ -1,7 +1,12 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import { addSiteEntry } from "../../../redux/slices/siteEntrySlice";
+import { useDispatch } from "react-redux";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 function SiteEntry() {
+  const dispatch= useDispatch()
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: "",
     workerId: "",
@@ -19,6 +24,7 @@ function SiteEntry() {
     inductionDate: "",
     siteLocation: "",
   });
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,10 +47,16 @@ function SiteEntry() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
-    // Here you would send the form data to the server
+    dispatch(addSiteEntry(formData))
+      .unwrap() 
+      .then(() => {   
+        toast.success("Site Entry Added Successfully!");
+        navigate("/siteEntryTable");
+      })
+      .catch((err) => {
+        toast.error("Failed to add site entry!");
+      });
   };
-
   const isSafetyEquipmentSelected = Object.values(
     formData.safetyEquipment
   ).every((item) => item);
@@ -310,7 +322,7 @@ function SiteEntry() {
           <button
             type="submit"
             className="btn btn-warning w-100 mt-3"
-            disabled={!isSafetyEquipmentSelected}
+          
           >
             Verify & Submit Entry
           </button>

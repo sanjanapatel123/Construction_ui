@@ -37,6 +37,35 @@ export const createsitereview = createAsyncThunk(
       }
     }
   );
+
+  export const fetchsitereview = createAsyncThunk(
+    'sitereview/fetchsitereview',
+    async (_, thunkAPI) => {
+      try {
+        const response = await axiosInstance.get(`${apiUrl}/sitereview`);
+        return response.data;
+      } catch (error) {
+        return thunkAPI.rejectWithValue(
+          error.response?.data || error.message || "error fetching sitereview"
+        );
+      }
+    }
+  );
+
+
+  export const deletesitereview = createAsyncThunk(
+    'sitereview/deletesitereview',
+    async (id, thunkAPI) => {
+      try {
+        const response = await axiosInstance.delete(`${apiUrl}/sitereview/${id}`);
+        return response.data;
+      } catch (error) {         
+        return thunkAPI.rejectWithValue(
+            
+          error.response?.data || error.message || "error deleting sitereview"
+      )
+    }}
+  )
   
 
 
@@ -65,6 +94,19 @@ const sitereviewSlice = createSlice ({
         state.loading = false;
         state.error = action.payload;
       })
+      .addCase(fetchsitereview.pending, (state) => {
+        state.loading = true;        
+        state.error = null;
+      }
+      )
+      .addCase(fetchsitereview.fulfilled, (state, action) => {
+        state.loading = false;
+        state.sitereview = action.payload;
+      })
+      .addCase(fetchsitereview.rejected, (state, action) => {
+        state.loading = false;        
+        state.error = action.payload;
+      })                     
 
  }
 
