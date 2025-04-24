@@ -1,34 +1,40 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom'
 
+import {fetchProjects} from "../../../redux/slices/projectSlice";
+import { createSwms } from "../../../redux/slices/swmsSlice";
+
 function AddnewSms() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const dispatchEvent = useDispatch();
+
+      const projects = useSelector((state) => state.projects.data);
+
+ 
+
+
   const [formData, setFormData] = useState({
     title: '',
-  siteAddress: '',
-  companyName: '',
-  responsiblePerson: '',
-  principalContractor: '',
-  reviewPerson: '',
-  dateCreated: '',
-  dateReviewed: '',
-  abn: '',
-    hazards: [{
-      description: '',
+    workArea: '',
+  project: '',
+  description: '',
+  hazardsandControls: [{
+    hazardDescription: '',
       riskLevel: 'Low',
       controlMeasures: ''
     }],
-    ppe: {
-      hardHat: false,
-      safetyBoots: false,
-      highVisVest: false,
-      safetyGlasses: false
+    ppeRequirements: {
+      HardHat: false,
+      SafetyBoots: false,
+      HighVisVest: false,
+      SafetyGlasses: false
     },
-    permits: {
-      workingAtHeights: false,
-      hotWork: false,
-      confinedSpace: false,
-      excavation: false
+    requiredPermits: {
+      WorkingatHeights: false,
+      HotWork: false,
+      ConfinedSpace: false,
+      Excavation: false
     }
   })
 
@@ -42,14 +48,14 @@ function AddnewSms() {
 
   const handleHazardChange = (index, field, value) => {
     setFormData(prev => {
-      const newHazards = [...prev.hazards]
+      const newHazards = [...prev.hazardsandControls]
       newHazards[index] = {
         ...newHazards[index],
         [field]: value
       }
       return {
         ...prev,
-        hazards: newHazards
+        hazardsandControls: newHazards
       }
     })
   }
@@ -67,15 +73,22 @@ function AddnewSms() {
   const addHazard = () => {
     setFormData(prev => ({
       ...prev,
-      hazards: [...prev.hazards, { description: '', riskLevel: 'Low', controlMeasures: '' }]
+      hazardsandControls: [...prev.hazardsandControls, { description: '', riskLevel: 'Low', controlMeasures: '' }]
     }))
   }
 
   const handleSubmit = (e, isDraft = false) => {
-    e.preventDefault()
-    // TODO: Implement form submission logic
+    e.preventDefault();
     console.log('Form submitted:', formData)
+    dispatchEvent(createSwms(formData));
+    
+    // TODO: Implement form submission logic
+
   }
+
+  useEffect(() => {
+    dispatchEvent(fetchProjects());
+  }, [dispatchEvent]);
 
   return (
     <div className="container py-4">
@@ -96,27 +109,34 @@ function AddnewSms() {
 </div>
 <div className="row">
   <div className="mb-3 col-md-6">
-    <label htmlFor="siteAddress" className="form-label">Project</label>
+    <label htmlFor="project" className="form-label">Project</label>
     <select
                       className="form-select"
-                      
-                     
+                      value={formData.project}
+                      onChange={handleInputChange}
+                      name="project"
+                    
                     >
-                      <option value="Low">Select Project</option>
-                      <option value="Medium"></option>
-                      <option value="High"></option>
+                      <option value="">Select Project</option>
+                      { projects && projects.map((project) => (
+                        <option key={project._id} value={project._id}>
+                          { console.log(project._id)}
+                          {project.name}
+                        </option>
+                      ))}
+                     
                     </select>
     
   </div>
 
   <div className="mb-3 col-md-6">
-    <label htmlFor="companyName" className="form-label">Work Area</label>
+    <label htmlFor="WorkArea" className="form-label">Work Area</label>
     <input
       type="text"
       className="form-control"
-      id="companyName"
-      name="companyName"
-      value={formData.companyName}
+      id="workArea"
+      name="workArea"
+      value={formData.workArea}
       onChange={handleInputChange}
       placeholder="Specify work area"
     />
@@ -124,7 +144,7 @@ function AddnewSms() {
 </div>
 <div className="row">
   <div className="mb-3 col-md-12">
-    <label htmlFor="responsiblePerson" className="form-label">Work Descripation</label>
+    <label htmlFor="description" className="form-label">Work Description</label>
     {/* <input  type="textarea"
       className="form-control"
       id="responsiblePerson"
@@ -133,7 +153,10 @@ function AddnewSms() {
       onChange={handleInputChange}
       placeholder="e.g., Marc El-Sabbagh"
     /> */}
-    <textarea className="form-control" placeholder='Descripation the work to be  performed'>  </textarea>
+    <textarea className="form-control" id="responsiblePerson"
+      name="description"
+      value={formData.description}
+      onChange={handleInputChange} placeholder='Description the work to be  performed'>  </textarea>
   </div>
   </div>
   {/* <div className="row">
@@ -204,7 +227,7 @@ function AddnewSms() {
 
         <div className="mb-4">
           <h5>Hazards and Controls</h5>
-          {formData.hazards.map((hazard, index) => (
+          {formData.hazardsandControls.map((hazard, index) => (
             <div key={index} className="card mb-3">
               <div className="card-body">
                 <h6>Hazard {index + 1}</h6>
@@ -215,8 +238,8 @@ function AddnewSms() {
                       type="text"
                       className="form-control"
                       placeholder=""
-                      value={hazard.description}
-                      onChange={(e) => handleHazardChange(index, 'description', e.target.value)}
+                      value={hazard.hazardDescription}
+                      onChange={(e) => handleHazardChange(index, 'hazardDescription', e.target.value)}
                     />
                   </div>
                   <div className="col-md-4">
@@ -259,41 +282,41 @@ function AddnewSms() {
               <input
                 type="checkbox"
                 className="form-check-input"
-                id="hardHat"
-                checked={formData.ppe.hardHat}
-                onChange={() => handleCheckboxChange('ppe', 'hardHat')}
+                id="HardHat"
+                checked={formData.ppeRequirements.HardHat}
+                onChange={() => handleCheckboxChange('ppeRequirements', 'HardHat')}
               />
-              <label className="form-check-label" htmlFor="hardHat">Hard Hat</label>
+              <label className="form-check-label" htmlFor="HardHat">Hard Hat</label>
             </div>
             <div className="form-check">
               <input
                 type="checkbox"
                 className="form-check-input"
-                id="safetyBoots"
-                checked={formData.ppe.safetyBoots}
-                onChange={() => handleCheckboxChange('ppe', 'safetyBoots')}
+                id="SafetyBoots"
+                checked={formData.ppeRequirements.SafetyBoots}
+                onChange={() => handleCheckboxChange('ppeRequirements', 'SafetyBoots')}
               />
-              <label className="form-check-label" htmlFor="safetyBoots">Safety Boots</label>
+              <label className="form-check-label" htmlFor="SafetyBoots">Safety Boots</label>
             </div>
             <div className="form-check">
               <input
                 type="checkbox"
                 className="form-check-input"
-                id="highVisVest"
-                checked={formData.ppe.highVisVest}
-                onChange={() => handleCheckboxChange('ppe', 'highVisVest')}
+                id="HighVisVest"
+                checked={formData.ppeRequirements.HighVisVest}
+                onChange={() => handleCheckboxChange('ppeRequirements', 'HighVisVest')}
               />
-              <label className="form-check-label" htmlFor="highVisVest">High Vis Vest</label>
+              <label className="form-check-label" htmlFor="HighVisVest">High Vis Vest</label>
             </div>
             <div className="form-check">
               <input
                 type="checkbox"
                 className="form-check-input"
-                id="safetyGlasses"
-                checked={formData.ppe.safetyGlasses}
-                onChange={() => handleCheckboxChange('ppe', 'safetyGlasses')}
+                id="SafetyGlasses"
+                checked={formData.ppeRequirements.SafetyGlasses}
+                onChange={() => handleCheckboxChange('ppeRequirements', 'SafetyGlasses')}
               />
-              <label className="form-check-label" htmlFor="safetyGlasses">Safety Glasses</label>
+              <label className="form-check-label" htmlFor="SafetyGlasses">Safety Glasses</label>
             </div>
           </div>
 
@@ -303,41 +326,41 @@ function AddnewSms() {
               <input
                 type="checkbox"
                 className="form-check-input"
-                id="workingAtHeights"
-                checked={formData.permits.workingAtHeights}
-                onChange={() => handleCheckboxChange('permits', 'workingAtHeights')}
+                id="WorkingatHeights"
+                checked={formData.requiredPermits.WorkingatHeights}
+                onChange={() => handleCheckboxChange('requiredPermits', 'WorkingatHeights')}
               />
-              <label className="form-check-label" htmlFor="workingAtHeights">Working at Heights</label>
+              <label className="form-check-label" htmlFor="WorkingatHeights">Working at Heights</label>
             </div>
             <div className="form-check">
               <input
                 type="checkbox"
                 className="form-check-input"
-                id="hotWork"
-                checked={formData.permits.hotWork}
-                onChange={() => handleCheckboxChange('permits', 'hotWork')}
+                id="HotWork"
+                checked={formData.requiredPermits.HotWork}
+                onChange={() => handleCheckboxChange('requiredPermits', 'HotWork')}
               />
-              <label className="form-check-label" htmlFor="hotWork">Hot Work</label>
+              <label className="form-check-label" htmlFor="HotWork">Hot Work</label>
             </div>
             <div className="form-check">
               <input
                 type="checkbox"
                 className="form-check-input"
-                id="confinedSpace"
-                checked={formData.permits.confinedSpace}
-                onChange={() => handleCheckboxChange('permits', 'confinedSpace')}
+                id="ConfinedSpace"
+                checked={formData.requiredPermits.ConfinedSpace}
+                onChange={() => handleCheckboxChange('requiredPermits', 'ConfinedSpace')}
               />
-              <label className="form-check-label" htmlFor="confinedSpace">Confined Space</label>
+              <label className="form-check-label" htmlFor="ConfinedSpace">Confined Space</label>
             </div>
             <div className="form-check">
               <input
                 type="checkbox"
                 className="form-check-input"
-                id="excavation"
-                checked={formData.permits.excavation}
-                onChange={() => handleCheckboxChange('permits', 'excavation')}
+                id="Excavation"
+                checked={formData.requiredPermits.Excavation}
+                onChange={() => handleCheckboxChange('requiredPermits', 'Excavation')}
               />
-              <label className="form-check-label" htmlFor="excavation">Excavation</label>
+              <label className="form-check-label" htmlFor="Excavation">Excavation</label>
             </div>
           </div>
         </div>

@@ -12,8 +12,19 @@ import {
   Modal,
 } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProjects } from "../../redux/projectSlice";
+import TimesheetEditModal from "./TimesheetEditModal";
+import {
+  fetchTimesheets,
+  deleteTimesheet,
+} from "../../../redux/slices/timesheetSlice";
+import { fetchProjects } from "../../../redux/slices/projectSlice";
+import { fetchDiaries } from "../../../redux/slices/diarySlice";
+import TimesheetDetailsModal from "./TimesheetDetailsModal";
 import { Line } from "react-chartjs-2";
+import EditDiaryModal from "./EditDiaryModal";
+import BASE_URL from "../../../utils/config";
+import DiaryDetailsModal from "./DiaryDetailsModal";
+import { toast } from "react-toastify";
 import {
   Chart as ChartJS,
   LineElement,
@@ -39,15 +50,33 @@ export default function DiariesTimesheets() {
   const [showModal, setShowModal] = useState(false);
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);
-
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedDiaryId, setSelectedDiaryId] = useState(null);
+  const [selectedDiary, setSelectedDiary] = useState(null);
+  const [showTimeSheetDetailsModal, setShowTimeSheetDetailsModal] = useState(
+    false
+  );
+  const [selectedTimesheetId, setSelectedTimesheetId] = useState("");
+  const [showTimeSheetEditModal, setShowTimeSheetEditModal] = useState(false);
   const [showTimesheetModal, setShowTimesheetModal] = useState(false);
   const handleCloseTimesheet = () => setShowTimesheetModal(false);
   const handleShowTimesheet = () => setShowTimesheetModal(true);
 
   const dispatch = useDispatch();
+
+  const [filters, setFilters] = useState({
+    project: "",
+    date: "",
+    worker: "",
+    search: "",
+  });
+
   const projects = useSelector((state) => state.projects.data);
-  console.log(projects);
-  const [selectedProjectId, setSelectedProjectId] = useState("");
+  const { data, loading, error } = useSelector((state) => state.diaries);
+  const { data: timesheets, loadingstate, errorstate } = useSelector(
+    (state) => state.timesheets
+  );
   const [diaryForm, setDiaryForm] = useState({
     date: "",
     projectName: "",
@@ -57,9 +86,54 @@ export default function DiariesTimesheets() {
     issuesDelays: "",
   });
 
+  const [editData, setEditData] = useState({
+    _id: "",
+    date: "",
+    worker: "",
+    project: "",
+    hoursWorked: "",
+    overtime: "",
+    status: "Pending",
+  });
+
+  const handleTimeSheetEditClick = async (id) => {
+    const res = await axios.get(`${BASE_URL}/timesheet/${id}`);
+    setEditData(res.data);
+    setShowTimeSheetEditModal(true);
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleUpdateTimesheet = async () => {
+    try {
+      await axios.put(`${BASE_URL}/timesheet/${editData._id}`, editData);
+      toast.success("Timesheet updated!");
+      dispatch(fetchTimesheets());
+      setShowTimeSheetEditModal(false);
+    } catch (error) {
+      console.error(error);
+      toast.error("Update failed.");
+    }
+  };
+
   useEffect(() => {
     dispatch(fetchProjects());
+    dispatch(fetchDiaries());
+    dispatch(fetchTimesheets());
   }, [dispatch]);
+
+  const handleEditClick = (diary) => {
+    setSelectedDiary(diary);
+    setShowEditModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowEditModal(false);
+    setSelectedDiary(null);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -71,11 +145,9 @@ export default function DiariesTimesheets() {
   const handleSubmitDiary = async () => {
     // const selectedProject = projects.find((p) => p._id === selectedProjectId);
     try {
-      await axios.post(
-        "https://contructionbackend.onrender.com/api/diaries",
-        diaryForm
-      );
+      await axios.post(`${BASE_URL}/diaries`, diaryForm);
       alert("Diary entry saved successfully!");
+      dispatch(fetchDiaries());
       handleClose(); // close the modal
       setDiaryForm({
         // reset form
@@ -89,48 +161,96 @@ export default function DiariesTimesheets() {
       });
     } catch (err) {
       console.error("Error submitting diary:", err);
-      alert("Failed to submit diary. Please try again.");
+      toast.error("Failed to save diary entry.");
     }
   };
 
-  const dailyDiariesData = [
-    {
-      date: "2024-02-20",
-      project: "Central Tower",
-      supervisor: "John Smith",
-      weather: "☀️ Sunny",
-      work:
-        "Completed foundation work for Block A. Started wall framework installation.",
-      issues: "Minor delay due to material delivery",
-    },
-    {
-      date: "2024-02-19",
-      project: "Riverside Complex",
-      supervisor: "Sarah Johnson",
-      weather: "🌧️ Rainy",
-      work: "Equipment maintenance and site preparation",
-      issues: "Weather-related delays",
-    },
-  ];
+  const handleDelete = (id) => {
+    dispatch(deleteTimesheet(id))
+      .unwrap()
+      .then(() => toast.success("Timesheet deleted successfully!"))
+      .catch(() => toast.error("Failed to delete timesheet."));
+  };
 
-  const timesheetsData = [
-    {
-      date: "2024-02-20",
-      worker: "John Smith",
-      project: "Central Tower",
-      hours: 8.5,
-      overtime: 1.5,
-      status: "Pending",
-    },
-    {
-      date: "2024-02-19",
-      worker: "Sarah Johnson",
-      project: "Riverside Complex",
-      hours: 7.5,
-      overtime: 0.0,
-      status: "Approved",
-    },
-  ];
+  const [timesheetData, setTimesheetData] = useState({
+    date: "",
+    worker: "",
+    project: "",
+    hoursWorked: "",
+    Overtime: "",
+    status: "Pending",
+  });
+
+  const handleTimeSheetChange = (e) => {
+    const { name, value } = e.target;
+    setTimesheetData({ ...timesheetData, [name]: value });
+  };
+
+  const handleSubmitTimeSheet = async () => {
+    try {
+      await axios.post(`${BASE_URL}/timesheet`, timesheetData);
+      toast.success("Timesheet entry added successfully!");
+      dispatch(fetchTimesheets());
+      handleCloseTimesheet(); // Close modal
+      setTimesheetData({
+        // Reset form
+        date: "",
+        worker: "",
+        project: "",
+        hoursWorked: "",
+        Overtime: "",
+        status: "Pending",
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to submit timesheet.");
+    }
+  };
+
+  const handleShowDetails = (id) => {
+    setSelectedTimesheetId(id);
+    setShowTimeSheetDetailsModal(true);
+  };
+
+  const filteredTimesheets = timesheets.filter((entry) => {
+    return (
+      (filters.project === "" || entry.project === filters.project) &&
+      (filters.date === "" || entry.date.startsWith(filters.date)) &&
+      (filters.worker === "" || entry.worker === filters.worker) &&
+      (filters.search === "" ||
+        entry.project.toLowerCase().includes(filters.search.toLowerCase()) ||
+        entry.worker.toLowerCase().includes(filters.search.toLowerCase()))
+    );
+  });
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const indexOfLastItem = (currentPage - 1) * itemsPerPage;
+  // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredTimesheets.slice(
+    indexOfLastItem,
+    indexOfLastItem + itemsPerPage
+  );
+
+  const filteredDiaries = data.filter((entry) => {
+    return (
+      (filters.project === "" || entry.projectName === filters.project) &&
+      (filters.date === "" || entry.date.startsWith(filters.date)) &&
+      (filters.worker === "" || entry.supervisorName === filters.worker) &&
+      (filters.search === "" ||
+        entry.project.toLowerCase().includes(filters.search.toLowerCase()) ||
+        entry.worker.toLowerCase().includes(filters.search.toLowerCase()))
+    );
+  });
+
+  const paginatedDiaries = filteredDiaries.slice(
+    indexOfLastItem,
+    indexOfLastItem + itemsPerPage
+  );
+
+  const totalPages = Math.ceil(filteredDiaries.length / itemsPerPage);
+
   const lineData = {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri"],
     datasets: [
@@ -155,6 +275,8 @@ export default function DiariesTimesheets() {
     },
   };
 
+  if (loading) return <p>Loading diaries...</p>;
+  if (error) return <p>Error: {error}</p>;
   return (
     <Container fluid className="p-4 bg-light">
       <h4 className="mb-4">Diaries & Timesheets</h4>
@@ -248,17 +370,41 @@ export default function DiariesTimesheets() {
           </div>
 
           <Form className="mb-3 d-flex gap-2">
-            <FormControl placeholder="Search entries..." />
-            <Form.Select>
-              <option>All Projects</option>
-              <option>Central Tower</option>
-              <option>Riverside Complex</option>
+            <FormControl
+              placeholder="Search entries..."
+              value={filters.search}
+              onChange={(e) =>
+                setFilters({ ...filters, search: e.target.value })
+              }
+            />
+            <Form.Select
+              onChange={(e) =>
+                setFilters({ ...filters, project: e.target.value })
+              }
+            >
+              <option value="">All Projects</option>
+              {projects.map((project) => (
+                <option key={project._id} value={project.name}>
+                  {project.name}
+                </option>
+              ))}
             </Form.Select>
-            <Form.Control type="date" />
-            <Form.Select>
-              <option>All Workers</option>
-              <option>John Smith</option>
-              <option>Sarah Johnson</option>
+            <Form.Control
+              type="date"
+              value={filters.date}
+              onChange={(e) => setFilters({ ...filters, date: e.target.value })}
+            />
+            <Form.Select
+              onChange={(e) =>
+                setFilters({ ...filters, worker: e.target.value })
+              }
+            >
+              <option value="">All Workers</option>
+              {[...new Set(timesheets.map((t) => t.worker))].map((worker) => (
+                <option key={worker} value={worker}>
+                  {worker}
+                </option>
+              ))}
             </Form.Select>
           </Form>
           <div
@@ -278,25 +424,31 @@ export default function DiariesTimesheets() {
                 </tr>
               </thead>
               <tbody>
-                {dailyDiariesData.map((entry, idx) => (
+                {paginatedDiaries.map((entry, idx) => (
                   <tr key={idx} className="py-3">
                     <td className="ps-4 py-3">{entry.date}</td>
-                    <td className="py-3">{entry.project}</td>
-                    <td className="py-3">{entry.supervisor}</td>
+                    <td className="py-3">{entry.projectName}</td>
+                    <td className="py-3">{entry.supervisorName}</td>
                     <td className="py-3">{entry.weather}</td>
-                    <td className="py-3">{entry.work}</td>
-                    <td className="py-3">{entry.issues}</td>
+                    <td className="py-3">{entry.workPerformed}</td>
+                    <td className="py-3">{entry.issuesDelays}</td>
                     <td className="pe-4 py-3">
                       <div className="d-flex align-items-center gap-2">
                         <i
                           className="fas fa-eye text-info"
-                          title="Assign"
+                          title="Details"
                           style={{ cursor: "pointer", fontSize: "15px" }}
+                          onClick={() => {
+                            setSelectedDiaryId(entry._id);
+                            setShowDetailsModal(true);
+                          }}
                         ></i>
+
                         <i
                           className="fas fa-edit text-primary"
                           title="Edit"
                           style={{ cursor: "pointer", fontSize: "15px" }}
+                          onClick={() => handleEditClick(entry)}
                         ></i>
                         <i
                           className="fa-solid fa-circle-check text-success"
@@ -309,6 +461,19 @@ export default function DiariesTimesheets() {
                 ))}
               </tbody>
             </Table>
+
+            <EditDiaryModal
+              show={showEditModal}
+              handleClose={handleCloseModal}
+              selectedDiary={selectedDiary}
+              onUpdate={() => dispatch(fetchDiaries())}
+            />
+
+            <DiaryDetailsModal
+              show={showDetailsModal}
+              handleClose={() => setShowDetailsModal(false)}
+              diaryId={selectedDiaryId}
+            />
           </div>
         </Tab>
 
@@ -324,17 +489,41 @@ export default function DiariesTimesheets() {
             </button>
           </div>
           <Form className="mb-3 d-flex gap-2">
-            <FormControl placeholder="Search entries..." />
-            <Form.Select>
-              <option>All Projects</option>
-              <option>Central Tower</option>
-              <option>Riverside Complex</option>
+            <FormControl
+              placeholder="Search entries..."
+              value={filters.search}
+              onChange={(e) =>
+                setFilters({ ...filters, search: e.target.value })
+              }
+            />
+            <Form.Select
+              onChange={(e) =>
+                setFilters({ ...filters, project: e.target.value })
+              }
+            >
+              <option value="">All Projects</option>
+              {projects.map((project) => (
+                <option key={project._id} value={project.name}>
+                  {project.name}
+                </option>
+              ))}
             </Form.Select>
-            <Form.Control type="date" />
-            <Form.Select>
-              <option>All Workers</option>
-              <option>John Smith</option>
-              <option>Sarah Johnson</option>
+            <Form.Control
+              type="date"
+              value={filters.date}
+              onChange={(e) => setFilters({ ...filters, date: e.target.value })}
+            />
+            <Form.Select
+              onChange={(e) =>
+                setFilters({ ...filters, worker: e.target.value })
+              }
+            >
+              <option value="">All Workers</option>
+              {[...new Set(timesheets.map((t) => t.worker))].map((worker) => (
+                <option key={worker} value={worker}>
+                  {worker}
+                </option>
+              ))}
             </Form.Select>
           </Form>
           <div
@@ -354,50 +543,100 @@ export default function DiariesTimesheets() {
                 </tr>
               </thead>
               <tbody>
-                {timesheetsData.map((entry, idx) => (
-                  <tr key={idx} className="bg-white py-3">
-                    <td className="ps-4 py-3">{entry.date}</td>
-                    <td className="py-3">{entry.worker}</td>
-                    <td className="py-3">{entry.project}</td>
-                    <td className="py-3">{entry.hours}</td>
-                    <td className="py-3">{entry.overtime}</td>
-                    <td className="py-3">
-                      <span
-                        className={`badge ${
-                          entry.status === "Approved"
-                            ? "bg-success"
-                            : "bg-warning text-dark"
-                        }`}
-                      >
-                        {entry.status}
-                      </span>
-                    </td>
-                    <td className="pe-4 py-3">
-                      <div className="d-flex align-items-center gap-2">
-                        <i
-                          className="fas fa-eye text-info"
-                          title="Assign"
-                          style={{ cursor: "pointer", fontSize: "15px" }}
-                        ></i>
-                        <i
-                          className="fas fa-edit text-primary"
-                          title="Edit"
-                          style={{ cursor: "pointer", fontSize: "15px" }}
-                        ></i>
-                        <i
-                          className="fa-solid fa-circle-check text-success"
-                          title="Resolve"
-                          style={{ cursor: "pointer", fontSize: "15px" }}
-                        ></i>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {loadingstate ? (
+                  <p>Loading..</p>
+                ) : errorstate ? (
+                  <p>Error:{error}</p>
+                ) : (
+                  currentItems.map((entry, idx) => (
+                    <tr key={idx} className="bg-white py-3">
+                      <td className="ps-4 py-3">{entry.date}</td>
+                      <td className="py-3">{entry.worker}</td>
+                      <td className="py-3">{entry.project}</td>
+                      <td className="py-3">{entry.hoursWorked}</td>
+                      <td className="py-3">{entry.Overtime}</td>
+                      <td className="py-3">
+                        <span
+                          className={`badge ${
+                            entry.status === "Approved"
+                              ? "bg-success"
+                              : "bg-warning text-dark"
+                          }`}
+                        >
+                          {entry.status}
+                        </span>
+                      </td>
+                      <td className="pe-4 py-3">
+                        <div className="d-flex align-items-center gap-2">
+                          <i
+                            className="fas fa-eye text-info"
+                            title="details"
+                            style={{ cursor: "pointer", fontSize: "15px" }}
+                            onClick={() => handleShowDetails(entry._id)}
+                          ></i>
+
+                          <i
+                            className="fas fa-edit text-primary"
+                            title="Edit"
+                            style={{ cursor: "pointer", fontSize: "15px" }}
+                            onClick={() => handleTimeSheetEditClick(entry._id)}
+                          ></i>
+                          <i
+                            className="fa-solid fa-circle-check text-success"
+                            title="Resolve"
+                            style={{ cursor: "pointer", fontSize: "15px" }}
+                          ></i>
+
+                          <i
+                            className="fas fa-trash text-danger"
+                            title="danger"
+                            style={{ cursor: "pointer", fontSize: "15px" }}
+                            onClick={() => handleDelete(entry._id)}
+                          ></i>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </Table>
+            <TimesheetEditModal
+              show={showTimeSheetEditModal}
+              onClose={() => setShowTimeSheetEditModal(false)}
+              editData={editData}
+              onChange={handleEditChange}
+              onSubmit={handleUpdateTimesheet}
+            />
+            <TimesheetDetailsModal
+              show={showTimeSheetDetailsModal}
+              handleClose={() => setShowTimeSheetDetailsModal(false)}
+              timesheetId={selectedTimesheetId}
+            />
           </div>
         </Tab>
       </Tabs>
+
+      <div className="d-flex justify-content-end mt-3">
+        <Button
+          variant="outline-primary"
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage(currentPage - 1)}
+          className="me-2"
+        >
+          Previous
+        </Button>
+        <span className="align-self-center">
+          Page {currentPage} of {totalPages}
+        </span>
+        <Button
+          variant="outline-primary"
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage(currentPage + 1)}
+          className="ms-2"
+        >
+          Next
+        </Button>
+      </div>
 
       <Modal
         show={showModal}
@@ -505,38 +744,75 @@ export default function DiariesTimesheets() {
           <Form>
             <Form.Group className="mb-3">
               <Form.Label>Date</Form.Label>
-              <Form.Control type="date" />
+              <Form.Control
+                type="date"
+                name="date"
+                value={timesheetData.date}
+                onChange={handleTimeSheetChange}
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Worker</Form.Label>
-              <Form.Control type="text" placeholder="Enter worker name" />
+              <Form.Control
+                type="text"
+                placeholder="Enter worker name"
+                value={timesheetData.worker}
+                onChange={handleTimeSheetChange}
+                name="worker"
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Project</Form.Label>
-              <Form.Select>
-                <option>Select Project</option>
-                <option>Central Tower</option>
-                <option>Riverside Complex</option>
+              <Form.Label>Project Name</Form.Label>
+              <Form.Select
+                name="project"
+                value={timesheetData.project}
+                onChange={handleTimeSheetChange}
+                required
+              >
+                <option value="">Select a project</option>
+                {projects.map((project) => (
+                  <option key={project._id} value={project.name}>
+                    {project.name}
+                  </option>
+                ))}
               </Form.Select>
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Hours Worked</Form.Label>
-              <Form.Control type="number" min="0" step="0.1" />
+              <Form.Control
+                type="number"
+                min="0"
+                step="0.1"
+                name="hoursWorked"
+                value={timesheetData.hoursWorked}
+                onChange={handleTimeSheetChange}
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Overtime</Form.Label>
-              <Form.Control type="number" min="0" step="0.1" />
+              <Form.Control
+                type="number"
+                name="Overtime"
+                min="0"
+                step="0.1"
+                value={timesheetData.Overtime}
+                onChange={handleTimeSheetChange}
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Status</Form.Label>
-              <Form.Select>
-                <option>Pending</option>
-                <option>Approved</option>
+              <Form.Select
+                name="status"
+                value={timesheetData.status}
+                onChange={handleTimeSheetChange}
+              >
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
               </Form.Select>
             </Form.Group>
           </Form>
@@ -545,7 +821,7 @@ export default function DiariesTimesheets() {
           <Button variant="secondary" onClick={handleCloseTimesheet}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleSubmitDiary}>
+          <Button variant="primary" onClick={handleSubmitTimeSheet}>
             Save Entry
           </Button>
         </Modal.Footer>

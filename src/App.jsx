@@ -73,6 +73,14 @@ import AddNewWorker from "./components/AdminComponents/ComplianceDashboard/AddNe
 import SiteEntry from "./components/AdminComponents/SiteEntry/SiteEntry";
 import SiteEntryTable from "./components/AdminComponents/SiteEntry/SiteEntryTable";
 import FullSiteMap from "./components/AdminComponents/Dashbord/FullSiteMap";
+import Dashboard from "./components/SuperAdmin/Dashboard";
+import PlanPackage from "./components/SuperAdmin/PlanPackage";
+import PlanRequest from "./components/SuperAdmin/PlanRequest";
+import UserInfo from "./components/SuperAdmin/UserInfo";
+import SuperadminSetting from "./components/SuperAdmin/SuperadminSetting";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
   const toggleSidebar = () => {
@@ -85,6 +93,7 @@ function App() {
 
   return (
     <div className="Main-App">
+      <ToastContainer position="top-right" autoClose={3000} />
       {!hideLayout && <Navbar toggleSidebar={toggleSidebar} />}
       <div className={`Main-App-container ${hideLayout ? "no-sidebar" : ""}`}>
         {!hideLayout && (
@@ -233,7 +242,7 @@ function App() {
             <Route path="/upload-new" element={<UploadNew />} />
             <Route path="/architure" element={<Architure />} />
             <Route path="/open-bim" element={<OpenBim />} />
-            <Route path="/view-swms" element={<ViewSmws />} />
+            <Route path="/view-swms/:id" element={<ViewSmws />} />
             <Route path="/View-Inductions" element={<ViewInductions />} />
             <Route path="/add-document-from" element={<AddDocumentFrom />} />
             <Route path="/DrawingRegister" element={<DrawingRegister />} />
@@ -312,6 +321,13 @@ function App() {
             <Route path="/UserManagement" element={<UserManagement />} />
             <Route path="/AddUserManagement" element={<AddUserManagement />} />
             <Route path="/Settings" element={<Settings />} />
+            {/* super-admin */}
+            <Route path="/super-admin-dashboard" element={<Dashboard />} />
+            <Route path="/Plan-Package" element={<PlanPackage />} />
+            <Route path="/Plan-request" element={<PlanRequest />} />
+            <Route path="/user-info" element={<UserInfo />} />
+            <Route path="/super-admin-setting" element={<SuperadminSetting />} />
+
           </Routes>
         </div>
       </div>

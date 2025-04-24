@@ -15,12 +15,14 @@ import {
   FaComments,
   FaListAlt,
 } from "react-icons/fa";
+import { FaBoxOpen, FaClipboardList } from "react-icons/fa";
 import { BsBuilding } from "react-icons/bs";
 import {
   MdSecurity,
   MdOutlineHighQuality,
   MdAnnouncement,
 } from "react-icons/md";
+
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [openMenuIndex, setOpenMenuIndex] = useState(null);
@@ -133,6 +135,33 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       icon: <FaLifeRing className="menu-icon" />,
       path: "/helpSupport",
     },
+
+
+    {
+      title: "Dashboard",
+      icon: <FaHome className="menu-icon" />,
+      path: "/super-admin-dashboard",
+    },
+    {
+      title: "Plan Package",
+      icon: <FaBoxOpen className="menu-icon" />,
+      path: "/Plan-Package",
+    },
+    {
+      title: "Plan Request",
+      icon: <FaClipboardList className="menu-icon" />,
+      path: "/Plan-request",
+    },
+    {
+      title: "User Info",
+      icon: <FaUserCog className="menu-icon" />,
+      path: "/user-info",
+    },
+    {
+      title: "Setting",
+      icon: <FaCogs className="menu-icon" />,
+      path: "/super-admin-setting",
+    },
   ];
 
   const navigate = useNavigate();
@@ -157,17 +186,29 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
   const filteredMenuItems = menuItems.filter((item) => {
     if (roledata === "admin") {
-      return true; // Admin sees everything
+      return true;
+    } else if (roledata === "superadmin") {
+      const superAdminMenuItems = [
+        "/super-admin-dashboard",
+        "/Plan-Package",
+        "/Plan-request",
+        "/user-info",
+        "/super-admin-setting",
+      ];
+      if (superAdminMenuItems.includes(item.path)) {
+        if (item.submenu) {
+          item.submenu = item.submenu.filter((subItem) => true);
+        }
+        return true;
+      }
+      return false;
     } else if (roledata === "supervisor") {
-      // Supervisor sees everything except User Management and Settings
       if (item.title === "User Management" || item.title === "Settings") {
         return false;
       }
-      // Filter submenus for supervisor
       if (item.submenu) {
         item.submenu = item.submenu.filter((subItem) => {
-          // Supervisors can only view submenus like "SWMS", "Inductions", etc.
-          return subItem.title !== "Site Review"; // Example of hiding a submenu
+          return subItem.title !== "Site Review";
         });
       }
       return true;
@@ -182,14 +223,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         "Toolbox Talks",
         "Help & Support",
         "Communication",
-        "Help & Support",
       ];
-      // Filter out any non-relevant menu items
       if (workerMenuItems.includes(item.title)) {
         if (item.submenu) {
-          // Filter submenus for workers
           item.submenu = item.submenu.filter((subItem) => {
-            // Workers can only view submenus that are relevant to them
             return [
               "Dashboard",
               "SWMS",
@@ -205,6 +242,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     }
     return false;
   });
+  
 
   return (
     <div className={`sidebar ${isOpen ? "expanded" : "collapsed"}`}>
@@ -270,6 +308,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </li>
         ))}
       </ul>
+
     </div>
   );
 };

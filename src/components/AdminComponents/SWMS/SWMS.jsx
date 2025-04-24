@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {  use, useEffect, useState } from "react";
 import {
   Container,
   Row,
@@ -10,10 +10,37 @@ import {
   Badge,
 } from "react-bootstrap";
 import { FaEdit, FaEye, FaTrash, FaDownload, FaShare } from "react-icons/fa";
+import { getallSwms } from "../../../redux/slices/swmsSlice";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+
+
 function SWMS() {
+
+  const [search, setSearch] = useState("");
+
+  const dispatch = useDispatch();
+
+  const { swms , loading ,error } = useSelector((state) => state.swms )
+
+  console.log("sWMS" ,swms)
   const navigate = useNavigate();
+
+  useEffect(() => {
+    dispatch(getallSwms());
+  }, [dispatch]);
+  
+
+  const SwmsList = Array.isArray(swms) ? swms : [];
+
+  const handleSearchChange = (e) => setSearch(e.target.value)
+
+
+  const filteredSwms = SwmsList.filter((swms) =>
+    swms.title.toLowerCase().includes(search.toLowerCase()) 
+  );
+
   const templates = [
     {
       id: 1,
@@ -71,6 +98,11 @@ function SWMS() {
     },
   ];
 
+
+ 
+
+
+
   const handleUseTemplate = (title) => {
     navigate(`/template`, { state: { title } });
   };
@@ -94,6 +126,8 @@ function SWMS() {
         <Col sm={12} md={3}>
           <Form.Control
             type="search"
+            value={search}
+            onChange={handleSearchChange}
             placeholder="Search SWMS..."
             style={{ borderRadius: "4px", border: "1px solid #dee2e6" }}
           />
@@ -156,16 +190,73 @@ function SWMS() {
   <div className="table-responsive">
     <table className="table table-hover align-middle mb-0">
       <thead className="bg-light">
-        <tr>
+
+
+         {/* Earliear recievde in ui  , Changed according to form. */}
+
+        {/* <tr>
           <th className="ps-4">SWMS Name</th>
           <th>Company Name</th>
           <th>Principal Contractor</th>
           <th>Date Created</th>
           <th className="pe-4">Actions</th>
+        </tr> */}
+
+        <tr>
+        <th className="ps-4">SWMS Name</th>
+        <th>Project</th>
+        <th>Work Area </th>
+        <th>Date Created</th>
+        <th className="pe-4">Actions</th>
         </tr>
       </thead>
+      {loading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p className="text-danger">{error}</p>
+      ) : (
       <tbody>
-        <tr>
+
+        {
+
+        (filteredSwms && filteredSwms.map((item,index) => (
+          <tr key={index}>
+          <td className="ps-4">
+            <div className="d-flex align-items-center gap-3">
+              <div
+                className="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center"
+                style={{ width: "36px", height: "36px" }}
+              >
+                EL
+              </div>
+              <div>
+                <div className="fw-medium">{item?.title}</div>
+                {/* <small className="text-muted">
+                  Created by: mike.j@example.com
+                </small> */}
+              </div>
+            </div>
+          </td>
+          <td>{item?.project}</td>
+          <td>{item?.workArea}</td>
+          <td> {new Date(item?.createdAt).toLocaleString()}</td>
+          <td className="pe-4">
+            <div className="d-flex gap-3">
+              <Link to={`/view-swms/${item?._id}`}>
+                <Button variant="link" className="text-primary p-0">
+                  <i className="fa-solid fa-eye"></i>
+                </Button>
+              </Link>
+              <Button variant="link" className="text-primary p-0">
+                <i className="fa-solid fa-download"></i>
+              </Button>
+            </div>
+          </td>
+        </tr>
+        )
+        ))
+      }
+        {/* <tr>
           <td className="ps-4">
             <div className="d-flex align-items-center gap-3">
               <div
@@ -197,9 +288,9 @@ function SWMS() {
               </Button>
             </div>
           </td>
-        </tr>
+        </tr> */}
 
-        <tr>
+        {/* <tr>
           <td className="ps-4">
             <div className="d-flex align-items-center gap-3">
               <div
@@ -231,8 +322,9 @@ function SWMS() {
               </Button>
             </div>
           </td>
-        </tr>
+        </tr> */}
       </tbody>
+      )}
     </table>
   </div>
 

@@ -9,13 +9,13 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
 
-  // Dummy credentials for different roles
-  const roleCredentials = {
-    admin: { email: "admin@example.com", password: "admin123" },
-    supervisor: { email: "supervisor@example.com", password: "manager123" },
-    worker: { email: "worker@example.com", password: "employee123" },
-    // client: { email: "client@example.com", password: "client123" },
-  };
+// Dummy credentials for different roles
+const roleCredentials = {
+  admin: { email: "admin@example.com", password: "admin123" },
+  superadmin: { email: "superadmin@example.com", password: "superadmin123" },
+  supervisor: { email: "supervisor@example.com", password: "manager123" },
+  worker: { email: "worker@example.com", password: "employee123" },
+};
 
   // Handle role selection and fill dummy credentials
   const handleRoleSelect = (role) => {
@@ -25,17 +25,23 @@ const Login = () => {
     setSelectedRole(role);
   };
 
-  // Handle login and save role to localStorage
   const handleLogin = (e) => {
     e.preventDefault();
     if (selectedRole) {
       localStorage.setItem("userRole", selectedRole);
       alert(`Logged in as ${selectedRole}`);
-      navigate("/dashboard");
+  
+      // Navigate based on role
+      if (selectedRole === "superadmin") {
+        navigate("/super-admin-dashboard");
+      } else {
+        navigate("/dashboard");
+      }
     } else {
       alert("Please select a role before logging in.");
     }
   };
+  
 
   return (
     <div className="auth-container d-flex justify-content-center align-items-center min-vh-100 bg-light">
@@ -52,45 +58,27 @@ const Login = () => {
               fontWeight: "500",
               padding: "10px 0",
               borderRadius: "4px",
-              transition: "all 0.3s ease",
-            }}
-          >
-            <i
-              className="fab fa-google me-2"
-              style={{
-                fontSize: "18px",
-                color: "#4285F4",
-              }}
-            />
-            Continue with Google
-          </button>
+              transition: "all 0.3s ease", }}>
+            <i className="fab fa-google me-2"
+              style={{ fontSize: "18px",color: "#4285F4",}}/>
+            Continue with Google </button>
 
           <div className="divider position-relative text-center my-4">
             <hr />
-            <span
-              className="position-absolute bg-white px-2"
-              style={{
+            <span className="position-absolute bg-white px-2" style={{
                 top: "50%",
                 left: "50%",
-                transform: "translate(-50%, -50%)",
-              }}
-            >
+                transform: "translate(-50%, -50%)", }}>
               or
             </span>
-          </div>
+          </div>                                  
 
           {/* Login Form */}
           <form onSubmit={handleLogin}>
             <div className="form-floating mb-3">
-              <input
-                type="email"
-                className="form-control"
-                id="email"
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <input  type="email"  className="form-control"
+                id="email" placeholder="name@example.com" value={email}
+                onChange={(e) => setEmail(e.target.value)} required/>
               <label htmlFor="email">Email address</label>
             </div>
             <div className="form-floating mb-3">
@@ -104,15 +92,12 @@ const Login = () => {
             </div>
             <div className="d-flex justify-content-between mb-4">
               <div className="form-check">
-                <input
-                  className="form-check-input"
+                <input  className="form-check-input"
                   type="checkbox"
-                  id="remember"
-                />
+                  id="remember"/>
                 <label
                   className="form-check-label text-secondary"
-                  htmlFor="remember"
-                >
+                  htmlFor="remember">
                   Remember me
                 </label>
               </div>
@@ -120,75 +105,62 @@ const Login = () => {
                 Forgot password?
               </a>
             </div>
-            <button
-              type="submit"
-              className="btn w-100 text-white"
+            <button type="submit" className="btn w-100 text-white"
               style={{
                 backgroundColor: "#0e4966",
                 padding: "10px",
-                borderRadius: "5px",
-              }}
-            >
-              Log In
+                borderRadius: "5px",}}> Log In
             </button>
             <p className="text-center mt-3 mb-0">
               <span className="text-secondary">Don't have an account?</span>
-              <Link
-                to="/signup"
-                className="text-decoration-none ms-1"
-                style={{ color: "#0e4966" }}
-              >
+              <Link to="/signup" className="text-decoration-none ms-1"
+                style={{ color: "#0e4966" }}>
                 Sign up
               </Link>
             </p>
 
             {/* Role Selection Buttons - 2x2 Grid */}
             <div className="row g-2 mt-3">
-              {/* First Row */}
-              <div className="col-12">
-                <button
-                  type="button"
-                  className={`btn w-100 text-white ${
-                    selectedRole === "admin"
-                      ? "border border-2 border-dark"
-                      : ""
-                  }`}
-                  style={{ backgroundColor: "#0e4966", fontWeight: 500 }}
-                  onClick={() => handleRoleSelect("admin")}
-                >
-                  Admin
-                </button>
-              </div>
-              <div className="col-6">
-                <button
-                  type="button"
-                  className={`btn w-100 text-white ${
-                    selectedRole === "supervisor"
-                      ? "border border-2 border-dark"
-                      : ""
-                  }`}
-                  style={{ backgroundColor: "#0e4966", fontWeight: 500 }}
-                  onClick={() => handleRoleSelect("supervisor")}
-                >
-                  Supervisor
-                </button>
-              </div>
+  {/* First Row */}
+  <div className="col-12">
+    <button type="button" className={`btn w-100 text-white ${  selectedRole === "admin" ? "border border-2 border-dark" : "" }`}
+      style={{ backgroundColor: "#0e4966", fontWeight: 500 }}  onClick={() => handleRoleSelect("admin")} >
+      Admin
+    </button>
+  </div>
 
-              <div className="col-6">
-                <button
-                  type="button"
-                  className={`btn w-100 text-white ${
-                    selectedRole === "worker"
-                      ? "border border-2 border-dark"
-                      : ""
-                  }`}
-                  style={{ backgroundColor: "#0e4966", fontWeight: 500 }}
-                  onClick={() => handleRoleSelect("worker")}
-                >
-                  Worker
-                </button>
-              </div>
-            </div>
+  {/* Superadmin Button */}
+  <div className="col-12">
+    <button type="button" className={`btn w-100 text-white ${   selectedRole === "superadmin" ? "border border-2 border-dark" : ""
+   }`} style={{ backgroundColor: "#0e4966", fontWeight: 500 }}  onClick={() => handleRoleSelect("superadmin")} >
+      Superadmin
+    </button>
+  </div>
+
+  {/* Supervisor */}
+  <div className="col-6">
+    <button  type="button"  className={`btn w-100 text-white ${
+        selectedRole === "supervisor" ? "border border-2 border-dark" : ""
+      }`}
+      style={{ backgroundColor: "#0e4966", fontWeight: 500 }}
+      onClick={() => handleRoleSelect("supervisor")}
+    >
+      Supervisor
+    </button>
+  </div>
+
+  {/* Worker */}
+  <div className="col-6">
+    <button type="button" className={`btn w-100 text-white ${   selectedRole === "worker" ? "border border-2 border-dark" : ""
+      }`}
+      style={{ backgroundColor: "#0e4966", fontWeight: 500 }}
+      onClick={() => handleRoleSelect("worker")}
+    >
+      Worker
+    </button>
+  </div>
+</div>
+
           </form>
         </div>
       </main>

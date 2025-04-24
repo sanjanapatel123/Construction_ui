@@ -8,13 +8,18 @@ import {
   Table,
   Form,
 } from "react-bootstrap";
-// import { FaSearch, FaPlusCircle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import ViewProjectModal from "./ViewProjectModal";
-import { fetchProjects } from "../../redux/projectSlice";
-import axios from "axios";
+import {
+  fetchProjects,
+  deleteProject,
+  getSingleProject,
+} from "../../../redux/slices/projectSlice";
 import EditProjectModal from "./EditProjectModal";
+import { apiUrl } from "../../../utils/config";
+import { toast } from "react-toastify";
+import axiosInstance from "../../../utils/axiosInstance";
 
 const ProjectDashboard = () => {
   const [showModal, setShowModal] = useState(false);
@@ -26,8 +31,8 @@ const ProjectDashboard = () => {
 
   const handleShowModal = async (projectId) => {
     try {
-      const response = await axios.get(
-        `https://contructionbackend.onrender.com/api/projects/${projectId}`
+      const response = await axiosInstance.get(
+        `${apiUrl}/projects/${projectId}`
       );
       setSelectedProject(response.data);
       setShowModal(true);
@@ -44,169 +49,9 @@ const ProjectDashboard = () => {
     setShowModal(false);
     setSelectedProject(null);
   };
-  // Sample data for the projects
-  const [projects] = useState([
-    {
-      name: "Website Redesign",
-      manager: "John Smith",
-      startDate: "2025-03-15",
-      endDate: "2025-06-30",
-      priority: "High",
-      description:
-        "Complete overhaul of company website with new design system and improved UX.",
-      progress: 65,
-      status: "Ongoing",
-      tasks: [
-        {
-          name: "Design System Creation",
-          status: "Completed",
-          assignedTo: "Sarah Johnson",
-          dueDate: "2025-04-01",
-        },
-        {
-          name: "Frontend Development",
-          status: "In Progress",
-          assignedTo: "Mike Chen",
-          dueDate: "2025-05-15",
-        },
-        {
-          name: "Content Migration",
-          status: "Not Started",
-          assignedTo: "John Smith",
-          dueDate: "2025-06-01",
-        },
-      ],
-      team: [
-        {
-          name: "John Smith",
-          role: "Project Manager",
-          avatar:
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEg09MmHvC-78aaRxyd52HabsZqI1-u8R6-w&s",
-        },
-        {
-          name: "Sarah Johnson",
-          role: "UX Designer",
-          avatar:
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEg09MmHvC-78aaRxyd52HabsZqI1-u8R6-w&s",
-        },
-        {
-          name: "Mike Chen",
-          role: "Developer",
-          avatar:
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEg09MmHvC-78aaRxyd52HabsZqI1-u8R6-w&s",
-        },
-      ],
-    },
-    {
-      name: "Website Redesign",
-      manager: "John Smith",
-      startDate: "2025-03-15",
-      endDate: "2025-06-30",
-      priority: "High",
-      description:
-        "Complete overhaul of company website with new design system and improved UX.",
-      progress: 65,
-      status: "Ongoing",
-      tasks: [
-        {
-          name: "Design System Creation",
-          status: "Completed",
-          assignedTo: "Sarah Johnson",
-          dueDate: "2025-04-01",
-        },
-        {
-          name: "Frontend Development",
-          status: "In Progress",
-          assignedTo: "Mike Chen",
-          dueDate: "2025-05-15",
-        },
-        {
-          name: "Content Migration",
-          status: "Not Started",
-          assignedTo: "John Smith",
-          dueDate: "2025-06-01",
-        },
-      ],
-      team: [
-        {
-          name: "John Smith",
-          role: "Project Manager",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          name: "Sarah Johnson",
-          role: "UX Designer",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          name: "Mike Chen",
-          role: "Developer",
-          avatar: "https://via.placeholder.com/50",
-        },
-      ],
-    },
-    {
-      name: "Website Redesign",
-      manager: "John Smith",
-      startDate: "2025-03-15",
-      endDate: "2025-06-30",
-      priority: "High",
-      description:
-        "Complete overhaul of company website with new design system and improved UX.",
-      progress: 65,
-      status: "Ongoing",
-      tasks: [
-        {
-          name: "Design System Creation",
-          status: "Completed",
-          assignedTo: "Sarah Johnson",
-          dueDate: "2025-04-01",
-        },
-        {
-          name: "Frontend Development",
-          status: "In Progress",
-          assignedTo: "Mike Chen",
-          dueDate: "2025-05-15",
-        },
-        {
-          name: "Content Migration",
-          status: "Not Started",
-          assignedTo: "John Smith",
-          dueDate: "2025-06-01",
-        },
-      ],
-      team: [
-        {
-          name: "John Smith",
-          role: "Project Manager",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          name: "Sarah Johnson",
-          role: "UX Designer",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          name: "Mike Chen",
-          role: "Developer",
-          avatar: "https://via.placeholder.com/50",
-        },
-      ],
-    },
-  ]);
 
-  const deleteProject = async (projectId) => {
-    try {
-      console.log(projectId);
-      const response = await axios.delete(
-        `https://contructionbackend.onrender.com/api/projects/${projectId}`
-      );
-      console.log("Project deleted:", response.data);
-      alert("Project deleted successfully!");
-    } catch (error) {
-      console.error("Error deleting project:", error);
-      alert(error?.response?.data?.message || "Failed to delete project!");
-    }
+  const handleDelete = (projectId) => {
+    dispatch(deleteProject(projectId));
   };
 
   return (
@@ -338,7 +183,7 @@ const ProjectDashboard = () => {
                   </button>
                   <button
                     className="text-danger btn p-0"
-                    onClick={() => deleteProject(`${project._id}`)}
+                    onClick={() => handleDelete(`${project._id}`)}
                   >
                     <i className="fa-solid fa-trash"></i>
                   </button>

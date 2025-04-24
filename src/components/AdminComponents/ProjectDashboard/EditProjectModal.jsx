@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
+import BASE_URL from "../../../utils/config";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { fetchProjects } from "../../../redux/slices/projectSlice"; // Adjust the import path as necessary
 
 const EditProjectModal = ({ show, handleClose, project, refreshData }) => {
   const [formData, setFormData] = useState({});
@@ -16,19 +20,22 @@ const EditProjectModal = ({ show, handleClose, project, refreshData }) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const dispatch = useDispatch();
+
   const handleUpdate = async () => {
     try {
       const response = await axios.put(
-        `https://contructionbackend.onrender.com/api/projects/${project._id}`,
+        `${BASE_URL}/projects/${project._id}`,
         formData
       );
       console.log(response);
-      alert("Project updated successfully!");
+      toast.success("Project updated successfully!");
+      dispatch(fetchProjects()); // Fetch updated projects list
       handleClose();
       //   refreshData && refreshData(); // optional: refresh project list after update
     } catch (error) {
       console.error("Update Error:", error);
-      alert("Failed to update project!");
+      toast.error("Failed to update project!");
     }
   };
 
