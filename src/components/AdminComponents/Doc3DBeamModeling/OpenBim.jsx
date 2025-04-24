@@ -263,30 +263,17 @@ const OpenBim = () => {
           <div className="absolute inset-0">
             {activeModelTab === 'building' && (
               <div className="w-full h-full flex items-center justify-center">
-                {/* <img
-                  src="https://readdy.ai/api/search-image?query=3D%20rendering%20of%20a%20modern%20office%20building%20with%20glass%20facade%2C%20architectural%20visualization%2C%20detailed%20BIM%20model%20with%20visible%20structural%20elements%2C%20professional%203D%20model%20visualization%2C%20high%20quality%20rendering%2C%20neutral%20lighting%2C%20construction%20visualization&width=800&height=600&seq=1&orientation=landscape"
-                  alt="Building Model"
-                  className="w-full h-full object-cover opacity-90"
-                /> */}
                 <BIMViewer modelUrl={'./1.glb'}/>
               </div>
             )}
             {activeModelTab === 'mep' && (
               <div className="w-full h-full flex items-center justify-center">
-                <img
-                  src="https://readdy.ai/api/search-image?query=3D%20rendering%20of%20building%20MEP%20systems%2C%20HVAC%20ducts%2C%20electrical%20conduits%2C%20plumbing%20pipes%2C%20all%20color%20coded%2C%20BIM%20model%20visualization%2C%20detailed%20mechanical%20electrical%20plumbing%20systems%2C%20professional%20engineering%20visualization%2C%20construction%20technical%20drawing%2C%20neutral%20background&width=800&height=600&seq=2&orientation=landscape"
-                  alt="MEP Systems Model"
-                  className="w-full h-full object-cover opacity-90"
-                />
+                 <BIMViewer modelUrl={'./1.glb'}/>
               </div>
             )}
             {activeModelTab === 'structural' && (
               <div className="w-full h-full flex items-center justify-center">
-                <img
-                  src="https://readdy.ai/api/search-image?query=3D%20rendering%20of%20building%20structural%20framework%2C%20steel%20beams%2C%20columns%2C%20concrete%20elements%2C%20detailed%20structural%20engineering%20model%2C%20BIM%20visualization%2C%20professional%20construction%20visualization%2C%20structural%20analysis%20model%2C%20neutral%20background%2C%20engineering%20precision&width=800&height=600&seq=3&orientation=landscape"
-                  alt="Structural Model"
-                  className="w-full h-full object-cover opacity-90"
-                />
+                 <BIMViewer modelUrl={'./1.glb'}/>
               </div>
             )}
             {/* Navigation Cube */}
