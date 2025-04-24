@@ -80,7 +80,16 @@ function AddnewSms() {
   const handleSubmit = (e, isDraft = false) => {
     e.preventDefault();
     console.log('Form submitted:', formData)
-    dispatchEvent(createSwms(formData));
+    dispatchEvent(createSwms(formData)).unwrap()
+    .then((data) =>{
+      alert("SWMS added successfully!");
+      // showSuccessToast(data?.title  || 'add swms successful!');
+       navigate("/swms");
+    }) .catch((err) => {
+      console.log("error in create swms",err)
+      showErrorToast(err || 'add failed!');
+      showErrorAlert(err || 'add failed!');
+    });
     
     // TODO: Implement form submission logic
 

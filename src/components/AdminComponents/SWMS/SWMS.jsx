@@ -10,9 +10,11 @@ import {
   Badge,
 } from "react-bootstrap";
 import { FaEdit, FaEye, FaTrash, FaDownload, FaShare } from "react-icons/fa";
-import { getallSwms } from "../../../redux/slices/swmsSlice";
+import { getallSwms, deleteswms } from "../../../redux/slices/swmsSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+
 import { Link } from "react-router-dom";
 
 
@@ -24,13 +26,17 @@ function SWMS() {
 
   const { swms , loading ,error } = useSelector((state) => state.swms )
 
+
+
   console.log("sWMS" ,swms)
   const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(getallSwms());
+    
   }, [dispatch]);
   
+
 
   const SwmsList = Array.isArray(swms) ? swms : [];
 
@@ -98,6 +104,42 @@ function SWMS() {
     },
   ];
 
+// const handleDelete = (id) => {
+//   dispatch(deleteswms(id))
+//     .unwrap()
+//     .then(() => toast.success("SWMS deleted successfully!"))
+//     .catch(() => toast.error("Failed to delete SWMS."));
+// };
+
+
+const handleDelete = (id) => {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "You won't be able to revert this!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      dispatch(deleteswms(id))
+        .then((response) => {
+          {console.log(response)}
+          if (response.meta.requestStatus === "fulfilled") {
+            // showSuccessToast("SWMS deleted successfully!");
+            dispatch(getallSwms());
+            navigate("/swms");
+          } else {
+            // showErrorToast("Failed to delete SWMS!");
+          }
+        })
+        .catch(() => {
+          showErrorToast("Something went wrong!");
+        });
+    }
+  });
+};
 
  
 
@@ -219,16 +261,16 @@ function SWMS() {
 
         {
 
-        (filteredSwms && filteredSwms.map((item,index) => (
+        (filteredSwms.length > 0 ? ( filteredSwms.map((item,index) => (
           <tr key={index}>
           <td className="ps-4">
             <div className="d-flex align-items-center gap-3">
-              <div
+              {/* <div
                 className="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center"
                 style={{ width: "36px", height: "36px" }}
               >
                 EL
-              </div>
+              </div> */}
               <div>
                 <div className="fw-medium">{item?.title}</div>
                 {/* <small className="text-muted">
@@ -250,11 +292,19 @@ function SWMS() {
               <Button variant="link" className="text-primary p-0">
                 <i className="fa-solid fa-download"></i>
               </Button>
+              <button
+                    className="text-danger btn p-0"
+                    // onClick={() => deleteProject(`${project._id}`)}
+                    onClick={() => handleDelete(item?._id)}
+                  >
+                    <i className="fa-solid fa-trash"></i>
+                  </button>
             </div>
           </td>
         </tr>
         )
-        ))
+        )) : <tr>
+          <td colSpan="5">No SWMS found</td></tr>)
       }
         {/* <tr>
           <td className="ps-4">
