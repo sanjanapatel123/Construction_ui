@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import BIMViewer from './BimViewer';
+import Toolbar from './ToolBar';
 const OpenBim = () => {
   const [activeModelTab, setActiveModelTab] = useState('building');
   const [activeSidePanel, setActiveSidePanel] = useState('details');
@@ -26,6 +27,7 @@ const OpenBim = () => {
   return (
     <div className="flex flex-col h-screen bg-gray-100" style={{marginTop: "0px"}}>
       {/* Top Navigation Bar */}
+      <Toolbar setTool={handleToolSelect} />
       <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 z-10">
         <div className="flex items-center gap-4">
           <a
@@ -213,14 +215,14 @@ const OpenBim = () => {
               <i className="fas fa-ruler-combined"></i>
             </button>
             <button
-              className={`w-10 h-10 rounded-md flex items-center justify-center ${activeTool === 'section' ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600 hover:bg-gray-100'} cursor-pointer`}
+              className={`w-10 h-10 rounded-md flex items-center justify-center ${activeTool === 'cut' ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600 hover:bg-gray-100'} cursor-pointer`}
               onClick={() => handleToolSelect('section')}
               title="Section Plane Tool"
             >
               <i className="fas fa-cut"></i>
             </button>
             <button
-              className={`w-10 h-10 rounded-md flex items-center justify-center ${activeTool === 'markup' ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600 hover:bg-gray-100'} cursor-pointer`}
+              className={`w-10 h-10 rounded-md flex items-center justify-center ${activeTool === 'annotate' ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600 hover:bg-gray-100'} cursor-pointer`}
               onClick={() => handleToolSelect('markup')}
               title="Markup Tool"
             >
@@ -233,60 +235,29 @@ const OpenBim = () => {
             >
               <i className="fas fa-camera"></i>
             </button>
-            <button
-              className={`w-10 h-10 rounded-md flex items-center justify-center ${activeTool === 'layers' ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600 hover:bg-gray-100'} cursor-pointer`}
-              onClick={() => handleToolSelect('layers')}
-              title="Layer Visibility"
-            >
-              <i className="fas fa-layer-group"></i>
-            </button>
-            <button
-              className={`w-10 h-10 rounded-md flex items-center justify-center ${activeTool === 'hide' ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600 hover:bg-gray-100'} cursor-pointer`}
-              onClick={() => handleToolSelect('hide')}
-              title="Hide/Isolate Elements"
-            >
-              <i className="fas fa-eye-slash"></i>
-            </button>
-          </div>
-          <div className="mt-auto">
-            <button
-              className="w-10 h-10 rounded-md flex items-center justify-center text-gray-600 hover:bg-gray-100 cursor-pointer"
-              title="Help"
-            >
-              <i className="fas fa-question-circle"></i>
-            </button>
           </div>
         </div>
          {/* Main Viewer */}
+
          <div className="flex-1 relative bg-gray-800 overflow-hidden">
           {/* 3D Model Viewer */}
-          <div className="absolute inset-0">
+          {/* <div className="absolute inset-0">
+            <BIMViewer modelUrl={'./1.glb'} activeTool={activeTool} />
+          </div> */}
+          <div>
             {activeModelTab === 'building' && (
-              <div className="w-full h-full flex items-center justify-center">
-                {/* <img
-                  src="https://readdy.ai/api/search-image?query=3D%20rendering%20of%20a%20modern%20office%20building%20with%20glass%20facade%2C%20architectural%20visualization%2C%20detailed%20BIM%20model%20with%20visible%20structural%20elements%2C%20professional%203D%20model%20visualization%2C%20high%20quality%20rendering%2C%20neutral%20lighting%2C%20construction%20visualization&width=800&height=600&seq=1&orientation=landscape"
-                  alt="Building Model"
-                  className="w-full h-full object-cover opacity-90"
-                /> */}
-                <BIMViewer modelUrl={'./1.glb'}/>
+              <div  className="absolute inset-0">
+                <BIMViewer modelUrl={'./1.glb'} activeTool={activeTool}/>
               </div>
             )}
             {activeModelTab === 'mep' && (
-              <div className="w-full h-full flex items-center justify-center">
-                <img
-                  src="https://readdy.ai/api/search-image?query=3D%20rendering%20of%20building%20MEP%20systems%2C%20HVAC%20ducts%2C%20electrical%20conduits%2C%20plumbing%20pipes%2C%20all%20color%20coded%2C%20BIM%20model%20visualization%2C%20detailed%20mechanical%20electrical%20plumbing%20systems%2C%20professional%20engineering%20visualization%2C%20construction%20technical%20drawing%2C%20neutral%20background&width=800&height=600&seq=2&orientation=landscape"
-                  alt="MEP Systems Model"
-                  className="w-full h-full object-cover opacity-90"
-                />
+              <div className="w-full h-full ">
+                 <BIMViewer modelUrl={'./1.glb'} activeTool={activeTool}/>
               </div>
-            )}
+            )}   
             {activeModelTab === 'structural' && (
               <div className="w-full h-full flex items-center justify-center">
-                <img
-                  src="https://readdy.ai/api/search-image?query=3D%20rendering%20of%20building%20structural%20framework%2C%20steel%20beams%2C%20columns%2C%20concrete%20elements%2C%20detailed%20structural%20engineering%20model%2C%20BIM%20visualization%2C%20professional%20construction%20visualization%2C%20structural%20analysis%20model%2C%20neutral%20background%2C%20engineering%20precision&width=800&height=600&seq=3&orientation=landscape"
-                  alt="Structural Model"
-                  className="w-full h-full object-cover opacity-90"
-                />
+                 <BIMViewer modelUrl={'./1.glb'} activeTool={activeTool}/>
               </div>
             )}
             {/* Navigation Cube */}
@@ -315,7 +286,7 @@ const OpenBim = () => {
               </div>
             )}
             {/* Section Plane Controls (when section tool is active) */}
-            {activeTool === 'section' && (
+            {/* {activeTool === 'section' && (
               <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md text-sm flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <span>X:</span>
@@ -330,7 +301,7 @@ const OpenBim = () => {
                   <input type="range" className="w-24" />
                 </div>
               </div>
-            )}
+            )} */}
             {/* Markup Controls (when markup tool is active) */}
             {activeTool === 'markup' && (
               <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md text-sm flex items-center gap-4">
