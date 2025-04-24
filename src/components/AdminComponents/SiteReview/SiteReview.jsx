@@ -252,30 +252,32 @@ ChartJS.register(
   Legend
 );
 import { Table ,Button} from "react-bootstrap";
+import { useSelector } from "react-redux";
 
 
 function SiteReview() {
-  const siteReviews = [
-    {
-      siteName: "Site A",
-      reviewDate: "Apr 20, 2025",
-      reviewerName: "John Smith",
-      complianceStatus: "Compliant",
-    },
-    {
-      siteName: "Site B",
-      reviewDate: "Apr 18, 2025",
-      reviewerName: "Sarah Smith",
-      complianceStatus: "Non-Compliant",
-    },
-    {
-      siteName: "Site C",
-      reviewDate: "Apr 19, 2025",
-      reviewerName: "David Brown",
-      complianceStatus: "Compliant",
-    },
-  ];
+  // const siteReviews = [
+  //   {
+  //     siteName: "Site A",
+  //     reviewDate: "Apr 20, 2025",
+  //     reviewerName: "John Smith",
+  //     complianceStatus: "Compliant",
+  //   },
+  //   {
+  //     siteName: "Site B",
+  //     reviewDate: "Apr 18, 2025",
+  //     reviewerName: "Sarah Smith",
+  //     complianceStatus: "Non-Compliant",
+  //   },
+  //   {
+  //     siteName: "Site C",
+  //     reviewDate: "Apr 19, 2025",
+  //     reviewerName: "David Brown",
+  //     complianceStatus: "Compliant",
+  //   },
+  // ];
 
+  const { sitereview, loading, error } = useSelector((state) => state.sitereview);
   const [categories, setCategories] = useState({
     safety: {
       PPE_Compliance: false,
@@ -363,55 +365,63 @@ function SiteReview() {
               </tr>
             </thead>
             <tbody>
-              {siteReviews.map((review, index) => (
-                <tr key={index}>
-                  <td>{review.siteName}</td>
-                  <td>{review.reviewDate}</td>
-                  <td>{review.reviewerName}</td>
-                  <td>
-                    <span
-                      className={`badge ${
-                        review.complianceStatus === "Compliant"
-                          ? "bg-success"
-                          : "bg-danger"
-                      }`}
-                    >
-                      {review.complianceStatus}
-                    </span>
-                  </td>
-                  {/* <td>
-                    <Link to={`/editReview/${index}`}>
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        className="me-2"
-                        style={{ borderRadius: "20px" }}
-                      >
-                        Edit
-                      </Button>
-                    </Link>
-                    <Button
-                      variant="outline-danger"
-                      size="sm"
-                      style={{ borderRadius: "20px" }}
-                    >
-                      Delete
-                    </Button>
-                  </td> */}
+              { loading ? (
+    <tr>
+      <td colSpan="5" className="text-center py-3">Loading...</td>
+    </tr>
+  ) :
 
-                  <td>
-                    <Link to={`/editReview/${index}`}>
-                      <button className="btn text-primary ">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                      </button>
-                    </Link>
+sitereview.map((review, index) => (
+  <tr key={index}>
+    <td>{review.siteName}</td>
+    <td>{review.reviewDate}</td>
+    <td>{review.reviewerName}</td>
+    <td>
+      <span
+        className={`badge ${
+          review.complianceStatus === "Compliant"
+            ? "bg-success"
+            : "bg-danger"
+        }`}
+      >
+        {review.complianceStatus}
+      </span>
+    </td>
+    {/* <td>
+      <Link to={`/editReview/${index}`}>
+        <Button
+          variant="outline-primary"
+          size="sm"
+          className="me-2"
+          style={{ borderRadius: "20px" }}
+        >
+          Edit
+        </Button>
+      </Link>
+      <Button
+        variant="outline-danger"
+        size="sm"
+        style={{ borderRadius: "20px" }}
+      >
+        Delete
+      </Button>
+    </td> */}
 
-                    <button className="btn text-danger">
-                      <i class="fa-solid fa-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-              ))}
+    <td>
+      <Link to={`/editReview/${index}`}>
+        <button className="btn text-primary ">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </button>
+      </Link>
+
+      <button className="btn text-danger">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    </td>
+  </tr>
+))
+              }
+            
             </tbody>
           </Table>
         </div>

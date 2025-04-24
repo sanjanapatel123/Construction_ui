@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Spinner } from "react-bootstrap";
 import axios from "axios";
-import BASE_URL from "../../../utils/config";
+import { apiUrl } from "../../../utils/config";
+
 
 const TimesheetDetailsModal = ({ show, handleClose, timesheetId }) => {
   const [details, setDetails] = useState(null);
@@ -12,7 +13,7 @@ const TimesheetDetailsModal = ({ show, handleClose, timesheetId }) => {
     if (timesheetId) {
       setLoading(true);
       axios
-        .get(`${BASE_URL}/timesheet/${timesheetId}`)
+        .get(`${apiUrl}/timesheet/${timesheetId}`)
         .then((res) => {
           setDetails(res.data);
           setLoading(false);

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { apiUrl } from "../../utils/config";
 
 
 
@@ -8,7 +9,7 @@ export const addSiteEntry = createAsyncThunk(
   "siteEntry/addSiteEntry",
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`https://hrb5wx2v-8000.inc1.devtunnels.ms/api/siteEntry`, formData);
+      const response = await axios.post(`${apiUrl}/siteEntry`, formData);
       return response.data;
     } catch (err) {
       return rejectWithValue(err.response.data);
@@ -21,7 +22,7 @@ export const fetchSiteEntries = createAsyncThunk(
   "siteEntry/fetchSiteEntries",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`https://hrb5wx2v-8000.inc1.devtunnels.ms/api/siteEntry`);
+      const response = await axios.get(`${apiUrl}/siteEntry`);
       return response.data.data;
     } catch (err) {
       return rejectWithValue(err.response.data);
@@ -34,7 +35,7 @@ export const deleteSiteEntry = createAsyncThunk(
   "siteEntry/deleteSiteEntry",
   async (id, { rejectWithValue }) => {
     try {
-      await axios.delete(`https://hrb5wx2v-8000.inc1.devtunnels.ms/api/siteEntry/${id}`);
+      await axios.delete(`${apiUrl}/siteEntry/${id}`);
       return id;
     } catch (err) {
       return rejectWithValue(err.response.data);
@@ -47,7 +48,7 @@ export const updateSiteEntry = createAsyncThunk(
   async ({ id, updatedEntry }, { rejectWithValue }) => {
     try {
       const response = await axios.patch(
-        `https://hrb5wx2v-8000.inc1.devtunnels.ms/api/siteEntry/${id}`,
+        `${apiUrl}/siteEntry/${id}`,
         updatedEntry
       );
       return response.data;

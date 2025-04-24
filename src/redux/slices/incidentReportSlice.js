@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axiosInstance from '../../utils/axiosInstance';
+import { apiUrl } from '../../utils/config';
 
 // CREATE INCIDENT REPORT
 export const createIncidentReport = createAsyncThunk(
@@ -7,7 +8,7 @@ export const createIncidentReport = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
-        'https://hrb5wx2v-8000.inc1.devtunnels.ms/api/incident',
+        `${apiUrl}/incident`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
@@ -24,7 +25,7 @@ export const getIncidentReports = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        'https://hrb5wx2v-8000.inc1.devtunnels.ms/api/incident'
+        `${apiUrl}/incident`
       );
       // console.log(response.data.incidents)
       return response.data.incidents;
@@ -40,7 +41,7 @@ export const deleteIncidentReport = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       await axiosInstance.delete(
-        `https://hrb5wx2v-8000.inc1.devtunnels.ms/api/incident/${id}`
+        `${apiUrl}/incident/${id}`
       );
       return id;  // return id for local state update
     } catch (error) {

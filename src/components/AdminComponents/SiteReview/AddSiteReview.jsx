@@ -239,6 +239,7 @@ function AddSiteReview() {
 
   const [formData, setFormData] = useState({
     siteName: '',
+    siteLocation: '',
     reviewerName: '',
     reviewDate: '',
     complianceStatus: 'Compliant',
@@ -285,10 +286,10 @@ function AddSiteReview() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.siteName || !formData.reviewerName || !formData.reviewDate) {
-      alert('Please fill in all required fields');
-      return;
-    }
+    // if (!formData.siteName || !formData.reviewerName || !formData.reviewDate) {
+    //   alert('Please fill in all required fields');
+    //   return;
+    // }
 
     const dataToSubmit = {
       ...formData,
@@ -320,11 +321,22 @@ function AddSiteReview() {
         <div className="row mb-3">
           <div className="col-md-6">
             <label className="form-label">Site Name/Location</label>
-            <select className="form-select" name="siteLocation" value={formData.siteName} onChange={handleInputChange}>
+            <select className="form-select" name="siteName" value={formData.siteName} onChange={handleInputChange}>
               <option value="">Select Site</option>
              { entries.map((entry) => (
                <option key={entry._id} value={entry._id}>
                  {entry.siteName}
+               </option>
+             ))}
+            </select>
+          </div>
+          <div className="col-md-6">
+            <label className="form-label">Site Location</label>
+            <select className="form-select" name="siteLocation" value={formData.siteLocation} onChange={handleInputChange}>
+              <option value="">Select Site</option>
+             { entries.map((entry) => (
+               <option key={entry._id} value={entry._id}>
+                 {entry.siteLocation}
                </option>
              ))}
             </select>

@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { apiUrl } from '../../utils/config';
 
 export const fetchDiaries = createAsyncThunk('diaries/fetchDiaries', async () => {
-  const response = await axios.get("https://contructionbackend.onrender.com/api/diaries");
+  const response = await axios.get(`${apiUrl}/diaries`);
   return response.data;
 });
 

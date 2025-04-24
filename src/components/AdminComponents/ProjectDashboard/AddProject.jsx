@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { Button, Form, Col, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import  BASE_URL  from "../../../utils/config"; // Adjust the import path as necessary
+ // Adjust the import path as necessary
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { fetchProjects } from "../../../redux/slices/projectSlice"; // Adjust the import path as necessary
 import axiosInstance from "../../../utils/axiosInstance";
+import { apiUrl } from "../../../utils/config";
 
 const AddProject = () => {
   // State to handle form inputs
@@ -46,7 +47,7 @@ const AddProject = () => {
   // Handle form submission
   const handleSubmit = async () => {
     try {
-      const response = await axiosInstance.post(`${BASE_URL}/projects`, formData);
+      const response = await axiosInstance.post(`${apiUrl}/projects`, formData);
       console.log("Project Created:", response.data);
       toast.success("Project created successfully!");
       dispatch(fetchProjects()); // Fetch updated projects list

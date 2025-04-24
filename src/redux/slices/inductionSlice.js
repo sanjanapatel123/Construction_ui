@@ -1,13 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import axiosInstance from '../../utils/axiosInstance';
+import { apiUrl } from '../../utils/config';
 
 // 📌 GET all inductions
 export const fetchInductions = createAsyncThunk(
   'induction/fetchInductions',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get('https://hrb5wx2v-8000.inc1.devtunnels.ms/api/induction');
+      const response = await axiosInstance.get(`${apiUrl}/induction`);
       return response.data.inductions;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -20,7 +21,7 @@ export const createInduction = createAsyncThunk(
   'induction/createInduction',
   async (submissionData, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post('https://hrb5wx2v-8000.inc1.devtunnels.ms/api/induction', submissionData, {
+      const response = await axiosInstance.post(`${apiUrl}/induction`, submissionData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -36,7 +37,7 @@ export const deleteInduction = createAsyncThunk(
   'induction/deleteInduction',
   async (id, { rejectWithValue }) => {
     try {
-      const res = await axios.delete(`https://hrb5wx2v-8000.inc1.devtunnels.ms/api/induction/${id}`);
+      const res = await axios.delete(`${apiUrl}/induction/${id}`);
       console.log(res.data)
       return id;
     } catch (err) {
