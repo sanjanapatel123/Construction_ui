@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+ import React, { useRef, useState, useEffect } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -50,7 +50,7 @@ const BIMViewer = ({ modelUrl, activeTool }) => {
       if (intersects.length > 0) {
         const selectedObject = intersects[0].object;
         setSelectedElement(selectedObject);
-        selectedObject.material.emissive.set(0x00ff00);  // Green glow effect
+        // selectedObject.material.emissive.set(0x00ff00);  // Green glow effect
       }
     };
 
@@ -102,16 +102,18 @@ const BIMViewer = ({ modelUrl, activeTool }) => {
 
   // Screenshot Tool
   const takeScreenshot = () => {
+    renderer.render(scene, camera);
+    
     const dataUrl = renderer.domElement.toDataURL('image/png');
     const link = document.createElement('a');
     link.href = dataUrl;
     link.download = 'screenshot.png';
     link.click();
   };
-
+  
   return (
     <div>
-      <div ref={sceneRef} style={{ width: '100%', height: '500px' }} />
+      <div ref={sceneRef} style={{ width: '100%', height: '500px',backgroundColor: '#fff' }} />
       {selectedElement && <div>Selected: {selectedElement.name}</div>}
       {distance && <div>Distance: {distance} units</div>}
       {activeTool === 'screenshot' && <button onClick={takeScreenshot}>Take Screenshot</button>}
