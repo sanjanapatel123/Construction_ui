@@ -12,9 +12,10 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import ViewProjectModal from "./ViewProjectModal";
-import { fetchProjects } from "../../../redux/projectSlice";
+import { fetchProjects } from "../../../redux/slices/projectSlice";
 import axios from "axios";
 import EditProjectModal from "./EditProjectModal";
+import { apiUrl } from "../../../utils/config";
 
 const ProjectDashboard = () => {
   const [showModal, setShowModal] = useState(false);
@@ -199,7 +200,7 @@ const ProjectDashboard = () => {
     try {
       console.log(projectId);
       const response = await axios.delete(
-        `https://contructionbackend.onrender.com/api/projects/${projectId}`
+        `${apiUrl}/projects/${projectId}`
       );
       console.log("Project deleted:", response.data);
       alert("Project deleted successfully!");

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom'
 
-import {fetchProjects} from "../../../redux/projectSlice";
-import { createSwms } from "../../../redux/swmsSlice";
+import {fetchProjects} from "../../../redux/slices/projectSlice";
+import { createSwms } from "../../../redux/slices/swmsSlice";
 
 function AddnewSms() {
   const navigate = useNavigate();

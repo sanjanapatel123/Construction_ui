@@ -16,9 +16,9 @@ import TimesheetEditModal from "./TimesheetEditModal";
 import {
   fetchTimesheets,
   deleteTimesheet,
-} from "../../../redux/timesheetSlice";
-import { fetchProjects } from "../../../redux/projectSlice";
-import { fetchDiaries } from "../../../redux/diarySlice";
+} from "../../../redux/slices/timesheetSlice";
+import { fetchProjects } from "../../../redux/slices/projectSlice";
+import { fetchDiaries } from "../../../redux/slices/diarySlice";
 import TimesheetDetailsModal from "./TimesheetDetailsModal";
 import { Line } from "react-chartjs-2";
 import EditDiaryModal from "./EditDiaryModal";
