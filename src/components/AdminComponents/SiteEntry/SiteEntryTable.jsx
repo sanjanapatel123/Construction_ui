@@ -106,6 +106,21 @@ function SiteEntryTable() {
 
      
       </div>
+        {/* Pagination */}
+        <div className="d-flex justify-content-end mt-2">
+          <Button size="sm" variant="outline-secondary" className="me-2">
+            Previous
+          </Button>
+          <Button size="sm" variant="primary" className="ms-2">
+            1
+          </Button>
+          <Button size="sm" variant="outline-secondary" className="ms-2">
+            2
+          </Button>
+          <Button size="sm" variant="outline-secondary" className="ms-2">
+            Next
+          </Button>
+        </div>
     </div>
   );
 }
