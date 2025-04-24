@@ -52,7 +52,7 @@ function SiteEntryTable() {
             <i className="fa-solid fa-plus me-2"></i>Site Entry
           </button>
         </Link>
-      </div>
+      </div> 
 
       {/* Table */}
       <div className="table-responsive shadow-sm bg-white rounded p-2">
@@ -84,9 +84,9 @@ function SiteEntryTable() {
         <td>{entry.siteLocation}</td>
         <td className="pe-4">
           <div className="d-flex gap-2">
-            <button className="btn text-primary p-0">
+          <Link to={`/siteEntry/${entry._id}`}><button className="btn text-primary p-0">
               <i className="fa-solid fa-pen-to-square"></i>
-            </button>
+            </button></Link>
             <button className="btn text-danger p-0" onClick={()=>HandleDelete(entry._id)}>
               <i className="fa-solid fa-trash"></i>
             </button>
@@ -94,17 +94,15 @@ function SiteEntryTable() {
         </td>
       </tr>
     ))
-  ) : (
+  ) : (   
     <tr>
       <td colSpan="9" className="text-center py-3">
         No site entries found.
-      </td>
+      </td> 
     </tr>
   )}
 </tbody>
         </Table>
-
-     
       </div>
         {/* Pagination */}
         <div className="d-flex justify-content-end mt-2">

@@ -41,6 +41,21 @@ export const deleteSiteEntry = createAsyncThunk(
     }
   }
 );
+// PUT: Update a site entry by ID
+export const updateSiteEntry = createAsyncThunk(
+  "siteEntry/updateSiteEntry",
+  async ({ id, updatedEntry }, { rejectWithValue }) => {
+    try {
+      const response = await axios.patch(
+        `https://hrb5wx2v-8000.inc1.devtunnels.ms/api/siteEntry/${id}`,
+        updatedEntry
+      );
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response.data);
+    }
+  }
+);
 
 const siteEntrySlice = createSlice({
   name: "siteEntry",
@@ -89,7 +104,23 @@ const siteEntrySlice = createSlice({
       .addCase(deleteSiteEntry.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
+      // Update site entry
+.addCase(updateSiteEntry.pending, (state) => {
+  state.loading = true;
+})
+.addCase(updateSiteEntry.fulfilled, (state, action) => {
+  state.loading = false;
+  const index = state.entries.findIndex(item => item._id === action.payload._id);
+  if (index !== -1) {
+    state.entries[index] = action.payload;
+  }
+})
+.addCase(updateSiteEntry.rejected, (state, action) => {
+  state.loading = false;
+  state.error = action.payload;
+})
+
   },
 });
 
