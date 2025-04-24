@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "./Navbar.css";
 const Navbar = ({ toggleSidebar }) => {
   const [roledata, setRoleData]= useState("")
-    console.log(roledata)
+    // console.log(roledata)
   useEffect(()=>{
     const Role= localStorage.getItem("userRole")
      if(Role){
