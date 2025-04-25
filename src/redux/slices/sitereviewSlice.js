@@ -8,21 +8,11 @@ export const createsitereview = createAsyncThunk(
     'sitereview/createsitereview',
     async (sitereviewData, thunkAPI) => {
       try {
-        const formData = new FormData();
-        
-        Object.keys(sitereviewData).forEach((key) => {
-          if (key === "attachments") {
-            sitereviewData.attachments.forEach((file) => {
-              formData.append('attachments', file);
-            });
-          } else {
-            formData.append(key, sitereviewData[key]);
-          }
-        });
+      
   
         const response = await axiosInstance.post(
           `${apiUrl}/sitereview`,
-          formData,
+          sitereviewData,
           {
             headers: { "Content-Type": "multipart/form-data" }
           }
@@ -66,6 +56,28 @@ export const createsitereview = createAsyncThunk(
       )
     }}
   )
+
+  export const updatesitereview = createAsyncThunk('sitereview/updatesitereview',
+    async({id,updatedEntry}, thunkAPI) => {
+   try{
+      const response = await axiosInstance.patch(
+        `${apiUrl}/sitereview/${id}`,
+        updatedEntry,
+        {
+          headers: { "Content-Type": "multipart/form-data" }
+        }
+      )
+      return response.data;
+    }
+    catch(error){
+      return thunkAPI.rejectWithValue(
+        error.response?.data || error.message || "error updating sitereview"
+      );
+    }
+
+
+    }
+  )
   
 
 
@@ -106,7 +118,25 @@ const sitereviewSlice = createSlice ({
       .addCase(fetchsitereview.rejected, (state, action) => {
         state.loading = false;        
         state.error = action.payload;
-      })                     
+      })
+      .addCase(updatesitereview.pending, (state) => {
+        state.loading = false;
+        state.error = null;
+      } )
+      .addCase(updatesitereview.fulfilled , (state, action) => {
+        state.loading = false;
+        const updatedItem = action.payload;
+        const index = state.sitereview.findIndex(item => item._id === updatedItem._id);
+        if (index !== -1) {
+          state.sitereview[index] = updatedItem;
+        }
+      })
+      
+      .addCase(updatesitereview.rejected , (state,action) => {
+        state.loading = false;
+        state.error =action.payload;
+      })                   
+                   
 
  }
 

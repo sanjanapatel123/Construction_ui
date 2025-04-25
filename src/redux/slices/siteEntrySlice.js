@@ -9,7 +9,7 @@ export const addSiteEntry = createAsyncThunk(
   "siteEntry/addSiteEntry",
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${apiUrl}/siteEntry`, formData);
+      const response = await axios.post(`${apiUrl}/siteEntry/`, formData);
       return response.data;
     } catch (err) {
       return rejectWithValue(err.response.data);
