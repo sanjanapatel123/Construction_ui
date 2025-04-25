@@ -279,7 +279,7 @@ const getProjectName = (projectId) => {
             </div>
           </div>
         </td>
-        <td>{getProjectName(item?.project)}</td>
+        <td>{(item?.project)}</td>
         <td>{item?.workArea}</td>
         <td>{new Date(item?.createdAt).toLocaleString()}</td>
         <td className="pe-4">

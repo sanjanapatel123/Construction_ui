@@ -138,6 +138,7 @@ function App() {
             <Route path="/siteEntryTable" element={<SiteEntryTable />} />
             <Route path="/siteReview" element={<SiteReview />} />
             <Route path="/addSiteReview" element={<AddSiteReview />} />
+            <Route path="/addSiteReview/:id" element= {<AddSiteReview />} />
             <Route path="/ITPs" element={<ITPs />} />
 
             <Route
