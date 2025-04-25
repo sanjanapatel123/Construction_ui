@@ -239,93 +239,72 @@ const OpenBim = () => {
         </div>
          {/* Main Viewer */}
 
-         <div className="flex-1 relative bg-gray-800 overflow-hidden">
-          {/* 3D Model Viewer */}
-          {/* <div className="absolute inset-0">
-            <BIMViewer modelUrl={'./1.glb'} activeTool={activeTool} />
-          </div> */}
-          <div>
-            {activeModelTab === 'building' && (
-              <div  className="absolute inset-0">
-                <BIMViewer modelUrl={'./1.glb'} activeTool={activeTool}/>
-              </div>
-            )}
-            {activeModelTab === 'mep' && (
-              <div className="w-full h-full ">
-                 <BIMViewer modelUrl={'./1.glb'} activeTool={activeTool}/>
-              </div>
-            )}   
-            {activeModelTab === 'structural' && (
-              <div className="w-full h-full flex items-center justify-center">
-                 <BIMViewer modelUrl={'./1.glb'} activeTool={activeTool}/>
-              </div>
-            )}
-            {/* Navigation Cube */}
-            <div className="absolute top-4 right-4 w-24 h-24 bg-gray-900 bg-opacity-50 rounded-md p-2">
-              <div className="w-full h-full relative">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 relative">
-                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xs">Y</div>
-                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 text-white text-xs">-Y</div>
-                    <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1/2 text-white text-xs">-X</div>
-                    <div className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1/2 text-white text-xs">X</div>
-                    <div className="w-full h-full border-2 border-gray-400 rounded-sm"></div>
-                  </div>
-                </div>
-              </div>
+         <div className="flex-1 relative bg-gray-800 overflow-hidden flex">
+  {/* Main Viewer */}
+  <div className="flex-1 relative bg-gray-800 overflow-hidden w-">
+    {/* 3D Model Viewer */}
+    <div className="absolute inset-0 w-full h-full ">
+      {activeModelTab === 'building' && (
+        <div className="absolute inset-0" >
+          <BIMViewer modelUrl={'./1.glb'} activeTool={activeTool} />
+        </div>
+      )}
+      {activeModelTab === 'mep' && (
+        <div className="w-full h-full">
+          <BIMViewer modelUrl={'./1.glb'} activeTool={activeTool} />
+        </div>
+      )}
+      {activeModelTab === 'structural' && (
+        <div className="w-full h-full flex items-center justify-center">
+          <BIMViewer modelUrl={'./1.glb'} activeTool={activeTool} />
+        </div>
+      )}
+      {/* Navigation Cube */}
+      <div className="absolute top-4 right-4 w-24 h-24 bg-gray-900 bg-opacity-50 rounded-md p-2">
+        <div className="w-full h-full relative">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-16 h-16 relative">
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xs">Y</div>
+              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 text-white text-xs">-Y</div>
+              <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1/2 text-white text-xs">-X</div>
+              <div className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1/2 text-white text-xs">X</div>
+              <div className="w-full h-full border-2 border-gray-400 rounded-sm"></div>
             </div>
-            {/* Grid Overlay */}
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="w-full h-full border border-gray-500 border-opacity-20"></div>
-              {/* Grid lines would be rendered here */}
-            </div>
-            {/* Measurement Display (when measure tool is active) */}
-            {activeTool === 'measure' && (
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md text-sm">
-                Distance: 12.45 m
-              </div>
-            )}
-            {/* Section Plane Controls (when section tool is active) */}
-            {/* {activeTool === 'section' && (
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md text-sm flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <span>X:</span>
-                  <input type="range" className="w-24" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>Y:</span>
-                  <input type="range" className="w-24" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>Z:</span>
-                  <input type="range" className="w-24" />
-                </div>
-              </div>
-            )} */}
-            {/* Markup Controls (when markup tool is active) */}
-            {activeTool === 'markup' && (
-              <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md text-sm flex items-center gap-4">
-                <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-700 cursor-pointer">
-                  <i className="fas fa-pen"></i>
-                </button>
-                <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-700 cursor-pointer">
-                  <i className="fas fa-square"></i>
-                </button>
-                <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-700 cursor-pointer">
-                  <i className="fas fa-circle"></i>
-                </button>
-                <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-700 cursor-pointer">
-                  <i className="fas fa-font"></i>
-                </button>
-                <div className="h-8 border-l border-gray-500 mx-2"></div>
-                <div className="flex items-center gap-2">
-                  <span>Color:</span>
-                  <div className="w-6 h-6 bg-red-500 rounded cursor-pointer"></div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
+      </div>
+      {/* Grid Overlay */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="w-full h-full border border-gray-500 border-opacity-20"></div>
+        {/* Grid lines would be rendered here */}
+      </div>
+      {/* Measurement Display (when measure tool is active) */}
+      {activeTool === 'measure' && (
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md text-sm">
+          Distance: 12.45 m
+        </div>
+      )}
+      {/* Section Plane Controls (when section tool is active) */}
+      {activeTool === 'section' && (
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md text-sm flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span>X:</span>
+            <input type="range" className="w-24" />
+          </div>
+          <div className="flex items-center gap-2">
+            <span>Y:</span>
+            <input type="range" className="w-24" />
+          </div>
+          <div className="flex items-center gap-2">
+            <span>Z:</span>
+            <input type="range" className="w-24" />
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+</div>
+
          {/* Right Side Panel */}
          <div className="w-80 bg-white border-l border-gray-200 flex flex-col">
           {/* Panel Tabs */}
