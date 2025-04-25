@@ -1,678 +1,931 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { Modal, Form, Button } from "react-bootstrap";
 const OpenBim = () => {
-  const [activeModelTab, setActiveModelTab] = useState('building');
-  const [activeSidePanel, setActiveSidePanel] = useState('details');
-  const [viewMode, setViewMode] = useState('solid');
+  const [activeModelTab, setActiveModelTab] = useState("building");
+  const [activeSidePanel, setActiveSidePanel] = useState("details");
+  const [viewMode, setViewMode] = useState("solid");
+  const [showModal, setShowModal] = useState(false);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
-  const [activeTool, setActiveTool] = useState('select');
+  const handleShow = () => setShowModal(true);
+
+  // Function to close the modal
+  const handleClose = () => setShowModal(false);
+
+  const handleSave = () => {
+    // Here you can handle saving logic
+    console.log("Title:", title);
+    console.log("Description:", description);
+    handleClose(); // Close the modal after save
+  };
+  const [activeTool, setActiveTool] = useState("select");
   const [selectedElement, setSelectedElement] = useState(null);
 
   const handleToolSelect = (tool) => {
     setActiveTool(tool);
-    if (tool !== 'select') {
+    if (tool !== "select") {
       setSelectedElement(null);
     }
   };
 
   const handleElementSelect = (element) => {
-    if (activeTool === 'select') {
+    if (activeTool === "select") {
       setSelectedElement(element);
-      setActiveSidePanel('details');
+      setActiveSidePanel("details");
     }
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100" style={{marginTop: "0px"}}>
-      {/* Top Navigation Bar */}
-      <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 z-10">
-        <div className="flex items-center gap-4">
-          <a
-            href="#"
-            data-readdy="true"
-            className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 cursor-pointer"
-          >
-            <i className="fas fa-arrow-left"></i>
-         <Link to="/Doc3DBeamModeling">   <span className="font-medium">Back</span></Link>
-          </a>
-        </div>
-        <div className="flex items-center">
-          <h1 className="text-xl font-medium text-gray-800">
-            {activeModelTab === 'building' && 'Building Model v1.3'}
-            {activeModelTab === 'mep' && 'MEP Systems Model v2.1'}
-            {activeModelTab === 'structural' && 'Structural Model v1.5'}
-          </h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <button
-              className="flex items-center gap-2 bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 !rounded-button whitespace-nowrap cursor-pointer"
-              onClick={() => {}}
+    <>
+      {" "}
+      <div
+        className="flex flex-col h-screen bg-gray-100"
+        style={{ marginTop: "0px" }}
+      >
+        {/* Top Navigation Bar */}
+        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 z-10">
+          <div className="flex items-center gap-4">
+            <a
+              href="#"
+              data-readdy="true"
+              className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 cursor-pointer"
             >
-              <i className="fas fa-eye mr-1"></i>
-              {viewMode === 'wireframe' && 'Wireframe'}
-              {viewMode === 'solid' && 'Solid'}
-              {viewMode === 'rendered' && 'Rendered'}
-              <i className="fas fa-chevron-down ml-1 text-xs"></i>
-            </button>
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 hidden">
-              <div
-                className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                onClick={() => setViewMode('wireframe')}
-              >
-                Wireframe
-              </div>
-              <div
-                className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                onClick={() => setViewMode('solid')}
-              >
-                Solid
-              </div>
-              <div
-                className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                onClick={() => setViewMode('rendered')}
-              >
-                Rendered
-              </div>
-            </div>
+              <i className="fas fa-arrow-left"></i>
+              <Link to="/Doc3DBeamModeling">
+                {" "}
+                <span className="font-medium">Back</span>
+              </Link>
+            </a>
           </div>
-          <button className="flex items-center gap-2 bg-indigo-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-indigo-700 !rounded-button whitespace-nowrap cursor-pointer">
-            <i className="fas fa-save mr-1"></i>
-            Save View
-          </button>
-        </div>
-      </header>
-      {/* Model Selection Tabs */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="flex px-6">
-          <button
-            onClick={() => setActiveModelTab('building')}
-            className={`px-4 py-3 text-sm font-medium ${activeModelTab === 'building' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-700'} !rounded-button whitespace-nowrap cursor-pointer`}
-          >
-            Building Model
-          </button>
-          <button
-            onClick={() => setActiveModelTab('mep')}
-            className={`px-4 py-3 text-sm font-medium ${activeModelTab === 'mep' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-700'} !rounded-button whitespace-nowrap cursor-pointer`}
-          >
-            MEP Systems
-          </button>
-          <button
-            onClick={() => setActiveModelTab('structural')}
-            className={`px-4 py-3 text-sm font-medium ${activeModelTab === 'structural' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-700'} !rounded-button whitespace-nowrap cursor-pointer`}
-          >
-            Structural
-          </button>
-        </div>
-      </div>
-      {/* Main Content Area */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Side Bar */}
-        <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
-          <div className="p-4">
+          <div className="flex items-center">
+            <h1 className="text-xl font-medium text-gray-800">
+              {activeModelTab === "building" && "Building Model v1.3"}
+              {activeModelTab === "mep" && "MEP Systems Model v2.1"}
+              {activeModelTab === "structural" && "Structural Model v1.5"}
+            </h1>
+          </div>
+          <div className="flex items-center gap-4">
             <div className="relative">
-              <input
-                type="text"
-                placeholder="Search elements..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              />
-              <i className="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-            </div>
-          </div>
-
-          <div className="flex-1 overflow-y-auto">
-            <div className="px-3">
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-2 px-2">
-                  <span className="text-sm font-medium text-gray-700">Building Elements</span>
-                  <i className="fas fa-chevron-down text-gray-500 text-xs"></i>
+              <button
+                className="flex items-center gap-2 bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 !rounded-button whitespace-nowrap cursor-pointer"
+                onClick={() => {}}
+              >
+                <i className="fas fa-eye mr-1"></i>
+                {viewMode === "wireframe" && "Wireframe"}
+                {viewMode === "solid" && "Solid"}
+                {viewMode === "rendered" && "Rendered"}
+                <i className="fas fa-chevron-down ml-1 text-xs"></i>
+              </button>
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 hidden">
+                <div
+                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => setViewMode("wireframe")}
+                >
+                  Wireframe
                 </div>
-                <div className="space-y-1">
-                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
-                    <i className="fas fa-square-full text-blue-500 mr-2"></i>
-                    Walls
-                  </div>
-                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
-                    <i className="fas fa-door-open text-red-500 mr-2"></i>
-                    Doors
-                  </div>
-                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
-                    <i className="fas fa-window-maximize text-cyan-500 mr-2"></i>
-                    Windows
-                  </div>
+                <div
+                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => setViewMode("solid")}
+                >
+                  Solid
                 </div>
-              </div>
-
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-2 px-2">
-                  <span className="text-sm font-medium text-gray-700">Structural Elements</span>
-                  <i className="fas fa-chevron-down text-gray-500 text-xs"></i>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
-                    <i className="fas fa-columns text-purple-500 mr-2"></i>
-                    Columns
-                  </div>
-                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
-                    <i className="fas fa-grip-lines text-green-500 mr-2"></i>
-                    Beams
-                  </div>
-                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
-                    <i className="fas fa-layer-group text-yellow-500 mr-2"></i>
-                    Floors
-                  </div>
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-2 px-2">
-                  <span className="text-sm font-medium text-gray-700">MEP Systems</span>
-                  <i className="fas fa-chevron-down text-gray-500 text-xs"></i>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
-                    <i className="fas fa-wind text-blue-400 mr-2"></i>
-                    HVAC
-                  </div>
-                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
-                    <i className="fas fa-faucet text-indigo-400 mr-2"></i>
-                    Plumbing
-                  </div>
-                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
-                    <i className="fas fa-bolt text-orange-400 mr-2"></i>
-                    Electrical
-                  </div>
+                <div
+                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => setViewMode("rendered")}
+                >
+                  Rendered
                 </div>
               </div>
             </div>
+            <button className="flex items-center gap-2 bg-indigo-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-indigo-700 !rounded-button whitespace-nowrap cursor-pointer">
+              <i className="fas fa-save mr-1"></i>
+              Save View
+            </button>
           </div>
-
-          <div className="p-4 border-t border-gray-200">
-            <button className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-indigo-700 !rounded-button whitespace-nowrap">
-              <i className="fas fa-plus"></i>
-              Add Element
+        </header>
+        {/* Model Selection Tabs */}
+        <div className="bg-white border-b border-gray-200">
+          <div className="flex px-6">
+            <button
+              onClick={() => setActiveModelTab("building")}
+              className={`px-4 py-3 text-sm font-medium ${
+                activeModelTab === "building"
+                  ? "text-indigo-600 border-b-2 border-indigo-600"
+                  : "text-gray-500 hover:text-gray-700"
+              } !rounded-button whitespace-nowrap cursor-pointer`}
+            >
+              Building Model
+            </button>
+            <button
+              onClick={() => setActiveModelTab("mep")}
+              className={`px-4 py-3 text-sm font-medium ${
+                activeModelTab === "mep"
+                  ? "text-indigo-600 border-b-2 border-indigo-600"
+                  : "text-gray-500 hover:text-gray-700"
+              } !rounded-button whitespace-nowrap cursor-pointer`}
+            >
+              MEP Systems
+            </button>
+            <button
+              onClick={() => setActiveModelTab("structural")}
+              className={`px-4 py-3 text-sm font-medium ${
+                activeModelTab === "structural"
+                  ? "text-indigo-600 border-b-2 border-indigo-600"
+                  : "text-gray-500 hover:text-gray-700"
+              } !rounded-button whitespace-nowrap cursor-pointer`}
+            >
+              Structural
             </button>
           </div>
         </div>
-                {/* Left Toolbar */}
-                <div className="w-16 bg-white border-r border-gray-200 flex flex-col items-center py-4 gap-6">
-          <div className="flex flex-col items-center gap-6">
-            <button
-              className={`w-10 h-10 rounded-md flex items-center justify-center ${activeTool === 'select' ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600 hover:bg-gray-100'} cursor-pointer`}
-              onClick={() => handleToolSelect('select')}
-              title="Select Tool"
-            >
-              <i className="fas fa-mouse-pointer"></i>
-            </button>
-            <button
-              className={`w-10 h-10 rounded-md flex items-center justify-center ${activeTool === 'measure' ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600 hover:bg-gray-100'} cursor-pointer`}
-              onClick={() => handleToolSelect('measure')}
-              title="Measure Tool"
-            >
-              <i className="fas fa-ruler-combined"></i>
-            </button>
-            <button
-              className={`w-10 h-10 rounded-md flex items-center justify-center ${activeTool === 'section' ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600 hover:bg-gray-100'} cursor-pointer`}
-              onClick={() => handleToolSelect('section')}
-              title="Section Plane Tool"
-            >
-              <i className="fas fa-cut"></i>
-            </button>
-            <button
-              className={`w-10 h-10 rounded-md flex items-center justify-center ${activeTool === 'markup' ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600 hover:bg-gray-100'} cursor-pointer`}
-              onClick={() => handleToolSelect('markup')}
-              title="Markup Tool"
-            >
-              <i className="fas fa-pen"></i>
-            </button>
-            <button
-              className={`w-10 h-10 rounded-md flex items-center justify-center ${activeTool === 'screenshot' ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600 hover:bg-gray-100'} cursor-pointer`}
-              onClick={() => handleToolSelect('screenshot')}
-              title="Screenshot Tool"
-            >
-              <i className="fas fa-camera"></i>
-            </button>
-            <button
-              className={`w-10 h-10 rounded-md flex items-center justify-center ${activeTool === 'layers' ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600 hover:bg-gray-100'} cursor-pointer`}
-              onClick={() => handleToolSelect('layers')}
-              title="Layer Visibility"
-            >
-              <i className="fas fa-layer-group"></i>
-            </button>
-            <button
-              className={`w-10 h-10 rounded-md flex items-center justify-center ${activeTool === 'hide' ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600 hover:bg-gray-100'} cursor-pointer`}
-              onClick={() => handleToolSelect('hide')}
-              title="Hide/Isolate Elements"
-            >
-              <i className="fas fa-eye-slash"></i>
-            </button>
-          </div>
-          <div className="mt-auto">
-            <button
-              className="w-10 h-10 rounded-md flex items-center justify-center text-gray-600 hover:bg-gray-100 cursor-pointer"
-              title="Help"
-            >
-              <i className="fas fa-question-circle"></i>
-            </button>
-          </div>
-        </div>
-         {/* Main Viewer */}
-         <div className="flex-1 relative bg-gray-800 overflow-hidden">
-          {/* 3D Model Viewer */}
-          <div className="absolute inset-0">
-            {activeModelTab === 'building' && (
-              <div className="w-full h-full flex items-center justify-center">
-                <img
-                  src="https://readdy.ai/api/search-image?query=3D%20rendering%20of%20a%20modern%20office%20building%20with%20glass%20facade%2C%20architectural%20visualization%2C%20detailed%20BIM%20model%20with%20visible%20structural%20elements%2C%20professional%203D%20model%20visualization%2C%20high%20quality%20rendering%2C%20neutral%20lighting%2C%20construction%20visualization&width=800&height=600&seq=1&orientation=landscape"
-                  alt="Building Model"
-                  className="w-full h-full object-cover opacity-90"
+        {/* Main Content Area */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Side Bar */}
+          <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
+            <div className="p-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search elements..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 />
+                <i className="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
               </div>
-            )}
-            {activeModelTab === 'mep' && (
-              <div className="w-full h-full flex items-center justify-center">
-                <img
-                  src="https://readdy.ai/api/search-image?query=3D%20rendering%20of%20building%20MEP%20systems%2C%20HVAC%20ducts%2C%20electrical%20conduits%2C%20plumbing%20pipes%2C%20all%20color%20coded%2C%20BIM%20model%20visualization%2C%20detailed%20mechanical%20electrical%20plumbing%20systems%2C%20professional%20engineering%20visualization%2C%20construction%20technical%20drawing%2C%20neutral%20background&width=800&height=600&seq=2&orientation=landscape"
-                  alt="MEP Systems Model"
-                  className="w-full h-full object-cover opacity-90"
-                />
-              </div>
-            )}
-            {activeModelTab === 'structural' && (
-              <div className="w-full h-full flex items-center justify-center">
-                <img
-                  src="https://readdy.ai/api/search-image?query=3D%20rendering%20of%20building%20structural%20framework%2C%20steel%20beams%2C%20columns%2C%20concrete%20elements%2C%20detailed%20structural%20engineering%20model%2C%20BIM%20visualization%2C%20professional%20construction%20visualization%2C%20structural%20analysis%20model%2C%20neutral%20background%2C%20engineering%20precision&width=800&height=600&seq=3&orientation=landscape"
-                  alt="Structural Model"
-                  className="w-full h-full object-cover opacity-90"
-                />
-              </div>
-            )}
-            {/* Navigation Cube */}
-            <div className="absolute top-4 right-4 w-24 h-24 bg-gray-900 bg-opacity-50 rounded-md p-2">
-              <div className="w-full h-full relative">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 relative">
-                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xs">Y</div>
-                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 text-white text-xs">-Y</div>
-                    <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1/2 text-white text-xs">-X</div>
-                    <div className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1/2 text-white text-xs">X</div>
-                    <div className="w-full h-full border-2 border-gray-400 rounded-sm"></div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+              <div className="px-3">
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-2 px-2">
+                    <span className="text-sm font-medium text-gray-700">
+                      Building Elements
+                    </span>
+                    <i className="fas fa-chevron-down text-gray-500 text-xs"></i>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
+                      <i className="fas fa-square-full text-blue-500 mr-2"></i>
+                      Walls
+                    </div>
+                    <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
+                      <i className="fas fa-door-open text-red-500 mr-2"></i>
+                      Doors
+                    </div>
+                    <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
+                      <i className="fas fa-window-maximize text-cyan-500 mr-2"></i>
+                      Windows
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-2 px-2">
+                    <span className="text-sm font-medium text-gray-700">
+                      Structural Elements
+                    </span>
+                    <i className="fas fa-chevron-down text-gray-500 text-xs"></i>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
+                      <i className="fas fa-columns text-purple-500 mr-2"></i>
+                      Columns
+                    </div>
+                    <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
+                      <i className="fas fa-grip-lines text-green-500 mr-2"></i>
+                      Beams
+                    </div>
+                    <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
+                      <i className="fas fa-layer-group text-yellow-500 mr-2"></i>
+                      Floors
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-2 px-2">
+                    <span className="text-sm font-medium text-gray-700">
+                      MEP Systems
+                    </span>
+                    <i className="fas fa-chevron-down text-gray-500 text-xs"></i>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
+                      <i className="fas fa-wind text-blue-400 mr-2"></i>
+                      HVAC
+                    </div>
+                    <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
+                      <i className="fas fa-faucet text-indigo-400 mr-2"></i>
+                      Plumbing
+                    </div>
+                    <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
+                      <i className="fas fa-bolt text-orange-400 mr-2"></i>
+                      Electrical
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            {/* Grid Overlay */}
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="w-full h-full border border-gray-500 border-opacity-20"></div>
-              {/* Grid lines would be rendered here */}
+
+            <div className="p-4 border-t border-gray-200">
+              <button className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-indigo-700 !rounded-button whitespace-nowrap">
+                <i className="fas fa-plus"></i>
+                Add Element
+              </button>
             </div>
-            {/* Measurement Display (when measure tool is active) */}
-            {activeTool === 'measure' && (
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md text-sm">
-                Distance: 12.45 m
-              </div>
-            )}
-            {/* Section Plane Controls (when section tool is active) */}
-            {activeTool === 'section' && (
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md text-sm flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <span>X:</span>
-                  <input type="range" className="w-24" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>Y:</span>
-                  <input type="range" className="w-24" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>Z:</span>
-                  <input type="range" className="w-24" />
-                </div>
-              </div>
-            )}
-            {/* Markup Controls (when markup tool is active) */}
-            {activeTool === 'markup' && (
-              <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md text-sm flex items-center gap-4">
-                <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-700 cursor-pointer">
-                  <i className="fas fa-pen"></i>
-                </button>
-                <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-700 cursor-pointer">
-                  <i className="fas fa-square"></i>
-                </button>
-                <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-700 cursor-pointer">
-                  <i className="fas fa-circle"></i>
-                </button>
-                <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-700 cursor-pointer">
-                  <i className="fas fa-font"></i>
-                </button>
-                <div className="h-8 border-l border-gray-500 mx-2"></div>
-                <div className="flex items-center gap-2">
-                  <span>Color:</span>
-                  <div className="w-6 h-6 bg-red-500 rounded cursor-pointer"></div>
-                </div>
-              </div>
-            )}
           </div>
-        </div>
-         {/* Right Side Panel */}
-         <div className="w-80 bg-white border-l border-gray-200 flex flex-col">
-          {/* Panel Tabs */}
-          <div className="flex border-b border-gray-200">
-            <button
-              onClick={() => setActiveSidePanel('details')}
-              className={`flex-1 px-4 py-3 text-sm font-medium ${activeSidePanel === 'details' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-700'} !rounded-button whitespace-nowrap cursor-pointer`}
-            >
-              Details
-            </button>
-            <button
-              onClick={() => setActiveSidePanel('layers')}
-              className={`flex-1 px-4 py-3 text-sm font-medium ${activeSidePanel === 'layers' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-700'} !rounded-button whitespace-nowrap cursor-pointer`}
-            >
-              Layers
-            </button>
-            <button
-              onClick={() => setActiveSidePanel('annotations')}
-              className={`flex-1 px-4 py-3 text-sm font-medium ${activeSidePanel === 'annotations' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-700'} !rounded-button whitespace-nowrap cursor-pointer`}
-            >
-              Annotations
-            </button>
+          {/* Left Toolbar */}
+          <div className="w-16 bg-white border-r border-gray-200 flex flex-col items-center py-4 gap-6">
+            <div className="flex flex-col items-center gap-6">
+              <button
+                className={`w-10 h-10 rounded-md flex items-center justify-center ${
+                  activeTool === "select"
+                    ? "bg-indigo-100 text-indigo-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                } cursor-pointer`}
+                onClick={() => handleToolSelect("select")}
+                title="Select Tool"
+              >
+                <i className="fas fa-mouse-pointer"></i>
+              </button>
+              <button
+                className={`w-10 h-10 rounded-md flex items-center justify-center ${
+                  activeTool === "measure"
+                    ? "bg-indigo-100 text-indigo-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                } cursor-pointer`}
+                onClick={() => handleToolSelect("measure")}
+                title="Measure Tool"
+              >
+                <i className="fas fa-ruler-combined"></i>
+              </button>
+              <button
+                className={`w-10 h-10 rounded-md flex items-center justify-center ${
+                  activeTool === "section"
+                    ? "bg-indigo-100 text-indigo-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                } cursor-pointer`}
+                onClick={() => handleToolSelect("section")}
+                title="Section Plane Tool"
+              >
+                <i className="fas fa-cut"></i>
+              </button>
+              <button
+                className={`w-10 h-10 rounded-md flex items-center justify-center ${
+                  activeTool === "markup"
+                    ? "bg-indigo-100 text-indigo-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                } cursor-pointer`}
+                onClick={() => handleToolSelect("markup")}
+                title="Markup Tool"
+              >
+                <i className="fas fa-pen"></i>
+              </button>
+              <button
+                className={`w-10 h-10 rounded-md flex items-center justify-center ${
+                  activeTool === "screenshot"
+                    ? "bg-indigo-100 text-indigo-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                } cursor-pointer`}
+                onClick={() => handleToolSelect("screenshot")}
+                title="Screenshot Tool"
+              >
+                <i className="fas fa-camera"></i>
+              </button>
+              <button
+                className={`w-10 h-10 rounded-md flex items-center justify-center ${
+                  activeTool === "layers"
+                    ? "bg-indigo-100 text-indigo-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                } cursor-pointer`}
+                onClick={() => handleToolSelect("layers")}
+                title="Layer Visibility"
+              >
+                <i className="fas fa-layer-group"></i>
+              </button>
+              <button
+                className={`w-10 h-10 rounded-md flex items-center justify-center ${
+                  activeTool === "hide"
+                    ? "bg-indigo-100 text-indigo-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                } cursor-pointer`}
+                onClick={() => handleToolSelect("hide")}
+                title="Hide/Isolate Elements"
+              >
+                <i className="fas fa-eye-slash"></i>
+              </button>
+            </div>
+            <div className="mt-auto">
+              <button
+                className="w-10 h-10 rounded-md flex items-center justify-center text-gray-600 hover:bg-gray-100 cursor-pointer"
+                title="Help"
+              >
+                <i className="fas fa-question-circle"></i>
+              </button>
+            </div>
           </div>
-          {/* Panel Content */}
-          <div className="flex-1 overflow-y-auto p-4">
-            {/* Details Panel */}
-            {activeSidePanel === 'details' && (
-              <div>
-                {selectedElement ? (
-                  <>
-                    <div className="mb-6">
-                      <h3 className="text-lg font-medium text-gray-800 mb-2">Element Information</h3>
-                      <div className="bg-gray-50 rounded-md p-3">
-                        <div className="grid grid-cols-2 gap-2 text-sm">
-                          <div className="text-gray-500">Element ID:</div>
-                          <div className="text-gray-900 font-medium">EL-10045</div>
-                          <div className="text-gray-500">Type:</div>
-                          <div className="text-gray-900 font-medium">Wall</div>
-                          <div className="text-gray-500">Category:</div>
-                          <div className="text-gray-900 font-medium">Structural</div>
-                          <div className="text-gray-500">Level:</div>
-                          <div className="text-gray-900 font-medium">Level 2</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mb-6">
-                      <h3 className="text-lg font-medium text-gray-800 mb-2">Dimensions</h3>
-                      <div className="bg-gray-50 rounded-md p-3">
-                        <div className="grid grid-cols-2 gap-2 text-sm">
-                          <div className="text-gray-500">Length:</div>
-                          <div className="text-gray-900 font-medium">4.5 m</div>
-                          <div className="text-gray-500">Width:</div>
-                          <div className="text-gray-900 font-medium">0.2 m</div>
-                          <div className="text-gray-500">Height:</div>
-                          <div className="text-gray-900 font-medium">3.2 m</div>
-                          <div className="text-gray-500">Area:</div>
-                          <div className="text-gray-900 font-medium">14.4 m²</div>
-                          <div className="text-gray-500">Volume:</div>
-                          <div className="text-gray-900 font-medium">2.88 m³</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mb-6">
-                      <h3 className="text-lg font-medium text-gray-800 mb-2">Material</h3>
-                      <div className="bg-gray-50 rounded-md p-3">
-                        <div className="grid grid-cols-2 gap-2 text-sm">
-                          <div className="text-gray-500">Material:</div>
-                          <div className="text-gray-900 font-medium">Concrete</div>
-                          <div className="text-gray-500">Grade:</div>
-                          <div className="text-gray-900 font-medium">C30/37</div>
-                          <div className="text-gray-500">Fire Rating:</div>
-                          <div className="text-gray-900 font-medium">120 min</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-medium text-gray-800 mb-2">Properties</h3>
-                      <div className="bg-gray-50 rounded-md p-3">
-                        <div className="grid grid-cols-2 gap-2 text-sm">
-                          <div className="text-gray-500">Load Bearing:</div>
-                          <div className="text-gray-900 font-medium">Yes</div>
-                          <div className="text-gray-500">Phase Created:</div>
-                          <div className="text-gray-900 font-medium">New Construction</div>
-                          <div className="text-gray-500">Comments:</div>
-                          <div className="text-gray-900 font-medium">Structural wall between units</div>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <div className="h-full flex flex-col items-center justify-center text-gray-500 p-6">
-                    <i className="fas fa-mouse-pointer text-4xl mb-4"></i>
-                    <p className="text-center">Select an element in the model to view its details</p>
-                  </div>
-                )}
-              </div>
-            )}
-            {/* Layers Panel */}
-            {activeSidePanel === 'layers' && (
-              <div>
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-gray-700">Architectural</h3>
-                    <div className="flex items-center">
-                      <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
-                        <i className="fas fa-eye"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <div className="space-y-2 pl-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <input type="checkbox" className="rounded text-indigo-600" checked />
-                        <span className="text-sm text-gray-700">Walls</span>
-                      </div>
-                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <input type="checkbox" className="rounded text-indigo-600" checked />
-                        <span className="text-sm text-gray-700">Doors</span>
-                      </div>
-                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <input type="checkbox" className="rounded text-indigo-600" checked />
-                        <span className="text-sm text-gray-700">Windows</span>
-                      </div>
-                      <div className="w-3 h-3 bg-cyan-500 rounded-full"></div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <input type="checkbox" className="rounded text-indigo-600" checked />
-                        <span className="text-sm text-gray-700">Furniture</span>
-                      </div>
-                      <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
-                    </div>
-                  </div>
+          {/* Main Viewer */}
+          <div className="flex-1 relative bg-gray-800 overflow-hidden">
+            {/* 3D Model Viewer */}
+            <div className="absolute inset-0">
+              {activeModelTab === "building" && (
+                <div className="w-full h-full flex items-center justify-center">
+                  <img
+                    src="https://readdy.ai/api/search-image?query=3D%20rendering%20of%20a%20modern%20office%20building%20with%20glass%20facade%2C%20architectural%20visualization%2C%20detailed%20BIM%20model%20with%20visible%20structural%20elements%2C%20professional%203D%20model%20visualization%2C%20high%20quality%20rendering%2C%20neutral%20lighting%2C%20construction%20visualization&width=800&height=600&seq=1&orientation=landscape"
+                    alt="Building Model"
+                    className="w-full h-full object-cover opacity-90"
+                  />
                 </div>
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-gray-700">Structural</h3>
-                    <div className="flex items-center">
-                      <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
-                        <i className="fas fa-eye"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <div className="space-y-2 pl-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <input type="checkbox" className="rounded text-indigo-600" checked />
-                        <span className="text-sm text-gray-700">Columns</span>
-                      </div>
-                      <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <input type="checkbox" className="rounded text-indigo-600" checked />
-                        <span className="text-sm text-gray-700">Beams</span>
-                      </div>
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <input type="checkbox" className="rounded text-indigo-600" checked />
-                        <span className="text-sm text-gray-700">Floors</span>
-                      </div>
-                      <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <input type="checkbox" className="rounded text-indigo-600" checked />
-                        <span className="text-sm text-gray-700">Foundation</span>
-                      </div>
-                      <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
-                    </div>
-                  </div>
+              )}
+              {activeModelTab === "mep" && (
+                <div className="w-full h-full flex items-center justify-center">
+                  <img
+                    src="https://readdy.ai/api/search-image?query=3D%20rendering%20of%20building%20MEP%20systems%2C%20HVAC%20ducts%2C%20electrical%20conduits%2C%20plumbing%20pipes%2C%20all%20color%20coded%2C%20BIM%20model%20visualization%2C%20detailed%20mechanical%20electrical%20plumbing%20systems%2C%20professional%20engineering%20visualization%2C%20construction%20technical%20drawing%2C%20neutral%20background&width=800&height=600&seq=2&orientation=landscape"
+                    alt="MEP Systems Model"
+                    className="w-full h-full object-cover opacity-90"
+                  />
                 </div>
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-gray-700">MEP</h3>
-                    <div className="flex items-center">
-                      <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
-                        <i className="fas fa-eye"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <div className="space-y-2 pl-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <input type="checkbox" className="rounded text-indigo-600" checked />
-                        <span className="text-sm text-gray-700">HVAC</span>
+              )}
+              {activeModelTab === "structural" && (
+                <div className="w-full h-full flex items-center justify-center">
+                  <img
+                    src="https://readdy.ai/api/search-image?query=3D%20rendering%20of%20building%20structural%20framework%2C%20steel%20beams%2C%20columns%2C%20concrete%20elements%2C%20detailed%20structural%20engineering%20model%2C%20BIM%20visualization%2C%20professional%20construction%20visualization%2C%20structural%20analysis%20model%2C%20neutral%20background%2C%20engineering%20precision&width=800&height=600&seq=3&orientation=landscape"
+                    alt="Structural Model"
+                    className="w-full h-full object-cover opacity-90"
+                  />
+                </div>
+              )}
+              {/* Navigation Cube */}
+              <div className="absolute top-4 right-4 w-24 h-24 bg-gray-900 bg-opacity-50 rounded-md p-2">
+                <div className="w-full h-full relative">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 relative">
+                      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xs">
+                        Y
                       </div>
-                      <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <input type="checkbox" className="rounded text-indigo-600" checked />
-                        <span className="text-sm text-gray-700">Plumbing</span>
+                      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 text-white text-xs">
+                        -Y
                       </div>
-                      <div className="w-3 h-3 bg-indigo-400 rounded-full"></div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <input type="checkbox" className="rounded text-indigo-600" checked />
-                        <span className="text-sm text-gray-700">Electrical</span>
+                      <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1/2 text-white text-xs">
+                        -X
                       </div>
-                      <div className="w-3 h-3 bg-orange-400 rounded-full"></div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <input type="checkbox" className="rounded text-indigo-600" checked />
-                        <span className="text-sm text-gray-700">Fire Protection</span>
+                      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1/2 text-white text-xs">
+                        X
                       </div>
-                      <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                      <div className="w-full h-full border-2 border-gray-400 rounded-sm"></div>
                     </div>
                   </div>
                 </div>
               </div>
-            )}
-            {/* Annotations Panel */}
-            {activeSidePanel === 'annotations' && (
-              <div>
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium text-gray-800">Annotations</h3>
-                  <button className="text-sm text-indigo-600 hover:text-indigo-800 cursor-pointer">
-                    <i className="fas fa-plus mr-1"></i> New
+              {/* Grid Overlay */}
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="w-full h-full border border-gray-500 border-opacity-20"></div>
+                {/* Grid lines would be rendered here */}
+              </div>
+              {/* Measurement Display (when measure tool is active) */}
+              {activeTool === "measure" && (
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md text-sm">
+                  Distance: 12.45 m
+                </div>
+              )}
+              {/* Section Plane Controls (when section tool is active) */}
+              {activeTool === "section" && (
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md text-sm flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span>X:</span>
+                    <input type="range" className="w-24" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span>Y:</span>
+                    <input type="range" className="w-24" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span>Z:</span>
+                    <input type="range" className="w-24" />
+                  </div>
+                </div>
+              )}
+              {/* Markup Controls (when markup tool is active) */}
+              {activeTool === "markup" && (
+                <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md text-sm flex items-center gap-4">
+                  <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-700 cursor-pointer">
+                    <i className="fas fa-pen"></i>
+                  </button>
+                  <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-700 cursor-pointer">
+                    <i className="fas fa-square"></i>
+                  </button>
+                  <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-700 cursor-pointer">
+                    <i className="fas fa-circle"></i>
+                  </button>
+                  <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-700 cursor-pointer">
+                    <i className="fas fa-font"></i>
+                  </button>
+                  <div className="h-8 border-l border-gray-500 mx-2"></div>
+                  <div className="flex items-center gap-2">
+                    <span>Color:</span>
+                    <div className="w-6 h-6 bg-red-500 rounded cursor-pointer"></div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          {/* Right Side Panel */}
+          <div className="w-80 bg-white border-l border-gray-200 flex flex-col">
+            {/* Panel Tabs */}
+            <div className="flex border-b border-gray-200">
+              <button
+                onClick={() => setActiveSidePanel("details")}
+                className={`flex-1 px-4 py-3 text-sm font-medium ${
+                  activeSidePanel === "details"
+                    ? "text-indigo-600 border-b-2 border-indigo-600"
+                    : "text-gray-500 hover:text-gray-700"
+                } !rounded-button whitespace-nowrap cursor-pointer`}
+              >
+                Details
+              </button>
+              <button
+                onClick={() => setActiveSidePanel("layers")}
+                className={`flex-1 px-4 py-3 text-sm font-medium ${
+                  activeSidePanel === "layers"
+                    ? "text-indigo-600 border-b-2 border-indigo-600"
+                    : "text-gray-500 hover:text-gray-700"
+                } !rounded-button whitespace-nowrap cursor-pointer`}
+              >
+                Layers
+              </button>
+              <button
+                onClick={() => setActiveSidePanel("annotations")}
+                className={`flex-1 px-4 py-3 text-sm font-medium ${
+                  activeSidePanel === "annotations"
+                    ? "text-indigo-600 border-b-2 border-indigo-600"
+                    : "text-gray-500 hover:text-gray-700"
+                } !rounded-button whitespace-nowrap cursor-pointer`}
+              >
+                Annotations
+              </button>
+            </div>
+            {/* Panel Content */}
+            <div className="flex-1 overflow-y-auto p-4">
+              {/* Details Panel */}
+              {activeSidePanel === "details" && (
+                <div>
+                  {selectedElement ? (
+                    <>
+                      <div className="mb-6">
+                        <h3 className="text-lg font-medium text-gray-800 mb-2">
+                          Element Information
+                        </h3>
+                        <div className="bg-gray-50 rounded-md p-3">
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div className="text-gray-500">Element ID:</div>
+                            <div className="text-gray-900 font-medium">
+                              EL-10045
+                            </div>
+                            <div className="text-gray-500">Type:</div>
+                            <div className="text-gray-900 font-medium">
+                              Wall
+                            </div>
+                            <div className="text-gray-500">Category:</div>
+                            <div className="text-gray-900 font-medium">
+                              Structural
+                            </div>
+                            <div className="text-gray-500">Level:</div>
+                            <div className="text-gray-900 font-medium">
+                              Level 2
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mb-6">
+                        <h3 className="text-lg font-medium text-gray-800 mb-2">
+                          Dimensions
+                        </h3>
+                        <div className="bg-gray-50 rounded-md p-3">
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div className="text-gray-500">Length:</div>
+                            <div className="text-gray-900 font-medium">
+                              4.5 m
+                            </div>
+                            <div className="text-gray-500">Width:</div>
+                            <div className="text-gray-900 font-medium">
+                              0.2 m
+                            </div>
+                            <div className="text-gray-500">Height:</div>
+                            <div className="text-gray-900 font-medium">
+                              3.2 m
+                            </div>
+                            <div className="text-gray-500">Area:</div>
+                            <div className="text-gray-900 font-medium">
+                              14.4 m²
+                            </div>
+                            <div className="text-gray-500">Volume:</div>
+                            <div className="text-gray-900 font-medium">
+                              2.88 m³
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mb-6">
+                        <h3 className="text-lg font-medium text-gray-800 mb-2">
+                          Material
+                        </h3>
+                        <div className="bg-gray-50 rounded-md p-3">
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div className="text-gray-500">Material:</div>
+                            <div className="text-gray-900 font-medium">
+                              Concrete
+                            </div>
+                            <div className="text-gray-500">Grade:</div>
+                            <div className="text-gray-900 font-medium">
+                              C30/37
+                            </div>
+                            <div className="text-gray-500">Fire Rating:</div>
+                            <div className="text-gray-900 font-medium">
+                              120 min
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-800 mb-2">
+                          Properties
+                        </h3>
+                        <div className="bg-gray-50 rounded-md p-3">
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div className="text-gray-500">Load Bearing:</div>
+                            <div className="text-gray-900 font-medium">Yes</div>
+                            <div className="text-gray-500">Phase Created:</div>
+                            <div className="text-gray-900 font-medium">
+                              New Construction
+                            </div>
+                            <div className="text-gray-500">Comments:</div>
+                            <div className="text-gray-900 font-medium">
+                              Structural wall between units
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="h-full flex flex-col items-center justify-center text-gray-500 p-6">
+                      <i className="fas fa-mouse-pointer text-4xl mb-4"></i>
+                      <p className="text-center">
+                        Select an element in the model to view its details
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+              {/* Layers Panel */}
+              {activeSidePanel === "layers" && (
+                <div>
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-sm font-medium text-gray-700">
+                        Architectural
+                      </h3>
+                      <div className="flex items-center">
+                        <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
+                          <i className="fas fa-eye"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-2 pl-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            className="rounded text-indigo-600"
+                            checked
+                          />
+                          <span className="text-sm text-gray-700">Walls</span>
+                        </div>
+                        <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            className="rounded text-indigo-600"
+                            checked
+                          />
+                          <span className="text-sm text-gray-700">Doors</span>
+                        </div>
+                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            className="rounded text-indigo-600"
+                            checked
+                          />
+                          <span className="text-sm text-gray-700">Windows</span>
+                        </div>
+                        <div className="w-3 h-3 bg-cyan-500 rounded-full"></div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            className="rounded text-indigo-600"
+                            checked
+                          />
+                          <span className="text-sm text-gray-700">
+                            Furniture
+                          </span>
+                        </div>
+                        <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-sm font-medium text-gray-700">
+                        Structural
+                      </h3>
+                      <div className="flex items-center">
+                        <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
+                          <i className="fas fa-eye"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-2 pl-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            className="rounded text-indigo-600"
+                            checked
+                          />
+                          <span className="text-sm text-gray-700">Columns</span>
+                        </div>
+                        <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            className="rounded text-indigo-600"
+                            checked
+                          />
+                          <span className="text-sm text-gray-700">Beams</span>
+                        </div>
+                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            className="rounded text-indigo-600"
+                            checked
+                          />
+                          <span className="text-sm text-gray-700">Floors</span>
+                        </div>
+                        <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            className="rounded text-indigo-600"
+                            checked
+                          />
+                          <span className="text-sm text-gray-700">
+                            Foundation
+                          </span>
+                        </div>
+                        <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-sm font-medium text-gray-700">MEP</h3>
+                      <div className="flex items-center">
+                        <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
+                          <i className="fas fa-eye"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-2 pl-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            className="rounded text-indigo-600"
+                            checked
+                          />
+                          <span className="text-sm text-gray-700">HVAC</span>
+                        </div>
+                        <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            className="rounded text-indigo-600"
+                            checked
+                          />
+                          <span className="text-sm text-gray-700">
+                            Plumbing
+                          </span>
+                        </div>
+                        <div className="w-3 h-3 bg-indigo-400 rounded-full"></div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            className="rounded text-indigo-600"
+                            checked
+                          />
+                          <span className="text-sm text-gray-700">
+                            Electrical
+                          </span>
+                        </div>
+                        <div className="w-3 h-3 bg-orange-400 rounded-full"></div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            className="rounded text-indigo-600"
+                            checked
+                          />
+                          <span className="text-sm text-gray-700">
+                            Fire Protection
+                          </span>
+                        </div>
+                        <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {/* Annotations Panel */}
+              {activeSidePanel === "annotations" && (
+                <div>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-medium text-gray-800">
+                      Annotations
+                    </h3>
+                    <button
+                      className="text-sm text-indigo-600 hover:text-indigo-800 cursor-pointer"
+                      onClick={handleShow}
+                    >
+                      <i className="fas fa-plus mr-1"></i> New
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="p-3 bg-gray-50 rounded-md border border-gray-200">
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="font-medium text-gray-800">
+                          Missing Fire Damper
+                        </div>
+                        <div className="text-xs text-gray-500">2h ago</div>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">
+                        Fire damper missing at duct penetration through
+                        fire-rated wall.
+                      </p>
+                      <div className="flex justify-between items-center">
+                        <div className="text-xs text-gray-500">
+                          By: John Smith
+                        </div>
+                        <div className="flex gap-2">
+                          <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
+                            <i className="fas fa-eye"></i>
+                          </button>
+                          <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
+                            <i className="fas fa-edit"></i>
+                          </button>
+                          <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-3 bg-gray-50 rounded-md border border-gray-200">
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="font-medium text-gray-800">
+                          Beam Clash
+                        </div>
+                        <div className="text-xs text-gray-500">1d ago</div>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">
+                        Structural beam clashing with HVAC duct. Coordinate with
+                        structural engineer.
+                      </p>
+                      <div className="flex justify-between items-center">
+                        <div className="text-xs text-gray-500">
+                          By: Sarah Johnson
+                        </div>
+                        <div className="flex gap-2">
+                          <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
+                            <i className="fas fa-eye"></i>
+                          </button>
+                          <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
+                            <i className="fas fa-edit"></i>
+                          </button>
+                          <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-3 bg-gray-50 rounded-md border border-gray-200">
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="font-medium text-gray-800">
+                          Door Swing Issue
+                        </div>
+                        <div className="text-xs text-gray-500">3d ago</div>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">
+                        Door swing conflicts with adjacent equipment. Revise
+                        door swing direction.
+                      </p>
+                      <div className="flex justify-between items-center">
+                        <div className="text-xs text-gray-500">
+                          By: Mike Chen
+                        </div>
+                        <div className="flex gap-2">
+                          <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
+                            <i className="fas fa-eye"></i>
+                          </button>
+                          <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
+                            <i className="fas fa-edit"></i>
+                          </button>
+                          <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* Panel Footer */}
+            <div className="border-t border-gray-200 p-4">
+              <div className="flex justify-between items-center">
+                <div className="text-sm text-gray-500">
+                  Last updated: April 18, 2025
+                </div>
+                <div className="flex gap-2">
+                  <button className="flex items-center gap-1 bg-white border border-gray-300 rounded-md px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 !rounded-button whitespace-nowrap cursor-pointer">
+                    <i className="fas fa-download"></i>
+                    <span>Export</span>
+                  </button>
+                  <button className="flex items-center gap-1 bg-white border border-gray-300 rounded-md px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 !rounded-button whitespace-nowrap cursor-pointer">
+                    <i className="fas fa-file-pdf"></i>
+                    <span>Report</span>
                   </button>
                 </div>
-                <div className="space-y-3">
-                  <div className="p-3 bg-gray-50 rounded-md border border-gray-200">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="font-medium text-gray-800">Missing Fire Damper</div>
-                      <div className="text-xs text-gray-500">2h ago</div>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-2">Fire damper missing at duct penetration through fire-rated wall.</p>
-                    <div className="flex justify-between items-center">
-                      <div className="text-xs text-gray-500">By: John Smith</div>
-                      <div className="flex gap-2">
-                        <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
-                          <i className="fas fa-eye"></i>
-                        </button>
-                        <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
-                          <i className="fas fa-edit"></i>
-                        </button>
-                        <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
-                          <i className="fas fa-trash"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-gray-50 rounded-md border border-gray-200">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="font-medium text-gray-800">Beam Clash</div>
-                      <div className="text-xs text-gray-500">1d ago</div>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-2">Structural beam clashing with HVAC duct. Coordinate with structural engineer.</p>
-                    <div className="flex justify-between items-center">
-                      <div className="text-xs text-gray-500">By: Sarah Johnson</div>
-                      <div className="flex gap-2">
-                        <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
-                          <i className="fas fa-eye"></i>
-                        </button>
-                        <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
-                          <i className="fas fa-edit"></i>
-                        </button>
-                        <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
-                          <i className="fas fa-trash"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-gray-50 rounded-md border border-gray-200">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="font-medium text-gray-800">Door Swing Issue</div>
-                      <div className="text-xs text-gray-500">3d ago</div>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-2">Door swing conflicts with adjacent equipment. Revise door swing direction.</p>
-                    <div className="flex justify-between items-center">
-                      <div className="text-xs text-gray-500">By: Mike Chen</div>
-                      <div className="flex gap-2">
-                        <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
-                          <i className="fas fa-eye"></i>
-                        </button>
-                        <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
-                          <i className="fas fa-edit"></i>
-                        </button>
-                        <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
-                          <i className="fas fa-trash"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-          {/* Panel Footer */}
-          <div className="border-t border-gray-200 p-4">
-            <div className="flex justify-between items-center">
-              <div className="text-sm text-gray-500">
-                Last updated: April 18, 2025
-              </div>
-              <div className="flex gap-2">
-                <button className="flex items-center gap-1 bg-white border border-gray-300 rounded-md px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 !rounded-button whitespace-nowrap cursor-pointer">
-                  <i className="fas fa-download"></i>
-                  <span>Export</span>
-                </button>
-                <button className="flex items-center gap-1 bg-white border border-gray-300 rounded-md px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 !rounded-button whitespace-nowrap cursor-pointer">
-                  <i className="fas fa-file-pdf"></i>
-                  <span>Report</span>
-                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+      <Modal show={showModal} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>New Item</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group controlId="formTitle">
+              <Form.Label>Title</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </Form.Group>
+
+            <Form.Group controlId="formDescription">
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                placeholder="Enter description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleSave}>
+            Save
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
   );
 };
 

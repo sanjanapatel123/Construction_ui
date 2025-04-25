@@ -93,7 +93,7 @@ function App() {
 
   return (
     <div className="Main-App">
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={2000} />
       {!hideLayout && <Navbar toggleSidebar={toggleSidebar} />}
       <div className={`Main-App-container ${hideLayout ? "no-sidebar" : ""}`}>
         {!hideLayout && (

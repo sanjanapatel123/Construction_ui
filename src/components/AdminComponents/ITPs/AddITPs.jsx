@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Form, Button, InputGroup } from "react-bootstrap";
 import {
   FaTrash,
@@ -8,11 +8,46 @@ import {
   FaCopy,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { apiUrl } from "../../../utils/config";
+import axiosInstance from "../../../utils/axiosInstance";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProjects } from "../../../redux/slices/projectSlice";
+import { fetchITPs } from "../../../redux/slices/itpSlice";
+import { toast } from "react-toastify";
 
 const AddITPs = () => {
+  const dispatch = useDispatch();
+  const { data: projects, loading: projectLoading } = useSelector(
+    (state) => state.projects
+  );
   const [items, setItems] = useState([
     { description: "", status: "Pass", comments: "" },
   ]);
+  const [formData, setFormData] = useState({
+    projectName: "",
+    inspectionType: "",
+    inspector: "",
+    activity: "",
+    criteria: "",
+    status: "",
+    inspectionDate: "",
+    additionalNotes: "",
+    image: [], // To store uploaded files
+  });
+
+  useEffect(() => {
+    dispatch(fetchProjects());
+  }, [dispatch]);
+
+  const navigate = useNavigate();
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const addItem = () => {
     setItems([...items, { description: "", status: "Pass", comments: "" }]);
@@ -22,19 +57,105 @@ const AddITPs = () => {
     setItems(items.filter((_, i) => i !== index));
   };
 
-  const navigate = useNavigate();
+  const handleItemChange = (index, e) => {
+    const { name, value } = e.target;
+    const updatedItems = [...items];
+    updatedItems[index][name] = value;
+    setItems(updatedItems);
+  };
+
+  const handleFileUpload = (e) => {
+    const files = Array.from(e.target.files);
+    setFormData((prev) => ({
+      ...prev,
+      image: [...prev.image, ...files],
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const requestData = {
+      ...formData,
+      inspectionItems: items,
+    };
+
+    const formDataToSubmit = new FormData();
+    formDataToSubmit.append("projectName", formData.projectName);
+    formDataToSubmit.append("InspectionType", formData.inspectionType); // Note casing
+    formDataToSubmit.append("Inspector", formData.inspector); // Note casing
+    formDataToSubmit.append("Date", formData.inspectionDate);
+    formDataToSubmit.append("activity", formData.activity);
+    formDataToSubmit.append("criteria", formData.criteria);
+    formDataToSubmit.append("status", formData.status);
+    formDataToSubmit.append("additionalNotes", formData.additionalNotes);
+
+    // Append inspection items as JSON string
+    formDataToSubmit.append("inspectionItems", JSON.stringify(items));
+
+    // Append files
+    formData.image.forEach((file) => {
+      formDataToSubmit.append("images", file);
+    });
+
+    try {
+      const response = await axiosInstance.post(
+        `${apiUrl}/itps`,
+        formDataToSubmit,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("ITP Created:", response.data);
+      toast.success("ITP submitted successfully!");
+      dispatch(fetchITPs()); // Fetch updated projects list
+      navigate("/itps"); // Redirect to the ITPS overview page
+    } catch (error) {
+      console.error("Submission failed:", error);
+      toast.error("Failed to submit ITP.");
+    }
+  };
+
   return (
     <div className="container p-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h3>Inspection Test Plans</h3>
         <button
           onClick={() => navigate(-1)}
-          className="btn bg-primary text-white" 
+          className="btn bg-primary text-white"
         >
-          <i class="fa-solid fa-arrow-left me-2"></i> Back to Overview
+          <i className="fa-solid fa-arrow-left me-2"></i> Back to Overview
         </button>
       </div>
       <div className="card p-4 shadow-sm">
+        <div className="row g-3 mb-3">
+          <div className="col-md-6">
+            <Form.Group controlId="activity">
+              <Form.Label className="fw-semibold small">Activity</Form.Label>
+              <Form.Control
+                type="text"
+                name="activity"
+                value={formData.activity}
+                onChange={handleInputChange}
+                required
+              />
+            </Form.Group>
+          </div>
+          <div className="col-md-6">
+            <Form.Group controlId="criteria">
+              <Form.Label className="fw-semibold small">Criteria</Form.Label>
+              <Form.Control
+                type="text"
+                name="criteria"
+                value={formData.criteria}
+                onChange={handleInputChange}
+                required
+              />
+            </Form.Group>
+          </div>
+        </div>
+
         {/* Header Fields */}
         <div className="row g-3 mb-3">
           <div className="col-md-6">
@@ -42,8 +163,21 @@ const AddITPs = () => {
               <Form.Label className="fw-semibold small">
                 Project Name
               </Form.Label>
-              <Form.Select>
-                <option>Select Project</option>
+              <Form.Select
+                name="projectName"
+                value={formData.projectName}
+                onChange={handleInputChange}
+              >
+                <option value="">Select Project</option>
+                {projectLoading ? (
+                  <option disabled>Loading...</option>
+                ) : (
+                  projects.map((project) => (
+                    <option key={project._id} value={project.projectName}>
+                      {project.name}
+                    </option>
+                  ))
+                )}
               </Form.Select>
             </Form.Group>
           </div>
@@ -52,8 +186,15 @@ const AddITPs = () => {
               <Form.Label className="fw-semibold small">
                 Inspection Type
               </Form.Label>
-              <Form.Select>
-                <option>Select Type</option>
+              <Form.Select
+                name="inspectionType"
+                value={formData.inspectionType}
+                onChange={handleInputChange}
+              >
+                <option value="">Select assignee</option>
+                <option value="John Doe">John Doe</option>
+                <option value="Jane Smith">Jane Smith</option>
+                <option value="Alex Johnson">Alex Johnson</option>
               </Form.Select>
             </Form.Group>
           </div>
@@ -63,8 +204,15 @@ const AddITPs = () => {
           <div className="col-md-6">
             <Form.Group controlId="inspector">
               <Form.Label className="fw-semibold small">Inspector</Form.Label>
-              <Form.Select>
-                <option>Select Inspector</option>
+              <Form.Select
+                name="inspector"
+                value={formData.inspector}
+                onChange={handleInputChange}
+              >
+                <option value="">Select assignee</option>
+                <option value="John Doe">John Doe</option>
+                <option value="Jane Smith">Jane Smith</option>
+                <option value="Alex Johnson">Alex Johnson</option>
               </Form.Select>
             </Form.Group>
           </div>
@@ -74,8 +222,32 @@ const AddITPs = () => {
                 Inspection Date
               </Form.Label>
               <InputGroup>
-                <Form.Control type="date" />
+                <Form.Control
+                  type="date"
+                  name="inspectionDate"
+                  value={formData.inspectionDate}
+                  onChange={handleInputChange}
+                />
               </InputGroup>
+            </Form.Group>
+          </div>
+        </div>
+
+        <div className="row g-3 mb-3">
+          <div className="col-md-6">
+            <Form.Group controlId="inspectionDate">
+              <Form.Label className="fw-semibold small">Status</Form.Label>
+              <Form.Select
+                name="status"
+                value={formData.status}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="">Select Status</option>
+                <option value="Approved">Approved</option>
+                <option value="Pending">Pending</option>
+                <option value="Rejected">Rejected</option>
+              </Form.Select>
             </Form.Group>
           </div>
         </div>
@@ -87,12 +259,26 @@ const AddITPs = () => {
           </Form.Label>
           {items.map((item, index) => (
             <InputGroup className="mb-2" key={index}>
-              <Form.Control placeholder="Item Description" />
-              <Form.Select defaultValue="Pass">
+              <Form.Control
+                placeholder="Item Description"
+                value={item.description}
+                name="description"
+                onChange={(e) => handleItemChange(index, e)}
+              />
+              <Form.Select
+                name="status"
+                value={item.status}
+                onChange={(e) => handleItemChange(index, e)}
+              >
                 <option>Pass</option>
                 <option>Fail</option>
               </Form.Select>
-              <Form.Control placeholder="Comments" />
+              <Form.Control
+                placeholder="Comments"
+                value={item.comments}
+                name="comments"
+                onChange={(e) => handleItemChange(index, e)}
+              />
               <Button
                 variant="outline-danger"
                 onClick={() => removeItem(index)}
@@ -127,6 +313,16 @@ const AddITPs = () => {
             <p className="text-muted mb-0">
               Drag and drop files here or click to upload
             </p>
+            <input
+              type="file"
+              multiple
+              onChange={handleFileUpload}
+              style={{ display: "none" }}
+              id="fileUpload"
+            />
+            <label htmlFor="fileUpload" className="text-muted small mb-0">
+              Choose Files
+            </label>
           </div>
         </Form.Group>
 
@@ -138,14 +334,23 @@ const AddITPs = () => {
           <Form.Control
             as="textarea"
             rows={3}
+            name="additionalNotes"
+            value={formData.additionalNotes}
+            onChange={handleInputChange}
             placeholder="Enter any additional notes or observations..."
           />
         </Form.Group>
 
         {/* Footer Buttons */}
         <div className="d-flex justify-content-end gap-2">
-          <Button variant="outline-secondary">Cancel</Button>
-          <Button style={{ backgroundColor: "#0052CC" }}>
+          <Button variant="outline-secondary" onClick={() => navigate(-1)}>
+            Cancel
+          </Button>
+          <Button
+            style={{ backgroundColor: "#0052CC" }}
+            type="submit"
+            onClick={handleSubmit}
+          >
             <FaSave className="me-2" /> Save ITP
           </Button>
         </div>

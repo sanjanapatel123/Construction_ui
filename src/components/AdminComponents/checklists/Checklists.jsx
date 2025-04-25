@@ -1,9 +1,44 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FiEdit, FiUser, FiCheckCircle, FiDownload } from "react-icons/fi";
-import { Button } from "react-bootstrap";
+import { Button ,Modal,} from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchChecklists,
+  fetchChecklistDetails,
+  updateChecklist,
+} from "../../../redux/slices/checklistSlice"; // Adjust the import path as necessary
+import { Spinner } from "react-bootstrap";
 
 function Checklists() {
+  const dispatch = useDispatch();
+  const { checklists, checklistDetails, loading, error } = useSelector(
+    (state) => state.checklists
+  );
+
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchChecklists());
+  }, [dispatch]);
+
+  const handleViewDetails = (id) => {
+    dispatch(fetchChecklistDetails(id)); // Fetch the checklist details when clicked
+    setShowModal(true); // Open the modal
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false); // Close the modal
+  };
+
+  if (loading) {
+    return <Spinner animation="border" />;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <>
       <div
@@ -62,39 +97,116 @@ function Checklists() {
                 </tr>
               </thead>
               <tbody className="p-2">
-                {[...Array(10)].map((_, idx) => (
-                  <tr key={idx} className="align-middle py-3">
-                    <td className="ps-4 py-3 fw-semibold fs-9">
-                      Site Safety Inspection
-                    </td>
-                    <td className="text-muted fs-9 py-3">Project Alpha</td>
-                    <td className="text-muted fs-9 py-3">John Smith</td>
-                    <td className="py-3">
-                      <span className="badge bg-warning text-dark fs-9">
-                        In Progress
-                      </span>
-                    </td>
-                    <td className="text-muted fs-9 py-3">2024-02-19</td>
-                    <td className="pe-4 py-3">
-                      <div className="d-flex gap-2">
-                        <button className="btn text-primary p-0">
-                          <i className="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <button className="btn text-info p-0">
-                          <i className="fa-solid fa-eye"></i>
-                        </button>
-                        <button className="btn text-success p-0">
-                          <i className="fa-solid fa-circle-check"></i>
-                        </button>
-                        <button className="btn text-dark p-0">
-                          <i className="fa-solid fa-download"></i>
-                        </button>
-                      </div>
+                {checklists.length > 0 ? (
+                  checklists.map((checklist) => (
+                    <tr key={checklist.id} className="align-middle py-3">
+                      <td className="ps-4 py-3 fw-semibold fs-9">
+                        {checklist.checklistName}
+                      </td>
+                      <td className="text-muted fs-9 py-3">
+                        {checklist.project}
+                      </td>
+                      <td className="text-muted fs-9 py-3">
+                        {checklist.assignTo}
+                      </td>
+                      <td className="py-3">
+                        <span
+                          className={`badge bg-${checklist.status.toLowerCase()} text-dark fs-9`}
+                        >
+                          {checklist.status}
+                        </span>
+                      </td>
+                      <td className="text-muted fs-9 py-3">
+                        {checklist.lastUpdated}
+                      </td>
+                      <td className="pe-4 py-3">
+                        <div className="d-flex gap-2">
+                          <button className="btn text-primary p-0">
+                            <i className="fa-solid fa-pen-to-square"></i>
+                          </button>
+                          <button
+                            className="btn text-info p-0"
+                            onClick={() => handleViewDetails(checklist.id)}
+                          >
+                            <i className="fa-solid fa-eye"></i>
+                          </button>
+                          <button className="btn text-success p-0">
+                            <i className="fa-solid fa-circle-check"></i>
+                          </button>
+                          <button className="btn text-dark p-0">
+                            <i className="fa-solid fa-download"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="text-center">
+                      No checklists available
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
+
+            {/* Modal for Displaying Checklist Details */}
+            <Modal show={showModal} onHide={handleCloseModal} size="lg">
+              <Modal.Header closeButton>
+                <Modal.Title>Checklist Details</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                {checklistDetails ? (
+                  <div className="container">
+                    <div className="row mb-3">
+                      <div className="col-md-6">
+                        <strong>Checklist Name:</strong>
+                        <p>{checklistDetails.checklistName}</p>
+                      </div>
+                      <div className="col-md-6">
+                        <strong>Assigned To:</strong>
+                        <p>{checklistDetails.assignTo}</p>
+                      </div>
+                    </div>
+                    <div className="row mb-3">
+                      <div className="col-md-6">
+                        <strong>Project:</strong>
+                        <p>{checklistDetails.project}</p>
+                      </div>
+                      <div className="col-md-6">
+                        <strong>Status:</strong>
+                        <p>{checklistDetails.status}</p>
+                      </div>
+                    </div>
+                    <div className="row mb-3">
+                      <div className="col-md-12">
+                        <strong>Checklist Items:</strong>
+                        <ul>
+                          {checklistDetails.checklistItems.map(
+                            (item, index) => (
+                              <li key={index}>{item.checklistItem}</li>
+                            )
+                          )}
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="row mb-3">
+                      <div className="col-md-12">
+                        <strong>Additional Notes:</strong>
+                        <p>{checklistDetails.additionalNotes}</p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <Spinner animation="border" />
+                )}
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleCloseModal}>
+                  Close
+                </Button>
+              </Modal.Footer>
+            </Modal>
 
             {/* Pagination */}
             <div className="d-flex justify-content-end mt-3 mb-3">

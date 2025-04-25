@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Button, Form, Col, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import  BASE_URL  from "../../../utils/config"; // Adjust the import path as necessary
+import BASE_URL from "../../../utils/config"; // Adjust the import path as necessary
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { fetchProjects } from "../../../redux/slices/projectSlice"; // Adjust the import path as necessary
@@ -12,7 +11,7 @@ const AddProject = () => {
   // State to handle form inputs
   const [formData, setFormData] = useState({
     name: "",
-    assignedTo: "",
+    assignedTo: 1,
     startDate: "",
     endDate: "",
     status: "",
@@ -46,7 +45,10 @@ const AddProject = () => {
   // Handle form submission
   const handleSubmit = async () => {
     try {
-      const response = await axiosInstance.post(`${BASE_URL}/projects`, formData);
+      const response = await axiosInstance.post(
+        `${BASE_URL}/projects`,
+        formData
+      );
       console.log("Project Created:", response.data);
       toast.success("Project created successfully!");
       dispatch(fetchProjects()); // Fetch updated projects list
@@ -78,6 +80,16 @@ const AddProject = () => {
         </Form.Group>
 
         <Form.Group className="mb-3">
+          <Form.Label>Project Name</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter project name"
+            name="assignedTo"
+            value={formData.assignedTo}
+            onChange={handleChange}
+          />
+        </Form.Group>
+        {/* <Form.Group className="mb-3">
           <Form.Label>Assigned To</Form.Label>
           <Form.Select
             name="assignedTo"
@@ -88,9 +100,9 @@ const AddProject = () => {
             <option value="John Doe">John Doe</option>
             <option value="Jane Smith">Jane Smith</option>
             <option value="Alex Johnson">Alex Johnson</option>
-            {/* Add more options as needed */}
+   
           </Form.Select>
-        </Form.Group>
+        </Form.Group> */}
 
         <Row className="mb-3">
           <Col md={6}>

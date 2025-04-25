@@ -4,6 +4,8 @@ import projectReducer from './slices/projectSlice';
 import diaryReducer from './slices/diarySlice';
 import timesheetReducer from "./slices/timesheetSlice"; 
 import swmsReducer from "./slices/swmsSlice";
+import itpReducer from './slices/itpSlice'
+import checklistReducer from './slices/checklistSlice';
 
 export const store = configureStore({
   reducer: {
@@ -11,5 +13,7 @@ export const store = configureStore({
      diaries: diaryReducer,
       timesheets: timesheetReducer,
       swms : swmsReducer,
+       itps: itpReducer,
+        checklists: checklistReducer,
   }
 });
