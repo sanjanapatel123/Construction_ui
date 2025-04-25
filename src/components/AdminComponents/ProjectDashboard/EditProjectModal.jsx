@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
-import BASE_URL from "../../../utils/config";
+
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { fetchProjects } from "../../../redux/slices/projectSlice"; // Adjust the import path as necessary
+import { apiUrl } from "../../../utils/config";
 
 const EditProjectModal = ({ show, handleClose, project, refreshData }) => {
   const [formData, setFormData] = useState({});
@@ -25,7 +26,7 @@ const EditProjectModal = ({ show, handleClose, project, refreshData }) => {
   const handleUpdate = async () => {
     try {
       const response = await axios.put(
-        `${BASE_URL}/projects/${project._id}`,
+        `${apiUrl}/projects/${project._id}`,
         formData
       );
       console.log(response);

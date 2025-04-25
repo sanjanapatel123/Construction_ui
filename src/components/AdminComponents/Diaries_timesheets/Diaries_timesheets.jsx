@@ -22,7 +22,7 @@ import { fetchDiaries } from "../../../redux/slices/diarySlice";
 import TimesheetDetailsModal from "./TimesheetDetailsModal";
 import { Line } from "react-chartjs-2";
 import EditDiaryModal from "./EditDiaryModal";
-import BASE_URL from "../../../utils/config";
+
 import DiaryDetailsModal from "./DiaryDetailsModal";
 import { toast } from "react-toastify";
 import {
@@ -35,6 +35,7 @@ import {
   Legend,
 } from "chart.js";
 import axios from "axios";
+import { apiUrl } from "../../../utils/config";
 
 ChartJS.register(
   LineElement,
@@ -97,7 +98,7 @@ export default function DiariesTimesheets() {
   });
 
   const handleTimeSheetEditClick = async (id) => {
-    const res = await axios.get(`${BASE_URL}/timesheet/${id}`);
+    const res = await axios.get(`${apiUrl}/timesheet/${id}`);
     setEditData(res.data);
     setShowTimeSheetEditModal(true);
   };
@@ -109,7 +110,7 @@ export default function DiariesTimesheets() {
 
   const handleUpdateTimesheet = async () => {
     try {
-      await axios.put(`${BASE_URL}/timesheet/${editData._id}`, editData);
+      await axios.put(`${apiUrl}/timesheet/${editData._id}`, editData);
       toast.success("Timesheet updated!");
       dispatch(fetchTimesheets());
       setShowTimeSheetEditModal(false);
@@ -145,7 +146,7 @@ export default function DiariesTimesheets() {
   const handleSubmitDiary = async () => {
     // const selectedProject = projects.find((p) => p._id === selectedProjectId);
     try {
-      await axios.post(`${BASE_URL}/diaries`, diaryForm);
+      await axios.post(`${apiUrl}/diaries`, diaryForm);
       alert("Diary entry saved successfully!");
       dispatch(fetchDiaries());
       handleClose(); // close the modal
@@ -188,7 +189,7 @@ export default function DiariesTimesheets() {
 
   const handleSubmitTimeSheet = async () => {
     try {
-      await axios.post(`${BASE_URL}/timesheet`, timesheetData);
+      await axios.post(`${apiUrl}/timesheet`, timesheetData);
       toast.success("Timesheet entry added successfully!");
       dispatch(fetchTimesheets());
       handleCloseTimesheet(); // Close modal

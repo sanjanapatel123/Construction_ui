@@ -10,9 +10,12 @@ import {
   Badge,
 } from "react-bootstrap";
 import { FaEdit, FaEye, FaTrash, FaDownload, FaShare } from "react-icons/fa";
-import { getallSwms } from "../../../redux/slices/swmsSlice";
+import { getallSwms, deleteswms } from "../../../redux/slices/swmsSlice";
+import { getSingleProject,fetchProjects  } from "../../../redux/slices/projectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+
 import { Link } from "react-router-dom";
 
 
@@ -23,14 +26,24 @@ function SWMS() {
   const dispatch = useDispatch();
 
   const { swms , loading ,error } = useSelector((state) => state.swms )
+  //   const { projects}  = useSelector((state) => state.projects.data)
+  // console.log(projects)
+
+   const  projects  = useSelector((state) => state.projects.data);
+    console.log(projects);
+
 
   console.log("sWMS" ,swms)
   const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(getallSwms());
+    // dispatch(getSingleProject());
+  dispatch(fetchProjects());
+    
   }, [dispatch]);
   
+
 
   const SwmsList = Array.isArray(swms) ? swms : [];
 
@@ -98,7 +111,48 @@ function SWMS() {
     },
   ];
 
+// const handleDelete = (id) => {
+//   dispatch(deleteswms(id))
+//     .unwrap()
+//     .then(() => toast.success("SWMS deleted successfully!"))
+//     .catch(() => toast.error("Failed to delete SWMS."));
+// };
 
+
+const handleDelete = (id) => {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "You won't be able to revert this!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      dispatch(deleteswms(id))
+        .then((response) => {
+          {console.log(response)}
+          if (response.meta.requestStatus === "fulfilled") {
+            // showSuccessToast("SWMS deleted successfully!");
+            dispatch(getallSwms());
+            navigate("/swms");
+          } else {
+            // showErrorToast("Failed to delete SWMS!");
+          }
+        })
+        .catch(() => {
+          showErrorToast("Something went wrong!");
+        });
+    }
+  });
+};
+
+const getProjectName = (projectId) => {
+  const project = projects.find((p) => p.id === projectId);
+  console.log("getproject",project);
+  return project ? project.name : "Unknown Project";
+};
  
 
 
@@ -210,121 +264,51 @@ function SWMS() {
         <th className="pe-4">Actions</th>
         </tr>
       </thead>
-      {loading ? (
-        <p>Loading...</p>
-      ) : error ? (
-        <p className="text-danger">{error}</p>
-      ) : (
       <tbody>
-
-        {
-
-        (filteredSwms && filteredSwms.map((item,index) => (
-          <tr key={index}>
-          <td className="ps-4">
-            <div className="d-flex align-items-center gap-3">
-              <div
-                className="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center"
-                style={{ width: "36px", height: "36px" }}
-              >
-                EL
-              </div>
-              <div>
-                <div className="fw-medium">{item?.title}</div>
-                {/* <small className="text-muted">
-                  Created by: mike.j@example.com
-                </small> */}
-              </div>
+  {loading ? (
+    <tr>
+      <td colSpan="5" className="text-center py-3">Loading...</td>
+    </tr>
+  ) : filteredSwms.length > 0 ? (
+    filteredSwms.map((item, index) => (
+      <tr key={index}>
+        <td className="ps-4">
+          <div className="d-flex align-items-center gap-3">
+            <div>
+              <div className="fw-medium">{item?.title}</div>
             </div>
-          </td>
-          <td>{item?.project}</td>
-          <td>{item?.workArea}</td>
-          <td> {new Date(item?.createdAt).toLocaleString()}</td>
-          <td className="pe-4">
-            <div className="d-flex gap-3">
-              <Link to={`/view-swms/${item?._id}`}>
-                <Button variant="link" className="text-primary p-0">
-                  <i className="fa-solid fa-eye"></i>
-                </Button>
-              </Link>
+          </div>
+        </td>
+        <td>{(item?.project)}</td>
+        <td>{item?.workArea}</td>
+        <td>{new Date(item?.createdAt).toLocaleString()}</td>
+        <td className="pe-4">
+          <div className="d-flex gap-3">
+            <Link to={`/view-swms/${item?._id}`}>
               <Button variant="link" className="text-primary p-0">
-                <i className="fa-solid fa-download"></i>
+                <i className="fa-solid fa-eye"></i>
               </Button>
-            </div>
-          </td>
-        </tr>
-        )
-        ))
-      }
-        {/* <tr>
-          <td className="ps-4">
-            <div className="d-flex align-items-center gap-3">
-              <div
-                className="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center"
-                style={{ width: "36px", height: "36px" }}
-              >
-                EL
-              </div>
-              <div>
-                <div className="fw-medium">Electrical Work SWMS</div>
-                <small className="text-muted">
-                  Created by: mike.j@example.com
-                </small>
-              </div>
-            </div>
-          </td>
-          <td>ABC Electrical Services</td>
-          <td>Johnson Builders Pty Ltd</td>
-          <td>2024-02-15</td>
-          <td className="pe-4">
-            <div className="d-flex gap-3">
-              <Link to="/view-swms">
-                <Button variant="link" className="text-primary p-0">
-                  <i className="fa-solid fa-eye"></i>
-                </Button>
-              </Link>
-              <Button variant="link" className="text-primary p-0">
-                <i className="fa-solid fa-download"></i>
-              </Button>
-            </div>
-          </td>
-        </tr> */}
+            </Link>
+            <Button variant="link" className="text-primary p-0">
+              <i className="fa-solid fa-download"></i>
+            </Button>
+            <button className="text-danger btn p-0" onClick={() => handleDelete(item?._id)}>
+              <i className="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="5" className="text-center py-3">No SWMS found</td>
+    </tr>
+  )}
+</tbody>
 
-        {/* <tr>
-          <td className="ps-4">
-            <div className="d-flex align-items-center gap-3">
-              <div
-                className="bg-warning text-white rounded-circle d-flex justify-content-center align-items-center"
-                style={{ width: "36px", height: "36px" }}
-              >
-                EX
-              </div>
-              <div>
-                <div className="fw-medium">Excavation SWMS</div>
-                <small className="text-muted">
-                  Created by: sarah.w@example.com
-                </small>
-              </div>
-            </div>
-          </td>
-          <td>GroundForce Pty Ltd</td>
-          <td>Urban Constructions</td>
-          <td>2024-02-14</td>
-          <td className="pe-4">
-            <div className="d-flex gap-3">
-              <Link to="/view-swms">
-                <Button variant="link" className="text-primary p-0">
-                  <i className="fa-solid fa-eye"></i>
-                </Button>
-              </Link>
-              <Button variant="link" className="text-primary p-0">
-                <i className="fa-solid fa-download"></i>
-              </Button>
-            </div>
-          </td>
-        </tr> */}
-      </tbody>
-      )}
+      
+     
+      
     </table>
   </div>
 

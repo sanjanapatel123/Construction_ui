@@ -1,51 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Button, Form, InputGroup, Badge } from "react-bootstrap";
-import {
-  FaSearch,
-  FaFilter,
-  FaPaperclip,
-  FaUserPlus,
-  FaFileExport,
-} from "react-icons/fa";
+import { FaSearch, FaFilter, FaPaperclip, FaUserPlus, FaFileExport,} from "react-icons/fa";
 import { Link } from "react-router-dom";
-
-const mockIncidents = [
-  {
-    id: "INC-001",
-    type: "Injury",
-    description: "Worker slipped on wet surface",
-    location: "Block A, Level 2",
-    status: "Under Review",
-    date: "2024-02-20",
-    assignedTo: "Sarah Johnson",
-  },
-  {
-    id: "INC-002",
-    type: "Equipment Damage",
-    description: "Crane malfunction",
-    location: "Main Site",
-    status: "Resolved",
-    date: "2024-02-19",
-    assignedTo: "Mike Peters",
-  },
-  {
-    id: "INC-003",
-    type: "Near Miss",
-    description: "Falling object near workers",
-    location: "Block B",
-    status: "New",
-    date: "2024-02-21",
-    assignedTo: "John Smith",
-  },
-];
-
+import { deleteIncidentReport, getIncidentReports } from "../../../redux/slices/incidentReportSlice";
+import { useDispatch, useSelector } from "react-redux";
+import Swal from 'sweetalert2';
 const safetyProtocols = [
   { id: 1, text: "Initial containment measures implemented", completed: true },
   { id: 2, text: "Safety team notified", completed: true },
   { id: 3, text: "Model behavior analysis completed", completed: false },
   { id: 4, text: "Mitigation strategy implemented", completed: false },
 ];
-
 const timelineEvents = [
   {
     id: 1,
@@ -68,18 +33,52 @@ const timelineEvents = [
 ];
 
 function IncidentReports() {
-  const [incidents] = useState(mockIncidents);
+  const {reports}= useSelector((state)=>state.reports)
+  console.log(reports)
+  const dispatch= useDispatch()
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("All Types");
-  const [selectedStatus, setSelectedStatus] = useState("All Status");
+  useEffect(()=>{
+  dispatch(getIncidentReports())
+  },[])
 
-  const getStatusBadge = (status) => {
-    const statusColors = {
-      New: "danger",
-      "Under Review": "warning",
-      Resolved: "success",
-    };
-    return <Badge bg={statusColors[status] || "secondary"}>{status}</Badge>;
+
+  const getSeverityBadge = (severity) => {
+    switch (severity) {
+      case 'low':
+        return <span className="badge bg-success">Low</span>;
+      case 'medium':
+        return <span className="badge bg-warning text-dark">Medium</span>;
+      case 'high':
+        return <span className="badge bg-danger">High</span>;
+      case 'critical':
+        return <span className="badge bg-dark">Critical</span>;
+      default:
+        return <span className="badge bg-secondary">Unknown</span>;
+    }
+  };
+  
+  const handleDelete = (id) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You won’t be able to revert this!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(deleteIncidentReport(id))
+          .unwrap()
+          .then(() => {
+            Swal.fire('Deleted!', 'Incident has been deleted.', 'success');
+          })
+          .catch((err) => {
+            Swal.fire('Error!', err, 'error');
+          });
+      }
+    });
   };
 
   return (
@@ -108,32 +107,12 @@ function IncidentReports() {
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
             style={{ width: "150px" }}
-            className="border-0 shadow-sm rounded"
-          >
+            className="border-0 shadow-sm rounded">
             <option>All Types</option>
             <option>Injury</option>
             <option>Equipment Damage</option>
             <option>Near Miss</option>
           </Form.Select>
-
-          <Form.Select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            style={{ width: "150px" }}
-            className="border-0 shadow-sm rounded"
-          >
-            <option>All Status</option>
-            <option>New</option>
-            <option>Under Review</option>
-            <option>Resolved</option>
-          </Form.Select>
-
-          <Button
-            variant="outline-secondary"
-            className="border-0 shadow-sm rounded"
-          >
-            <FaFilter />
-          </Button>
         </div>
 
         <Link to="/AddIncidentReports">
@@ -174,38 +153,36 @@ function IncidentReports() {
       <Table hover className="shadow-sm bg-white mb-0 rounded mt-2">
   <thead className="table-light p-2">
     <tr>
-      <th className="ps-4">ID</th>
+      <th>#</th>
       <th>Type</th>
-      <th>Description</th>
       <th>Location</th>
       <th>Status</th>
       <th>Date</th>
-      <th className="pe-4">Assigned To</th>
+      <th>Action</th>
+
     </tr>
   </thead>
   <tbody className="p-2">
-    {incidents.map((incident) => (
-      <tr key={incident.id}>
-        <td className="ps-4">
-          <div className="d-flex align-items-center gap-3">
-            <div
-              className=" rounded-circle d-flex justify-content-center align-items-center"
-              style={{ width: "36px", height: "36px" }}
-            >
-              {incident.id}
-            </div>
-           
-          </div>
-        </td>
-        <td>{incident.type}</td>
-        <td>{incident.description}</td>
-        <td>{incident.location}</td>
-        <td>{getStatusBadge(incident.status)}</td>
-        <td>{incident.date}</td>
-        <td className="pe-4">{incident.assignedTo}</td>
+  {reports.length === 0 ? (
+    <tr>
+      <td colSpan="7" className="text-center">No Reports Found</td>
+    </tr>
+  ) : (
+    reports?.map((incident,index) => (
+      <tr key={incident._id}>
+        <td>{index+1}</td>
+        <td>{incident?.incidentType}</td>
+        <td>{incident?.location}</td>
+        <td>{getSeverityBadge(incident.severityLevel)}</td>
+        <td>{new Date(incident.dateTime).toLocaleString()}</td>
+          <td> <Button variant="link" className="text-primary p-0" onClick={()=>handleDelete(incident._id)}>
+         <i className="fas fa-trash  text-danger"></i> 
+         </Button></td>
       </tr>
-    ))}
-  </tbody>
+    ))
+  )}
+</tbody>
+
 </Table>
 </div>
 <div className="d-flex justify-content-end mb-2 mt-3">

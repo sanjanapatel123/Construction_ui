@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../utils/axiosInstance";
-import { apiUrl } from "../../utils/config";
+import  {apiUrl}  from "../../utils/config";
 
 
 export const createSwms = createAsyncThunk(
@@ -39,6 +39,19 @@ export const getswmsbyId = createAsyncThunk("swms/getswmsbyId",
         }
         catch(error){
             console.log("getswmsbyId Error",error.response)
+            return thunkAPI.rejectWithValue(error.response?.data || "No SWMS found for given id")
+        }
+    }
+)
+
+export const deleteswms = createAsyncThunk("swms/deletswms",
+    async(id, thunkAPI) => {
+        try {
+            const response = await axiosInstance.delete(`${apiUrl}/swms/${id}`)
+            return response.data;
+        }
+        catch(error){
+            console.log("deletswms Error",error.response)
             return thunkAPI.rejectWithValue(error.response?.data || "No SWMS found for given id")
         }
     }
@@ -95,6 +108,19 @@ const swmsSlice = createSlice({
     .addCase(getswmsbyId.rejected, (state) => {
         state.loading = false;
         state.error = action.payload
+    })
+
+    .addCase(deleteswms.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+    })
+    .addCase(deleteswms.fulfilled, (state,action) => {
+        state.loading = false;
+        state.swms = state.swms.filter((swms) => swms._id !== action.payload._id);
+    })
+    .addCase(deleteswms.rejected, (state) => {
+        state.loading = false;
+        state.error = action.payload;
     })
     },
 });

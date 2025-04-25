@@ -1,49 +1,47 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-
+import { deleteSiteEntry, fetchSiteEntries } from '../../../redux/slices/siteEntrySlice';
+import { useDispatch, useSelector } from 'react-redux';
+import Swal from 'sweetalert2'
 function SiteEntryTable() {
-  const siteEntries = [
-    {
-      fullName: "Rahul Sharma",
-      workerId: "W12345",
-      phoneNumber: "9876543210",
-      emailAddress: "rahul@example.com",
-      siteName: "Site A",
-      siteSupervisor: "Mr. Verma",
-      inductionDate: "2025-04-18",
-      siteLocation: "Delhi"
-    },
-    {
-      fullName: "Priya Patel",
-      workerId: "W12346",
-      phoneNumber: "9123456789",
-      emailAddress: "priya@example.com",
-      siteName: "Site B",
-      siteSupervisor: "Ms. Sharma",
-      inductionDate: "2025-04-17",
-      siteLocation: "Mumbai"
-    },
-    // Add more entries here if needed
-  ];
-
-  const itemsPerPage = 10;
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(siteEntries.length / itemsPerPage);
-
-  const paginatedEntries = siteEntries.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const handlePrev = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  const dispatch= useDispatch()
+  const {entries}= useSelector((state)=>state.entries)
+  console.log(entries)
+  useEffect(()=>{
+    dispatch(fetchSiteEntries())
+  } ,[])
+ 
+  const HandleDelete = (id) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(deleteSiteEntry  (id))
+          .then(() => {
+            Swal.fire(
+              'Deleted!',
+              'The site entry has been deleted.',
+              'success'
+            );
+            dispatch(fetchSiteEntries());  // Refresh the table after delete
+          })
+          .catch((error) => {
+            Swal.fire(
+              'Error!',
+              'Something went wrong.',
+              'error'
+            );
+          });
+      }
+    });
   };
-
-  const handleNext = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
-
   return (
     <div className="container ">
       {/* Header */}
@@ -54,7 +52,7 @@ function SiteEntryTable() {
             <i className="fa-solid fa-plus me-2"></i>Site Entry
           </button>
         </Link>
-      </div>
+      </div> 
 
       {/* Table */}
       <div className="table-responsive shadow-sm bg-white rounded p-2">
@@ -73,64 +71,54 @@ function SiteEntryTable() {
             </tr>
           </thead>
           <tbody className="p-2">
-            {paginatedEntries.map((entry, index) => (
-              <tr key={index}>
-                <td className="ps-4">{entry.fullName}</td>
-                <td>{entry.workerId}</td>
-                <td>{entry.phoneNumber}</td>
-                <td>{entry.emailAddress}</td>
-                <td>{entry.siteName}</td>
-                <td>{entry.siteSupervisor}</td>
-                <td>{entry.inductionDate}</td>
-                <td>{entry.siteLocation}</td>
-                <td className="pe-4">
-                  <div className="d-flex gap-2">
-                    <button className="btn text-primary p-0">
-                      <i className="fa-solid fa-pen-to-square"></i>
-                    </button>
-                    <button className="btn text-danger p-0">
-                      <i className="fa-solid fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+  {entries && entries.length > 0 ? (
+    entries.map((entry, index) => (
+      <tr key={index}>
+        <td className="ps-4">{entry.fullName}</td>
+        <td>{entry.workerId}</td>
+        <td>{entry.phoneNumber}</td>
+        <td>{entry.emailAddress}</td>
+        <td>{entry.siteName}</td>
+        <td>{entry.siteSupervisor}</td>
+        <td>{new Date(entry.inductionDate).toLocaleDateString()}</td>
+        <td>{entry.siteLocation}</td>
+        <td className="pe-4">
+          <div className="d-flex gap-2">
+          <Link to={`/siteEntry/${entry._id}`}><button className="btn text-primary p-0">
+              <i className="fa-solid fa-pen-to-square"></i>
+            </button></Link>
+            <button className="btn text-danger p-0" onClick={()=>HandleDelete(entry._id)}>
+              <i className="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    ))
+  ) : (   
+    <tr>
+      <td colSpan="9" className="text-center py-3">
+        No site entries found.
+      </td> 
+    </tr>
+  )}
+</tbody>
         </Table>
-
-        {/* Pagination Controls */}
-        <div className="d-flex justify-content-end my-3 ">
-          <Button
-            size="sm"
-            variant="outline-secondary"
-            className="me-2"
-            onClick={handlePrev}
-            disabled={currentPage === 1}
-          >
+      </div>
+        {/* Pagination */}
+        <div className="d-flex justify-content-end mt-2">
+          <Button size="sm" variant="outline-secondary" className="me-2">
             Previous
           </Button>
-          {[...Array(totalPages)].map((_, i) => (
-            <Button
-              key={i + 1}
-              size="sm"
-              variant={currentPage === i + 1 ? "primary" : "outline-secondary"}
-              className="ms-1"
-              onClick={() => setCurrentPage(i + 1)}
-            >
-              {i + 1}
-            </Button>
-          ))}
-          <Button
-            size="sm"
-            variant="outline-secondary"
-            className="ms-2"
-            onClick={handleNext}
-            disabled={currentPage === totalPages}
-          >
+          <Button size="sm" variant="primary" className="ms-2">
+            1
+          </Button>
+          <Button size="sm" variant="outline-secondary" className="ms-2">
+            2
+          </Button>
+          <Button size="sm" variant="outline-secondary" className="ms-2">
             Next
           </Button>
         </div>
-      </div>
     </div>
   );
 }

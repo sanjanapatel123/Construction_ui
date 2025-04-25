@@ -1,7 +1,43 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { addSiteEntry, fetchSiteEntries, updateSiteEntry } from "../../../redux/slices/siteEntrySlice";
+import { useDispatch, useSelector } from "react-redux";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 function SiteEntry() {
+  const dispatch= useDispatch()
+  const navigate = useNavigate();
+  const {id}= useParams()
+  console.log(id)
+  const {entries}= useSelector((state)=>state.entries)
+  console.log(entries)
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchSiteEntries());
+    }
+  }, [id, dispatch]);
+  
+  useEffect(() => {
+    if (id && entries.length > 0) {
+      const existingEntry = entries.find((entry) => entry._id === id);
+      if (existingEntry) {
+        setFormData({
+          fullName: existingEntry.fullName,
+          workerId: existingEntry.workerId,
+          phoneNumber: existingEntry.phoneNumber,
+          emailAddress: existingEntry.emailAddress,
+          safetyEquipment: existingEntry.safetyEquipment,
+          siteName: existingEntry.siteName,
+          siteSupervisor: existingEntry.siteSupervisor,
+          inductionDate: existingEntry.inductionDate.split("T")[0],
+          siteLocation: existingEntry.siteLocation,
+        });
+      }
+    }
+  }, [id, entries]);
+  
+
   const [formData, setFormData] = useState({
     fullName: "",
     workerId: "",
@@ -19,6 +55,8 @@ function SiteEntry() {
     inductionDate: "",
     siteLocation: "",
   });
+  
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,10 +79,30 @@ function SiteEntry() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
-    // Here you would send the form data to the server
+  
+    if (id) {
+      dispatch(updateSiteEntry({ id, updatedEntry: formData }))
+        .unwrap()
+        .then(() => {
+          toast.success("Site Entry Updated Successfully!");
+          navigate("/siteEntryTable");
+        })
+        .catch(() => {
+          toast.error("Failed to update site entry!");
+        });
+    } else {
+      dispatch(addSiteEntry(formData))
+        .unwrap()
+        .then(() => {
+          toast.success("Site Entry Added Successfully!");
+          navigate("/siteEntryTable");
+        })
+        .catch(() => {
+          toast.error("Failed to add site entry!");
+        });
+    }
   };
-
+  
   const isSafetyEquipmentSelected = Object.values(
     formData.safetyEquipment
   ).every((item) => item);
@@ -52,18 +110,15 @@ function SiteEntry() {
   return (
     <>
       <div className="container mt-4">
-
         <div className="d-flex justify-content-between">
           <div>
-            <h4>Site Entry Form</h4>
+          <h4>{id ? "Edit Site Entry" : "Add Site Entry"}</h4>
             <p>Please complete all fields to gain access to the site</p>
           </div>
           <div>
             <Link to="/siteEntryTable">
-              <button
-                className="btn "
-                style={{ backgroundColor: "#0d6efd", color: "white" }}
-              >
+              <button  className="btn"
+                style={{ backgroundColor: "#0d6efd", color: "white" }}>
                 <i class="fa-solid fa-arrow-left me-2"></i>Back
               </button>
             </Link>
@@ -76,16 +131,13 @@ function SiteEntry() {
             <label htmlFor="fullName" className="form-label">
               Full Name
             </label>
-            <input
-              type="text"
-              className="form-control"
+            <input type="text" className="form-control"
               id="fullName"
               name="fullName"
               value={formData.fullName}
               onChange={handleChange}
               placeholder="John Doe"
-              required
-            />
+              required/>
           </div>
           <div className="row">
             <div className="mb-3 col-md-6">
@@ -307,13 +359,9 @@ function SiteEntry() {
           </div>
           </div>
           {/* Submit Button */}
-          <button
-            type="submit"
-            className="btn btn-warning w-100 mt-3"
-            disabled={!isSafetyEquipmentSelected}
-          >
-            Verify & Submit Entry
-          </button>
+          <button type="submit" className="btn btn-primary">
+  {id ? "Update Entry" : "Add Entry"}
+</button>
         </form>
       </div>
     </>

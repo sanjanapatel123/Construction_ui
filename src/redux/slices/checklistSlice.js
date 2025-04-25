@@ -6,7 +6,7 @@ import { apiUrl } from '../../utils/config.js'; // Your API base URL
 export const fetchChecklists = createAsyncThunk(
   'checklists/fetchChecklists',
   async () => {
-    const response = await axiosInstance.get("http://localhost:8000//api/checklists");
+    const response = await axiosInstance.get(`${apiUrl}/checklists`);
     return response.data; // This is the data you want to store in the state
   }
 );
@@ -14,7 +14,7 @@ export const fetchChecklists = createAsyncThunk(
 export const fetchChecklistDetails = createAsyncThunk(
   'checklists/fetchChecklistDetails',
   async (id) => {
-    const response = await axiosInstance.get(`http://localhost:8000/api/checklists/${id}`);
+    const response = await axiosInstance.get(`${apiUrl}/checklists/${id}`);
     return response.data; // This is the data you want to store in the state
   }
 );
@@ -22,7 +22,7 @@ export const fetchChecklistDetails = createAsyncThunk(
 export const updateChecklist = createAsyncThunk(
   'checklists/updateChecklist',
   async ({ id, checklistData }) => {
-    const response = await axiosInstance.put(`${apiUrl}/api/checklists/${id}`, checklistData);
+    const response = await axiosInstance.put(`${apiUrl}/checklists/${id}`, checklistData);
     return response.data;
   }
 );
