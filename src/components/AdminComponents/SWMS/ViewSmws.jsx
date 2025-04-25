@@ -148,14 +148,14 @@ const ViewSwms = () => {
             <div className="mb-3 col-md-6"><strong>SWMS Name:</strong> {singleSwms?.title}</div>
             <div className="mb-3 col-md-6"><strong>Site Address:</strong> {singleSwms?.workArea}</div>
             <div className="mb-3 col-md-6"><strong>Company Name:</strong> {singleSwms?.project}</div>
-            <div className="mb-3 col-md-6"><strong>Person Responsible:</strong> John Doe</div>
+            {/* <div className="mb-3 col-md-6"><strong>Person Responsible:</strong> John Doe</div>
             <div className="mb-3 col-md-6"><strong>Principal Contractor:</strong> BuildSafe Pty Ltd</div>
-            <div className="mb-3 col-md-6"><strong>Reviewer:</strong> Jane Smith</div>
+            <div className="mb-3 col-md-6"><strong>Reviewer:</strong> Jane Smith</div> */}
             <div className="mb-3 col-md-6">
               <strong>Date Created:</strong> {new Date(singleSwms?.createdAt).toLocaleString()}
             </div>
-            <div className="mb-3 col-md-6"><strong>Date Reviewed:</strong> 2024-04-10</div>
-            <div className="mb-3 col-md-6"><strong>ABN:</strong> 12 345 678 901</div>
+            {/* <div className="mb-3 col-md-6"><strong>Date Reviewed:</strong> 2024-04-10</div>
+            <div className="mb-3 col-md-6"><strong>ABN:</strong> 12 345 678 901</div> */}
           </div>
 
           <div className="mb-4">
