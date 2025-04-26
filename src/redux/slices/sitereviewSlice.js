@@ -33,6 +33,8 @@ export const createsitereview = createAsyncThunk(
     async (_, thunkAPI) => {
       try {
         const response = await axiosInstance.get(`https://hrb5wx2v-8000.inc1.devtunnels.ms/api/sitereview`);
+        // const response = await axiosInstance.get(`${apiUrl}/sitereview`);
+        console.log("Response from API:", response);
         return response.data;
       } catch (error) {
         return thunkAPI.rejectWithValue(
@@ -41,6 +43,20 @@ export const createsitereview = createAsyncThunk(
       }
     }
   );
+
+  export const fetchsitereviewById = createAsyncThunk(
+    'sitereview/fetchsitereviewById',
+    async (id, thunkAPI) => {
+      try {
+        const response = await axiosInstance.get(`${apiUrl}/sitereview/${id}`);
+        return response.data;
+      } catch (error) {
+        return thunkAPI.rejectWithValue(
+          error.response?.data || error.message || "error fetching sitereview"
+        );
+      
+    }}
+  )
 
 
   export const deletesitereview = createAsyncThunk(
@@ -67,6 +83,8 @@ export const createsitereview = createAsyncThunk(
           headers: { "Content-Type": "multipart/form-data" }
         }
       )
+
+      console.log("Response from update review API:", response);
       return response.data;
     }
     catch(error){
@@ -100,7 +118,7 @@ const sitereviewSlice = createSlice ({
       })
       .addCase(createsitereview.fulfilled, (state, action) => {
         state.loading = false;
-        state.sitereview.push(action.payload);
+        state.sitereview =action.payload;
       })
       .addCase(createsitereview.rejected, (state, action) => {
         state.loading = false;
@@ -135,7 +153,34 @@ const sitereviewSlice = createSlice ({
       .addCase(updatesitereview.rejected , (state,action) => {
         state.loading = false;
         state.error =action.payload;
-      })                   
+      })  
+      .addCase(deletesitereview.pending, (state) => {
+        state.loading = false;
+        state.error = null;
+      } ) 
+      .addCase(deletesitereview.fulfilled , (state, action) => {
+        state.loading = false;
+        state.sitereview = state.sitereview.filter(item => item._id !== action.payload._id);
+      })
+      .addCase(deletesitereview.rejected , (state,action) => {
+        state.loading = false;
+        state.error =action.payload;
+      })  
+      
+      .addCase(fetchsitereviewById.pending, (state) => {
+        state.loading = true;        
+        state.error = null;
+      }
+      )
+      .addCase(fetchsitereviewById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.sitereview = action.payload;
+      })
+      .addCase(fetchsitereviewById.rejected, (state, action) => {
+        state.loading = false;        
+        state.error = action.payload;
+      })
+      
                    
 
  }

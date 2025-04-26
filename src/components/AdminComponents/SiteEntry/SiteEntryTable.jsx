@@ -7,6 +7,7 @@ import Swal from 'sweetalert2'
 function SiteEntryTable() {
   const dispatch= useDispatch()
   const {entries}= useSelector((state)=>state.entries)
+  
   console.log(entries)
   useEffect(()=>{
     dispatch(fetchSiteEntries())
