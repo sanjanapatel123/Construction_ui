@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../utils/axiosInstance.jsx' // Make sure axiosInstance is configured
 import { apiUrl } from '../../utils/config.js'; // Your API base URL
+import { toast } from 'react-toastify';
 
 // Async thunk to fetch all checklists
 export const fetchChecklists = createAsyncThunk(
@@ -12,10 +13,15 @@ export const fetchChecklists = createAsyncThunk(
 );
 
 export const fetchChecklistDetails = createAsyncThunk(
-  'checklists/fetchChecklistDetails',
-  async (id) => {
-    const response = await axiosInstance.get(`${apiUrl}/checklists/${id}`);
-    return response.data; // This is the data you want to store in the state
+  'checklist/fetchChecklistDetails',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`${apiUrl}/checklists/${id}`);
+      return response.data;
+    } catch (error) {
+      toast.error("Failed to fetch ITP details");
+      return rejectWithValue(error?.response?.data?.message || "Failed to fetch ITP details");
+    }
   }
 );
 
@@ -26,6 +32,18 @@ export const updateChecklist = createAsyncThunk(
     return response.data;
   }
 );
+
+export const deleteChecklist = createAsyncThunk('checklist/deleteChecklist', async (projectId, { dispatch, rejectWithValue }) => {
+  try {
+    const response = await axiosInstance.delete(`${apiUrl}/itps/${projectId}`);
+    toast.success("Itps deleted successfully!");
+    dispatch(fetchChecklists()); // re-fetch list
+    return response.data;
+  } catch (error) {
+    toast.error(error?.response?.data?.message || "Failed to delete Itps!");
+    return rejectWithValue(error?.response?.data?.message || "Delete failed");
+  }
+});
 
 const checklistSlice = createSlice({
   name: 'checklists',
@@ -59,6 +77,20 @@ const checklistSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
+       .addCase(deleteChecklist.pending, (state) => {
+              state.loading = true;
+              state.error = null;
+              state.deleteSuccessMsg = '';
+            })
+            .addCase(deleteChecklist.fulfilled, (state, action) => {
+              state.loading = false;
+              state.data = state.data.filter((itp) => itp._id !== action.payload.id);
+              state.deleteSuccessMsg = action.payload.message;
+            })
+            .addCase(deleteChecklist.rejected, (state, action) => {
+              state.loading = false;
+              state.error = action.payload;
+            })
   },
 });
 

@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Form, Button, Table } from "react-bootstrap";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const SafetyEquipment = () => {
   const [formData, setFormData] = useState({
@@ -23,26 +26,95 @@ const SafetyEquipment = () => {
     ],
   });
 
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name.includes("equipment")) {
-      const index = name.split("-")[1];
-      const newChecklist = [...formData.equipmentChecklist];
-      newChecklist[index][name.split("-")[0]] = value;
-      setFormData({ ...formData, equipmentChecklist: newChecklist });
+
+    // Check if the field is part of the equipmentChecklist
+    if (name.includes("-")) {
+      const [field, index] = name.split("-");
+      const updatedChecklist = [...formData.equipmentChecklist];
+      updatedChecklist[index][field] = value;
+      setFormData({ ...formData, equipmentChecklist: updatedChecklist });
     } else {
+      // Handle fields outside of the checklist like specialInstructions and equipmentConditionRemarks
       setFormData({ ...formData, [name]: value });
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleCheckboxChange = (index) => {
+    const updatedChecklist = [...formData.equipmentChecklist];
+    updatedChecklist[index].selected = !updatedChecklist[index].selected;
+    setFormData({ ...formData, equipmentChecklist: updatedChecklist });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
+
+    const isValid = formData.equipmentChecklist.every((item) => item.condition);
+    if (!isValid) {
+      toast.error("Please select a condition for all equipment items.");
+      return;
+    }
+
+    if (!formData.specialInstructions || !formData.equipmentConditionRemarks) {
+      toast.error("Please provide all the required additional details.");
+      return;
+    }
+
+    const payload = {
+      assignmentId: formData.assignmentID,
+      assignmentDate: formData.assignmentDate,
+      assignedBy: formData.assignedBy,
+      assignedTo: formData.assignedTo,
+      submissionDeadline: formData.submissionDeadline,
+      expectedReturnDate: formData.expectedReturnDate,
+      equipmentChecklist: formData.equipmentChecklist.map((item) => ({
+        equipment: item.equipment,
+        quantity: item.quantity,
+        condition: item.condition,
+      })),
+      additionalDetails: formData.specialInstructions,
+      specialInstructions: formData.specialInstructions,
+      equipmentConditionRemarks: formData.equipmentConditionRemarks,
+      confirmation: true, // assuming confirmation is always true
+      employeeSignature: "signature_url_5", // Replace with actual signature URL
+      supervisorSignature: "signature_url_6", // Replace with actual signature URL
+    };
+    console.log("Submitting payload", payload);
+
+    try {
+      const response = await axios.post(
+        "https://hrb5wx2v-8000.inc1.devtunnels.ms/api/safety",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Success:", response.data);
+      toast.success("Assignment submitted successfully!");
+    } catch (error) {
+      toast.error("Failed to submit assignment. Please try again.");
+      console.error("Error submitting assignment:", error);
+    }
   };
 
   return (
     <Container>
-      <h3 className="my-2">Safety Equipment </h3>
+      <div className="d-flex justify-content-between align-items-center mb-4 mt-4">
+        <h2>Safety Equipment</h2>
+        <button
+          onClick={() => navigate(-1)}
+          className="btn "
+          style={{ backgroundColor: "#0d6efd", color: "white" }}
+        >
+          <i class="fa-solid fa-arrow-left me-2"></i> Back to Overview
+        </button>
+      </div>
+
       <hr />
       <Form onSubmit={handleSubmit}>
         <Row className="mb-3">
@@ -130,8 +202,8 @@ const SafetyEquipment = () => {
                 <td style={{ textAlign: "center" }}>
                   <Form.Check
                     type="checkbox"
-                    name={`equipment-${index}`}
-                    onChange={() => {}}
+                    checked={item.selected}
+                    onChange={() => handleCheckboxChange(index)}
                   />
                 </td>
                 <td>{item.equipment}</td>
@@ -150,7 +222,7 @@ const SafetyEquipment = () => {
                     value={item.condition}
                     onChange={handleChange}
                   >
-                    <option>Select Condition</option>
+                    <option value="">Select Condition</option>
                     <option>New</option>
                     <option>Used</option>
                     <option>Damaged</option>

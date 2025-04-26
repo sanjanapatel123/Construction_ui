@@ -1,21 +1,32 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import { apiUrl } from "../../../utils/config"; // Define your API base URL here
 import axiosInstance from "../../../utils/axiosInstance"; // Create axios instance with base URL
 import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProjects } from "../../../redux/slices/projectSlice";
+import { fetchChecklists } from "../../../redux/slices/checklistSlice";
 
 function AddChecklists() {
   const [formData, setFormData] = useState({
     checklistName: "",
     project: "",
-    assignTo: "",
+    AssignTo: "",
     date: "",
     checklistItems: [{ checklistItem: "" }],
     additionalNotes: "",
+    status: "true",
   });
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { data: projects, loading } = useSelector((state) => state.projects);
+  // console.log("Projects →", projects);
+
+  useEffect(() => {
+    dispatch(fetchProjects()); // Fetch projects when component mounts
+  }, [dispatch]);
 
   // Handle form field changes
   const handleChange = (e) => {
@@ -57,15 +68,47 @@ function AddChecklists() {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Frontend validation
+    if (
+      !formData.checklistName.trim() ||
+      !formData.project.trim() ||
+      !formData.AssignTo.trim() ||
+      !formData.date.trim() ||
+      formData.checklistItems.some((item) => !item.checklistItem.trim())
+    ) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+
+    const cleanFormData = {
+      ...formData,
+      checklistName: formData.checklistName.trim(),
+      project: formData.project.trim(),
+      AssignTo: formData.AssignTo.trim(),
+      date: formData.date.trim(),
+      status: formData.status,
+      additionalNotes: formData.additionalNotes.trim(),
+      checklistItems: formData.checklistItems.map((item) => ({
+        checklistItem: item.checklistItem.trim(),
+      })),
+    };
+
+    console.log("Final Payload →", cleanFormData);
+
     try {
       const response = await axiosInstance.post(
         `${apiUrl}/checklists`,
-        formData
+        cleanFormData
       );
       toast.success("Checklist created successfully!");
-      navigate("/checklists"); // Redirect after success
+      dispatch(fetchChecklists()); // Fetch updated projects list
+      navigate("/checklists");
     } catch (error) {
-      toast.error("Failed to create checklist. Please try again.", error);
+      console.error("Submission error:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to create checklist."
+      );
     }
   };
 
@@ -99,18 +142,24 @@ function AddChecklists() {
             </div>
             <div className="col-md-6">
               <label className="form-label">Project</label>
-              <select
-                className="form-select"
-                name="project"
-                value={formData.project}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select Project</option>
-                <option value="Project 1">Project 1</option>
-                <option value="Project 2">Project 2</option>
-                {/* Add more projects here */}
-              </select>
+              {loading ? (
+                <div>Loading projects...</div>
+              ) : (
+                <select
+                  className="form-select"
+                  name="project"
+                  value={formData.project}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select Project</option>
+                  {projects?.map((project) => (
+                    <option key={project._id} value={project._id}>
+                      {project.name}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
           </div>
 
@@ -119,8 +168,8 @@ function AddChecklists() {
               <label className="form-label">Assign To</label>
               <select
                 className="form-select"
-                name="assignTo"
-                value={formData.assignTo}
+                name="AssignTo"
+                value={formData.AssignTo}
                 onChange={handleChange}
                 required
               >
@@ -143,6 +192,21 @@ function AddChecklists() {
             </div>
           </div>
 
+          <div className="mt-3">
+            <label className="form-label">Status</label>
+            <select
+              className="form-select"
+              name="status"
+              value={formData.status}
+              onChange={handleChange} // direct string value
+            >
+              <option value="">Select Status</option>
+              <option value="Approved">Approved</option>
+              <option value="Pending">Pending</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+
           <div className="mt-4">
             <h5>Checklist Items</h5>
             {formData.checklistItems.map((item, index) => (
@@ -156,9 +220,9 @@ function AddChecklists() {
                   onChange={(e) => handleChecklistItemChange(index, e)}
                   required
                 />
-                <select className="form-select w-auto" defaultValue="Required">
+                {/* <select className="form-select w-auto" defaultValue="Required">
                   <option>Required</option>
-                </select>
+                </select> */}
                 <i
                   className="fas fa-trash text-danger"
                   onClick={() => removeChecklistItem(index)}

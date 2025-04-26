@@ -80,6 +80,7 @@ import UserInfo from "./components/SuperAdmin/UserInfo";
 import SuperadminSetting from "./components/SuperAdmin/SuperadminSetting";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import SafetyEquipmentList from "./components/AdminComponents/SafetyEquipment/SafetyEquipmentList";
 
 function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
@@ -114,7 +115,7 @@ function App() {
             <Route path="/AddnewInduction" element={<AddnewInduction />} />
             <Route path="/swms" element={<SWMS />} />
             <Route path="/audit-equipment" element={<AuditEquipment />} />
-            <Route path="/safety-equipment" element={<SafetyEquipment />} />
+            <Route path="/safety-equipment" element={<SafetyEquipmentList />} />
             <Route path="/submit-report" element={<SubmitReport />} />
             <Route
               path="/ComplianceDashboard"
@@ -138,7 +139,7 @@ function App() {
             <Route path="/siteEntryTable" element={<SiteEntryTable />} />
             <Route path="/siteReview" element={<SiteReview />} />
             <Route path="/addSiteReview" element={<AddSiteReview />} />
-            <Route path="/addSiteReview/:id" element= {<AddSiteReview />} />
+            <Route path="/addSiteReview/:id" element={<AddSiteReview />} />
             <Route path="/ITPs" element={<ITPs />} />
 
             <Route
@@ -284,12 +285,16 @@ function App() {
             <Route path="/AddDefectList" element={<AddDefectList />} />
             <Route path="/PlantMachinery" element={<PlantMachinery />} />
             <Route path="/AddToolRegistry" element={<AddToolRegistry />} />
-            <Route path="/AddEquipment" element={<AddEquipment />} />
+            <Route path="/AddSafety" element={<SafetyEquipment />} />
             <Route path="/view-service" element={<ViewServicePage />} />
             <Route
               path="/equipment-details"
               element={<EquipmentDetailsPage />}
             />
+            <Route
+              path="/addEquipment"
+              element={<SafetyEquipment></SafetyEquipment>}
+            ></Route>
             <Route
               path="/FullSiteMap"
               element={<FullSiteMap></FullSiteMap>}
@@ -328,8 +333,10 @@ function App() {
             <Route path="/Plan-Package" element={<PlanPackage />} />
             <Route path="/Plan-request" element={<PlanRequest />} />
             <Route path="/user-info" element={<UserInfo />} />
-            <Route path="/super-admin-setting" element={<SuperadminSetting />} />
-
+            <Route
+              path="/super-admin-setting"
+              element={<SuperadminSetting />}
+            />
           </Routes>
         </div>
       </div>

@@ -11,6 +11,8 @@ import sitereviewReducer from "./slices/sitereviewSlice";
 import inductionReducer from './slices/inductionSlice';
 import incidentReportReducer from './slices/incidentReportSlice';
 import siteEntrySliceReducer from './slices/siteEntrySlice';
+import defectReducer from "./slices/defectSlice";
+
 export const store = configureStore({
   reducer: {
       projects: projectReducer,
@@ -22,6 +24,7 @@ export const store = configureStore({
       sitereview: sitereviewReducer,
       inductions:inductionReducer,
       reports:incidentReportReducer,
-      entries:siteEntrySliceReducer
+      entries:siteEntrySliceReducer,
+       defects: defectReducer,
   }
 });
