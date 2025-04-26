@@ -38,7 +38,7 @@ export const deleteAnnotation = createAsyncThunk(
   'annotation/deleteAnnotation',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.delete(`${apiUrl}/annotation/${id}`);
+       await axiosInstance.delete(`${apiUrl}/annotation/${id}`);
       return id; // Returning the id to delete it from the state
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);

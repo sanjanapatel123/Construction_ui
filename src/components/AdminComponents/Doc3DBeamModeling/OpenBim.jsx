@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import BIMViewer from './BimViewer';
 import Toolbar from './ToolBar';
 import NewAnnotationForm from './NewAnnotationForm';
-import { fetchAnnotations } from '../../../redux/slices/annotationSlice';
+import { fetchAnnotations , deleteAnnotation} from '../../../redux/slices/annotationSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import AddElementModal from './AddElimentModal';
+// import AddElementModal from './AddElimentModal';
 const OpenBim = () => {
   const [activeModelTab, setActiveModelTab] = useState('building');
   const [activeSidePanel, setActiveSidePanel] = useState('details');
@@ -19,6 +19,7 @@ const OpenBim = () => {
    useEffect(() => {
     dispatch(fetchAnnotations());
   }, [dispatch]);
+
 
   // Use the selector to get the annotations state
   const annotations = useSelector((state) => state.annotations.annotations.data);
@@ -46,6 +47,10 @@ const OpenBim = () => {
       setSelectedElement(element);
       setActiveSidePanel('details');
     }
+  };
+  const delete_annotation  = (id) => {
+      dispatch(deleteAnnotation(id));
+      dispatch(fetchAnnotations()); 
   };
 
   return (
@@ -579,7 +584,7 @@ const OpenBim = () => {
                           <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
                             <i className="fas fa-edit"></i>
                           </button>
-                          <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
+                          <button className="text-gray-500 hover:text-gray-700 cursor-pointer" onClick={() => delete_annotation(annotation._id)}>
                             <i className="fas fa-trash"></i>
                           </button>
                         </div>

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import './NewAnnotationForm.css';
 import { useDispatch } from 'react-redux';
-import { createAnnotation } from '../../../redux/slices/annotationSlice';
+import { createAnnotation, fetchAnnotations } from '../../../redux/slices/annotationSlice';
 
 const NewAnnotationForm = ({ closeModal }) => {
   const [title, setTitle] = useState('');
@@ -22,6 +22,7 @@ const NewAnnotationForm = ({ closeModal }) => {
 
     // Dispatch the createAnnotation action to the Redux store
     dispatch(createAnnotation(newAnnotation)); // Dispatch thunk here
+    dispatch(fetchAnnotations())
 
     // Clear the form fields after submission
     setTitle('');
