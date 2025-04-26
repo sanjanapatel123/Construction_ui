@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button, Dropdown, Form } from 'react-bootstrap';
 
-const AddElementModal = () => {
+const AddElementModal = ({ closeModal }) => {
   const [show, setShow] = useState(false);
   const [category, setCategory] = useState('');
   const [element, setElement] = useState('');
@@ -40,7 +40,7 @@ const AddElementModal = () => {
   const handleAddElement = () => {
     // Handle adding the element here
     console.log('Element added:', category, element, details);
-    handleClose();
+  { closeModal };
   };
 
   return (
@@ -97,7 +97,7 @@ const AddElementModal = () => {
             <>
               <hr />
               <Form>
-                <Form.Group controlId="formElementName">
+                {/* <Form.Group controlId="formElementName">
                   <Form.Label>Element Name</Form.Label>
                   <Form.Control
                     type="text"
@@ -106,20 +106,22 @@ const AddElementModal = () => {
                     onChange={handleDetailChange}
                     placeholder="Enter name"
                   />
-                </Form.Group>
+                </Form.Group> */}
 
                 <Form.Group controlId="formDescription">
-                  <Form.Label>Description</Form.Label>
+                  <Form.Label>Add Details</Form.Label>
                   <Form.Control
                     type="text"
                     name="description"
                     value={details.description}
                     onChange={handleDetailChange}
-                    placeholder="Enter description"
+                    placeholder="Enter Details"
+                    as="textarea"
+                    rows={5}
                   />
                 </Form.Group>
 
-                <Form.Group controlId="formDimensions">
+                {/* <Form.Group controlId="formDimensions">
                   <Form.Label>Dimensions</Form.Label>
                   <Form.Control
                     type="text"
@@ -128,7 +130,7 @@ const AddElementModal = () => {
                     onChange={handleDetailChange}
                     placeholder="Enter dimensions"
                   />
-                </Form.Group>
+                </Form.Group> */}
               </Form>
             </>
           )}
