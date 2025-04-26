@@ -11,7 +11,7 @@ export const createsitereview = createAsyncThunk(
       
   
         const response = await axiosInstance.post(
-          `${apiUrl}/sitereview`,
+          `https://hrb5wx2v-8000.inc1.devtunnels.ms/api/sitereview`,
           sitereviewData,
           {
             headers: { "Content-Type": "multipart/form-data" }
@@ -32,7 +32,8 @@ export const createsitereview = createAsyncThunk(
     'sitereview/fetchsitereview',
     async (_, thunkAPI) => {
       try {
-        const response = await axiosInstance.get(`${apiUrl}/sitereview`);
+        const response = await axiosInstance.get(`https://hrb5wx2v-8000.inc1.devtunnels.ms/api/sitereview`);
+        // const response = await axiosInstance.get(`${apiUrl}/sitereview`);
         console.log("Response from API:", response);
         return response.data;
       } catch (error) {
@@ -62,7 +63,7 @@ export const createsitereview = createAsyncThunk(
     'sitereview/deletesitereview',
     async (id, thunkAPI) => {
       try {
-        const response = await axiosInstance.delete(`${apiUrl}/sitereview/${id}`);
+        const response = await axiosInstance.delete(`https://hrb5wx2v-8000.inc1.devtunnels.ms/api/sitereview/${id}`);
         return response.data;
       } catch (error) {         
         return thunkAPI.rejectWithValue(

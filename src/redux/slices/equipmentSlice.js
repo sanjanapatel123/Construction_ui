@@ -363,3 +363,4 @@ const equipmentSlice = createSlice({
 
 export default equipmentSlice.reducer;
 
+

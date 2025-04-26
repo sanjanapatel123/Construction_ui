@@ -8,7 +8,7 @@ export const createIncidentReport = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
-        `${apiUrl}/incident`,
+        `https://hrb5wx2v-8000.inc1.devtunnels.ms/api/incident`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
@@ -25,7 +25,7 @@ export const getIncidentReports = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `${apiUrl}/incident`
+        `https://hrb5wx2v-8000.inc1.devtunnels.ms/api/incident`
       );
       // console.log(response.data.incidents)
       return response.data.incidents;
@@ -41,7 +41,7 @@ export const deleteIncidentReport = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       await axiosInstance.delete(
-        `${apiUrl}/incident/${id}`
+        `https://hrb5wx2v-8000.inc1.devtunnels.ms/api/incident/${id}`
       );
       return id;  // return id for local state update
     } catch (error) {
