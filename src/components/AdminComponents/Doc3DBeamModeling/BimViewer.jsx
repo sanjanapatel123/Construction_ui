@@ -1,20 +1,23 @@
-import React, { useRef, useState, useEffect } from 'react';
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import React, { useRef, useState, useEffect } from "react";
+import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 const BIMViewer = ({ modelUrl, activeTool }) => {
   const sceneRef = useRef(null);
   const [selectedElement, setSelectedElement] = useState(null);
   const [startPoint, setStartPoint] = useState(null);
-  const [endPoint, setEndPoint] = useState(null);   
+  const [endPoint, setEndPoint] = useState(null);
   const [distance, setDistance] = useState(null);
   const [startSphere, setStartSphere] = useState(null);
-  const [endSphere, setEndSphere] = useState(null); 
+  const [endSphere, setEndSphere] = useState(null);
   const [line, setLine] = useState(null);
+  const [highlightedObject, setHighlightedObject] = useState(null);
+  const [pointer, setPointer] = useState(null); // State for the 3D pointer
+  const [pointerVisible, setPointerVisible] = useState(true); // Ensure pointer is always visible
 
   const camera = useRef(new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)).current;
-  const renderer = useRef(new THREE.WebGLRenderer()).current;
+  const renderer = useRef(new THREE.WebGLRenderer({ alpha: true })).current; // Enable transparency for pointer
   const scene = useRef(new THREE.Scene()).current;
   const raycaster = useRef(new THREE.Raycaster()).current;
   const mouse = useRef(new THREE.Vector2()).current;
@@ -24,19 +27,24 @@ const BIMViewer = ({ modelUrl, activeTool }) => {
     if (!sceneRef.current) return;
 
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000, 0); // Make background transparent
     sceneRef.current.appendChild(renderer.domElement);
 
     // Add lights
     const light = new THREE.AmbientLight(0x404040);
     scene.add(light);
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(1, 1, 1).normalize();
     scene.add(directionalLight);
+
+    let model;
 
     // Load the model
     const loader = new GLTFLoader();
     loader.load(modelUrl, (gltf) => {
-      scene.add(gltf.scene);
-      gltf.scene.scale.set(1, 1, 1);
+      model = gltf.scene;
+      scene.add(model);
+      model.scale.set(1, 1, 1);
     });
 
     // Initialize controls
@@ -45,17 +53,41 @@ const BIMViewer = ({ modelUrl, activeTool }) => {
 
     // Event listener for mouse click (select object)
     const onMouseClick = (event) => {
+      if (activeTool !== 'select') return;
+
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
       raycaster.setFromCamera(mouse, camera);
 
-      const intersects = raycaster.intersectObject(scene, true);
+      const intersects = raycaster.intersectObjects(scene.children, true);
       if (intersects.length > 0) {
         const selectedObject = intersects[0].object;
         setSelectedElement(selectedObject);
+      } else {
+        setSelectedElement(null);
       }
     };
 
+    // Event listener for mouse move (highlighting and pointer)
+    const onMouseMove = (event) => {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+
+      const intersects = raycaster.intersectObjects(scene.children, true);
+
+      // Handle pointer position updates when measure tool is active
+      if (intersects.length > 0) {
+        const intersectionPoint = intersects[0].point;
+        const cameraPosition = camera.position;
+        const direction = new THREE.Vector3().subVectors(intersectionPoint, cameraPosition).normalize();
+        const offset = 0.01;
+        pointer.position.copy(new THREE.Vector3().addVectors(intersectionPoint, direction.multiplyScalar(offset)));
+      }
+    };
+
+    // Add mouse move event listener
+    window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('click', onMouseClick);
 
     // Render loop
@@ -68,9 +100,40 @@ const BIMViewer = ({ modelUrl, activeTool }) => {
 
     return () => {
       window.removeEventListener('click', onMouseClick);
+      window.removeEventListener('mousemove', onMouseMove);
       if (sceneRef.current) sceneRef.current.removeChild(renderer.domElement);
     };
-  }, [modelUrl]);
+  }, [modelUrl, activeTool]);
+
+  // Initialize the pointer object once
+  useEffect(() => {
+    const pointerGeometry = new THREE.SphereGeometry(0.05, 16, 16); // Slightly larger pointer
+    const pointerMaterial = new THREE.MeshBasicMaterial({ 
+      color: 0xffff00, 
+      depthTest: false, 
+      transparent: true, 
+      opacity: 0.8
+    });
+    const newPointer = new THREE.Mesh(pointerGeometry, pointerMaterial);
+    newPointer.renderOrder = 2; // Render on top of markers
+    scene.add(newPointer);
+    setPointer(newPointer); // Store pointer reference
+
+    return () => {
+      if (scene && newPointer) {
+        scene.remove(newPointer);
+      }
+    };
+  }, []); // Empty dependency array ensures this only runs once on mount
+
+  // Cleanup pointer on unmount
+  useEffect(() => {
+    return () => {
+      if (pointer) {
+        scene.remove(pointer);
+      }
+    };
+  }, [pointer]);
 
   // Measure Tool Logic
   useEffect(() => {
@@ -80,7 +143,7 @@ const BIMViewer = ({ modelUrl, activeTool }) => {
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
         raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObject(scene, true);
+        const intersects = raycaster.intersectObjects(scene.children, true);
 
         if (intersects.length > 0) {
           const clickedPoint = intersects[0].point;
@@ -88,28 +151,26 @@ const BIMViewer = ({ modelUrl, activeTool }) => {
           if (!startPoint) {
             // First click (start point)
             setStartPoint(clickedPoint);
-
-            // Create and store the start sphere
-            const startMarker = createMarker(clickedPoint);
+            const startMarker = createMarker(clickedPoint, 0xff0000); // Red for start
             setStartSphere(startMarker);
 
-            // Clear previous line and spheres if any
             clearPreviousLine();
             clearPreviousSpheres();
+            setEndPoint(null);
+            setDistance(null);
           } else {
             // Second click (end point)
-            setEndPoint(clickedPoint);  // Using the endPoint state to store the end position
+            setEndPoint(clickedPoint);
 
-            // Create and store the end sphere at the end point
-            const endMarker = createMarker(clickedPoint);
-            setEndSphere(endMarker);  // Assign endSphere marker
+            const endMarker = createMarker(clickedPoint, 0x0000ff); // Blue for end
+            setEndSphere(endMarker);
 
-            // Calculate and display distance
             const dist = startPoint.distanceTo(clickedPoint);
-            setDistance(dist);
+            setDistance(dist.toFixed(2));
 
-            // Draw line between start and end point
             drawLine(startPoint, clickedPoint);
+
+            setStartPoint(null);
           }
         }
       };
@@ -119,42 +180,47 @@ const BIMViewer = ({ modelUrl, activeTool }) => {
       return () => {
         window.removeEventListener('click', onMeasureClick);
       };
+    } else {
+      clearPreviousLine();
+      clearPreviousSpheres();
+      setStartPoint(null);
+      setEndPoint(null);
+      setDistance(null);
     }
-  }, [activeTool, startPoint, endPoint]);  // endPoint is now used here
+  }, [activeTool, startPoint]);
 
   // Function to create a marker (sphere)
-  const createMarker = (position) => {
-    const geometry = new THREE.SphereGeometry(0.1, 16, 16); // Small sphere for markers
-    const material = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red color
+  const createMarker = (position, color) => {
+    const geometry = new THREE.SphereGeometry(0.07, 16, 16); // Slightly larger markers too
+    const material = new THREE.MeshBasicMaterial({ color: color, depthTest: false, transparent: true, opacity: 0.8 });
     const marker = new THREE.Mesh(geometry, material);
     marker.position.copy(position);
+    marker.renderOrder = 1;
     scene.add(marker);
     return marker;
   };
 
-  // Function to draw a line between start and end points
+  // Function to draw a line
   const drawLine = (start, end) => {
-    // Clear any existing line
     if (line) {
-      scene.remove(line); // Remove the previous line
+      scene.remove(line);
     }
-
     const geometry = new THREE.BufferGeometry().setFromPoints([start, end]);
-    const material = new THREE.LineBasicMaterial({ color: 0x00ff00 }); // Green color for line
+    const material = new THREE.LineBasicMaterial({ color: 0x00ff00, linewidth: 2 });
     const newLine = new THREE.Line(geometry, material);
     scene.add(newLine);
-    setLine(newLine); // Store the new line state
+    setLine(newLine);
   };
 
-  // Function to clear previous line (before starting a new measurement)
+  // Function to clear line
   const clearPreviousLine = () => {
     if (line) {
       scene.remove(line);
-      setLine(null); // Reset the line state
+      setLine(null);
     }
   };
 
-  // Function to clear previous spheres (start and end)
+  // Function to clear spheres
   const clearPreviousSpheres = () => {
     if (startSphere) {
       scene.remove(startSphere);
@@ -169,7 +235,6 @@ const BIMViewer = ({ modelUrl, activeTool }) => {
   // Screenshot Tool
   const takeScreenshot = () => {
     renderer.render(scene, camera);
-
     const dataUrl = renderer.domElement.toDataURL('image/png');
     const link = document.createElement('a');
     link.href = dataUrl;
@@ -179,8 +244,8 @@ const BIMViewer = ({ modelUrl, activeTool }) => {
 
   return (
     <div>
-      <div ref={sceneRef} style={{ width: '100%', height: '500px', backgroundColor: '#fff' }} />
-      {selectedElement && <div>Selected: {selectedElement.name}</div>}
+      <div ref={sceneRef} style={{ width: '100%', height: '500px', backgroundColor: '#fff', cursor: activeTool === 'measure' ? 'none' : 'default' }} />
+      {selectedElement && <div>Selected: {selectedElement.name || 'Object'}</div>}
       {distance && <div>Distance: {distance} units</div>}
       {activeTool === 'screenshot' && <button onClick={takeScreenshot}>Take Screenshot</button>}
     </div>
