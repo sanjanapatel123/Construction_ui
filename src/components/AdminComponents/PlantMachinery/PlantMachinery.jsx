@@ -611,15 +611,12 @@ import RescheduleModal from "./RescheduleModal";
 import { Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { deletetool, getalltool } from "../../../redux/slices/toolSlice";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import Swal from "sweetalert2";
 import { fetchEquipment } from "../../../redux/slices/equipmentSlice";
-
-
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
+import "react-toastify/dist/ReactToastify.css";
 
 function PlantMachinery() {
-
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSite, setSelectedSite] = useState("Main Construction Site");
   const [status, setStatus] = useState("All Status");
@@ -628,15 +625,27 @@ function PlantMachinery() {
   const [selectedService, setSelectedService] = useState(null);
 
   const dispatch = useDispatch();
-  const { tools , loading, error } = useSelector((state) => state.tools);
-  console.log("tool",tools);
-   
-
-  const filteredTools = Array.isArray(tools)   && tools.filter((tool) => tool.name.toLowerCase().includes(searchTerm.toLowerCase()));
-   
-  console.log("filteredTools",filteredTools);
-   
   const navigate = useNavigate();
+  const { tools, loading, error } = useSelector((state) => state.tools);
+  const { equipments } = useSelector((state) => state.equipments);
+  const filteredequipments = equipments.PlantMachinery;
+  console.log(filteredequipments)
+  //  const filteredequipments = Array.i  sArray(equipments.PlantMachinery) && equipments.PlantMachinery.filter((equipment) => equipment.name.toLowerCase().includes(searchTerm.toLowerCase()));
+   console.log("equipment",equipments);
+
+  useEffect(() => {
+    if (activeTab === "Tool Registry") {
+      dispatch(getalltool());
+    } else if (activeTab === "Equipment") {
+      dispatch(fetchEquipment());
+    }
+  }, [dispatch, activeTab]);
+
+  const filteredTools = Array.isArray(tools)
+    ? tools.filter((tool) =>
+        tool.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   const handleDelete = (id) => {
     Swal.fire({
@@ -651,35 +660,19 @@ function PlantMachinery() {
       if (result.isConfirmed) {
         dispatch(deletetool(id))
           .then((response) => {
-            {console.log(response)}
             if (response.meta.requestStatus === "fulfilled") {
-              toast.success("Tool deleted Succcessfully")
-              // showSuccessToast("SWMS deleted successfully!");
+              toast.success("Tool deleted successfully!");
               dispatch(getalltool());
-              // navigate("/swms");
             } else {
-              toast.error("Failed to delete SWMS!");
+              toast.error("Failed to delete tool!");
             }
           })
           .catch(() => {
-            showErrorToast("Something went wrong!");
+            toast.error("Something went wrong!");
           });
       }
     });
   };
-
-  if( activeTab === "Tool Registry"){
-  useEffect(() => {
-    dispatch(getalltool());
-  }, [dispatch]);
-}
-
-if (activeTab === "Equipment") {
-  useEffect(() => {
-    dispatch(fetchEquipment());
-  }, [dispatch]);
-}
-
 
   const handleViewService = (service) => {
     navigate("/view-service", { state: { service } });
@@ -691,42 +684,21 @@ if (activeTab === "Equipment") {
 
   const handleShowModal = (service) => {
     setSelectedService(service);
-    setShowModal(true); // Open the modal
+    setShowModal(true);
   };
 
   const handleCloseModal = () => {
-    setShowModal(false); // Close the modal
+    setShowModal(false);
   };
 
   const handleReschedule = (serviceId, newServiceDate, comments) => {
     console.log(
       `Rescheduling service ${serviceId} to ${newServiceDate} with comments: ${comments}`
     );
-    // Here, you can implement the logic to save the updated service details
+    // Save updated service details here
   };
 
-  // Sample data for tools
-  // const tools = [
-  //   {
-  //     id: "T001",
-  //     name: "Power Drill - DeWalt",
-  //     status: "Available",
-  //     currentUser: "",
-  //     checkoutDate: "",
-  //     expectedReturn: "",
-  //   },
-  //   {
-  //     id: "T002",
-  //     name: "Circular Saw - Makita",
-  //     status: "In Use",
-  //     currentUser: "John Smith",
-  //     checkoutDate: "2024-02-20",
-  //     expectedReturn: "2024-02-22",
-  //   },
-  // ];
-
-  // Sample data for equipment
-  const equipment = [
+  const equipmentData = [
     {
       id: "E001",
       name: "Excavator - CAT",
@@ -745,7 +717,6 @@ if (activeTab === "Equipment") {
     },
   ];
 
-  // Sample data for services
   const services = [
     {
       id: "S001",
@@ -770,9 +741,8 @@ if (activeTab === "Equipment") {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h6 className="fw-semibold mb-0">Equipment Management</h6>
         <Link to={"/AddEquipment"}>
-          {" "}
           <button id="btn_itp" className="btn btn-dark p-2">
-            <i class="fa-solid fa-arrow-left me-2"></i> Add Equipment
+            <i className="fa-solid fa-plus me-2"></i> Add Equipment
           </button>
         </Link>
       </div>
@@ -804,7 +774,7 @@ if (activeTab === "Equipment") {
             </tr>
           </thead>
           <tbody>
-            {tools.map((item) => (
+            {equipmentData.map((item) => (
               <tr key={item.id} className="py-3">
                 <td className="ps-4 py-3">{item.id}</td>
                 <td className="py-3">{item.name}</td>
@@ -843,7 +813,6 @@ if (activeTab === "Equipment") {
             ))}
           </tbody>
         </table>
-
         {/* Pagination */}
         <div className="d-flex justify-content-end mt-3 mb-2">
           <Button size="sm" variant="outline-secondary" className="me-2">
