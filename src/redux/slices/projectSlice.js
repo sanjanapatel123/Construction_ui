@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import { apiUrl } from '../../utils/config';
 import axiosInstance from '../../utils/axiosInstance.jsx'
+
 
 
 export const fetchProjects = createAsyncThunk('projects/fetchProjects', async () => {

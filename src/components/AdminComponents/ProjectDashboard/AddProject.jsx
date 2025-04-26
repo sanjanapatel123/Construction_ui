@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, Form, Col, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../../../utils/config"; // Adjust the import path as necessary
 import axios from "axios";
  // Adjust the import path as necessary
 import { toast } from "react-toastify";
@@ -13,7 +14,7 @@ const AddProject = () => {
   // State to handle form inputs
   const [formData, setFormData] = useState({
     name: "",
-    assignedTo: "",
+    assignedTo: 1,
     startDate: "",
     endDate: "",
     status: "",
@@ -79,6 +80,16 @@ const AddProject = () => {
         </Form.Group>
 
         <Form.Group className="mb-3">
+          <Form.Label>Project Name</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter project name"
+            name="assignedTo"
+            value={formData.assignedTo}
+            onChange={handleChange}
+          />
+        </Form.Group>
+        {/* <Form.Group className="mb-3">
           <Form.Label>Assigned To</Form.Label>
           <Form.Select
             name="assignedTo"
@@ -89,9 +100,9 @@ const AddProject = () => {
             <option value="John Doe">John Doe</option>
             <option value="Jane Smith">Jane Smith</option>
             <option value="Alex Johnson">Alex Johnson</option>
-            {/* Add more options as needed */}
+   
           </Form.Select>
-        </Form.Group>
+        </Form.Group> */}
 
         <Row className="mb-3">
           <Col md={6}>

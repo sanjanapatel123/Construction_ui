@@ -4,6 +4,8 @@ import projectReducer from './slices/projectSlice';
 import diaryReducer from './slices/diarySlice';
 import timesheetReducer from "./slices/timesheetSlice"; 
 import swmsReducer from "./slices/swmsSlice";
+import itpReducer from './slices/itpSlice'
+import checklistReducer from './slices/checklistSlice';
 import sitereviewReducer from "./slices/sitereviewSlice";
 
 import inductionReducer from './slices/inductionSlice';
@@ -15,6 +17,7 @@ import equipmentSliceReducer from './slices/equipmentSlice';
 import announcementReducer from './slices/announcementSlice';
 import rfiSliceReducer from './slices/rfiSlice.js'
 
+import defectReducer from "./slices/defectSlice";
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +25,8 @@ export const store = configureStore({
       diaries: diaryReducer,
       timesheets: timesheetReducer,
       swms : swmsReducer,
+       itps: itpReducer,
+        checklists: checklistReducer,
       sitereview: sitereviewReducer,
       inductions:inductionReducer,
       reports:incidentReportReducer,
@@ -29,6 +34,7 @@ export const store = configureStore({
       tools: toolSliceReducer,
       equipments: equipmentSliceReducer,
       announcements:announcementReducer,
-      rfi:rfiSliceReducer
+      rfi:rfiSliceReducer,
+       defects: defectReducer,
   }
 });

@@ -11,3 +11,4 @@ const BASE_URL = "https://hrb5wx2v-8000.inc1.devtunnels.ms/api";   //sagar sir u
 export const apiUrl = BASE_URL;
 
 
+export default BASE_URL;

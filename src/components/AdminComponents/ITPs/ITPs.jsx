@@ -1,6 +1,12 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
-
+import {
+  fetchITPs,
+  fetchITPDetails,
+  deleteITP,
+  clearSelectedITP,
+} from "../../../redux/slices/itpSlice";
+import ITPDetailsModal from "./ITPDetailsModal";
 import {
   LineChart,
   Line,
@@ -20,6 +26,8 @@ import {
   FaCheckCircle,
   FaExclamationCircle,
 } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import EditITPModal from "./EditITPModal";
 
 const pieChartData = [
   { name: "< 24 hrs", value: 40, color: "#3366CC" },
@@ -27,7 +35,7 @@ const pieChartData = [
   { name: "3-7 days", value: 20, color: "#FF9900" },
   { name: "> 7 days", value: 10, color: "#DC3912" },
 ];
-function ITPs() {
+const ITPs = () => {
   const analytics = {
     totalITPs: {
       current: 42,
@@ -56,83 +64,51 @@ function ITPs() {
       onTimeRate: 93,
     },
   };
+  const [showModal, setShowModal] = useState(false);
+  const [selectedITP, setSelectedITP] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const dispatch = useDispatch();
+  const { data: itps, loading, error } = useSelector((state) => state.itps);
+
+  // console.log(itps);
+  const openModal = () => {
+    console.log("Modal opened");
+    setShowEditModal(true);
+  };
+
+  useEffect(() => {
+    dispatch(fetchITPs());
+  }, [dispatch]);
+
+  const handleViewDetails = (itpId) => {
+    dispatch(fetchITPDetails(itpId));
+    setShowModal(true);
+  };
+  console.log("ITPs", selectedITP);
+
+  const handleDelete = (id) => {
+    dispatch(deleteITP(id));
+  };
 
   const itemsPerPage = 6;
-  const [itpData] = useState([
-    {
-      id: 1,
-      documentName: "Concrete Strength Test",
-      status: "Approved",
-      assignedTo: { name: "John Smith", initials: "JS" },
-      submissionDate: "Apr 10, 2025",
-      dueDate: "Apr 25, 2025",
-      comments: "All test parameters are within acceptable ranges.",
-    },
-    {
-      id: 2,
-      documentName: "Structural Steel Inspection",
-      status: "Pending",
-      assignedTo: { name: "Emily Johnson", initials: "EJ" },
-      submissionDate: "Apr 12, 2025",
-      dueDate: "Apr 27, 2025",
-      comments: "Waiting for additional documentation from contractor.",
-    },
-    {
-      id: 3,
-      documentName: "Electrical Systems Test",
-      status: "Under Review",
-      assignedTo: { name: "Michael Chen", initials: "MC" },
-      submissionDate: "Apr 15, 2025",
-      dueDate: "Apr 22, 2025",
-      comments: "Some inconsistencies found in the test results.",
-    },
-    {
-      id: 4,
-      documentName: "HVAC Performance Test",
-      status: "Approved",
-      assignedTo: { name: "Sarah Williams", initials: "SW" },
-      submissionDate: "Apr 8, 2025",
-      dueDate: "Apr 20, 2025",
-      comments: "All systems functioning as per specifications.",
-    },
-    {
-      id: 5,
-      documentName: "Plumbing Pressure Test",
-      status: "Pending",
-      assignedTo: { name: "Robert Davis", initials: "RD" },
-      submissionDate: "Apr 14, 2025",
-      dueDate: "Apr 28, 2025",
-      comments: "Awaiting final pressure test results.",
-    },
-    {
-      id: 6,
-      documentName: "Fire Safety Inspection",
-      status: "Under Review",
-      assignedTo: { name: "Jennifer Lee", initials: "JL" },
-      submissionDate: "Apr 16, 2025",
-      dueDate: "Apr 23, 2025",
-      comments: "Some fire extinguishers need replacement.",
-    },
-  ]);
-
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedStatus, setSelectedStatus] = useState("All Statuses");
   const [selectedAssignee, setSelectedAssignee] = useState("All Assignees");
 
   const filteredData = useMemo(() => {
-    return itpData.filter((item) => {
+    return itps.filter((item) => {
       const matchesSearch =
-        item.documentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.comments.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus =
-        selectedStatus === "All Statuses" || item.status === selectedStatus;
+        item.projectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.additionalNotes.toLowerCase().includes(searchQuery.toLowerCase());
+      // const matchesStatus =
+      //   selectedStatus === "All Statuses" || item.status === selectedStatus;
       const matchesAssignee =
         selectedAssignee === "All Assignees" ||
-        item.assignedTo.name === selectedAssignee;
-      return matchesSearch && matchesStatus && matchesAssignee;
+        item.Inspector === selectedAssignee;
+      return matchesSearch && matchesAssignee;
     });
-  }, [itpData, searchQuery, selectedStatus, selectedAssignee]);
+  }, [itps, searchQuery, selectedAssignee]);
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -334,172 +310,204 @@ function ITPs() {
         </div>
       </div>
 
-
       <div className="mt-4 shadow-sm p-3 bg-white rounded-3">
-  {/* Filters */}
-  <div className="filters-section mb-3">
-    <div className="row g-2">
-      <div className="col-md-4">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Search..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
-      <div className="col-md-4">
-        <select
-          className="form-select"
-          value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
-        >
-          <option>All Statuses</option>
-          <option>Approved</option>
-          <option>Pending</option>
-          <option>Under Review</option>
-        </select>
-      </div>
-      <div className="col-md-4">
-        <select
-          className="form-select"
-          value={selectedAssignee}
-          onChange={(e) => setSelectedAssignee(e.target.value)}
-        >
-          <option>All Assignees</option>
-          <option>John Smith</option>
-          <option>Emily Johnson</option>
-          <option>Michael Chen</option>
-          <option>Sarah Williams</option>
-          <option>Robert Davis</option>
-          <option>Jennifer Lee</option>
-        </select>
-      </div>
-    </div>
-  </div>
+        {/* Filters */}
+        <div className="filters-section mb-3">
+          <div className="row g-2">
+            <div className="col-md-4">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <div className="col-md-4">
+              <select
+                className="form-select"
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+              >
+                <option>All Statuses</option>
+                <option>Approved</option>
+                <option>Pending</option>
+                <option>Under Review</option>
+              </select>
+            </div>
+            <div className="col-md-4">
+              <select
+                className="form-select"
+                value={selectedAssignee}
+                onChange={(e) => setSelectedAssignee(e.target.value)}
+              >
+                <option>All Assignees</option>
+                <option>John Smith</option>
+                <option>Emily Johnson</option>
+                <option>Michael Chen</option>
+                <option>Sarah Williams</option>
+                <option>Robert Davis</option>
+                <option>Jennifer Lee</option>
+              </select>
+            </div>
+          </div>
+        </div>
 
-  {/* Table */}
-  <div className="table-responsive shadow-sm bg-white rounded">
-    <table className="table table-bordered table-striped align-middle mb-0">
-      <thead className="table-light p-2">
-        <tr>
-          <th className="ps-4">Document Name</th>
-         
-          <th>Assigned To</th>
-          <th>Submission Date</th>
-          <th>Due Date</th>
-          <th>Comments</th>
-          <th>Status</th>
-          <th className="pe-4">Actions</th>
-        </tr>
-      </thead>
-      <tbody className="p-2">
-        {paginatedData.map((item) => (
-          <tr key={item.id}>
-            <td className="ps-4">{item.documentName}</td>
-          
-            <td>
-              <div className="d-flex align-items-center gap-2">
-                <div
-                  className="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center"
-                  style={{ width: "32px", height: "32px" }}
+        {/* Table */}
+        <div className="table-responsive shadow-sm bg-white rounded">
+          <table className="table table-bordered table-striped align-middle mb-0">
+            <thead className="table-light p-2">
+              <tr>
+                <th className="ps-4">Activity</th>
+
+                <th>Inspector</th>
+                <th>Criteria</th>
+                <th>Due Date</th>
+                <th>Comments</th>
+                <th>Status</th>
+                <th className="pe-4">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="p-2">
+              {paginatedData.map((item) => (
+                <tr key={item.id}>
+                  <td className="ps-4">{item.activity}</td>
+                  <td>
+                    <div className="d-flex align-items-center gap-2">
+                      {/* <div
+                        className="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center"
+                        style={{ width: "32px", height: "32px" }}
+                      >
+                        {item.Inspector}
+                      </div> */}
+                      <span> {item.Inspector}</span>
+                    </div>
+                  </td>
+                  <td>{item.criteria}</td>
+                  <td
+                    className={item.Date.includes("20") ? "text-warning" : ""}
+                  >
+                    {item.Date}
+                  </td>
+                  <td className="text-muted">{item.additionalNotes}</td>
+                  <td>
+                    <span
+                      className={`badge ${getStatusBadgeClass(item.status)}`}
+                    >
+                      {item.status}
+                    </span>
+                  </td>
+                  <td className="pe-4">
+                    <div className="d-flex gap-2">
+                      <button
+                        className="btn btn-sm text-primary p-0"
+                        onClick={() => handleViewDetails(item._id)}
+                      >
+                        <i
+                          className="fas fa-eye text-info "
+                          style={{ fontSize: "15px" }}
+                        ></i>
+                      </button>
+                      <button
+                        className="btn btn-sm text-primary p-0"
+                        onClick={() => {
+                          // setSelectedITP(item);
+                          setShowEditModal(true);
+                        }}
+                      >
+                        <i
+                          className="fas fa-edit text-primary"
+                          style={{ fontSize: "15px" }}
+                        ></i>
+                      </button>
+                      <button
+                        className="btn btn-sm  p-0"
+                        onClick={() => handleDelete(item._id)}
+                      >
+                        <i
+                          className="fas fa-trash text-danger"
+                          style={{ fontSize: "15px" }}
+                        ></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <ITPDetailsModal
+            show={showModal}
+            handleClose={() => setShowModal(false)}
+          />
+          <EditITPModal
+            show={showEditModal}
+            handleClose={() => setShowEditModal(false)}
+            itpData={itps}
+          />
+        </div>
+
+        {/* Pagination */}
+        <div className="d-flex justify-content-between align-items-center mt-3">
+          <div className="results-counter">
+            Showing {startIndex + 1} to{" "}
+            {Math.min(startIndex + itemsPerPage, filteredData.length)} of{" "}
+            {filteredData.length} results
+          </div>
+          <nav>
+            <ul className="pagination mb-0">
+              <li
+                className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => handlePageChange(currentPage - 1)}
                 >
-                  {item.assignedTo.initials}
-                </div>
-                <span>{item.assignedTo.name}</span>
-              </div>
-            </td>
-            <td>{item.submissionDate}</td>
-            <td className={item.dueDate.includes("20") ? "text-warning" : ""}>
-              {item.dueDate}
-            </td>
-            <td className="text-muted">{item.comments}</td>
-            <td>
-              <span className={`badge ${getStatusBadgeClass(item.status)}`}>
-                {item.status}
-              </span>
-            </td>
-            <td className="pe-4">
-              <div className="d-flex gap-2">
-                <button className="btn btn-sm text-primary p-0">
-                  <i className="fas fa-eye text-info " style={{fontSize:"15px"}}></i>
+                  &laquo;
                 </button>
-                <button className="btn btn-sm text-primary p-0">
-                  <i className="fas fa-edit text-primary"style={{fontSize:"15px"}}></i>
+              </li>
+              {renderPaginationItems()}
+              <li
+                className={`page-item ${
+                  currentPage === totalPages ? "disabled" : ""
+                }`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                >
+                  &raquo;
                 </button>
-                <button className="btn btn-sm  p-0">
-                  <i className="fas fa-trash text-danger" style={{fontSize:"15px"}}></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-
-  {/* Pagination */}
-  <div className="d-flex justify-content-between align-items-center mt-3">
-    <div className="results-counter">
-      Showing {startIndex + 1} to{" "}
-      {Math.min(startIndex + itemsPerPage, filteredData.length)} of{" "}
-      {filteredData.length} results
-    </div>
-    <nav>
-      <ul className="pagination mb-0">
-        <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-          <button
-            className="page-link"
-            onClick={() => handlePageChange(currentPage - 1)}
-          >
-            &laquo;
-          </button>
-        </li>
-        {renderPaginationItems()}
-        <li
-          className={`page-item ${
-            currentPage === totalPages ? "disabled" : ""
-          }`}
-        >
-          <button
-            className="page-link"
-            onClick={() => handlePageChange(currentPage + 1)}
-          >
-            &raquo;
-          </button>
-        </li>
-      </ul>
-    </nav>
-  </div>
-</div>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
 
       {/* Approval Rate and Submission Metrics */}
       <div className="row mt-4 g-4">
         <div className="col-md-6">
-     
-            <div className="card p-3 shadow-sm" >
-              <h5 className="mb-4">Resolution Time</h5>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={pieChartData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={90}
-                    innerRadius={50}
-                    label
-                  >
-                    {pieChartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-      
+          <div className="card p-3 shadow-sm">
+            <h5 className="mb-4">Resolution Time</h5>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={pieChartData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={90}
+                  innerRadius={50}
+                  label
+                >
+                  {pieChartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
         <div className="col-md-6">
@@ -562,10 +570,8 @@ function ITPs() {
       </div>
 
       {/* ITP Records Table */}
-     
-
     </div>
   );
-}
+};
 
 export default ITPs;
