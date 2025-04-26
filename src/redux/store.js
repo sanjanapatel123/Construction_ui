@@ -11,6 +11,12 @@ import sitereviewReducer from "./slices/sitereviewSlice";
 import inductionReducer from './slices/inductionSlice';
 import incidentReportReducer from './slices/incidentReportSlice';
 import siteEntrySliceReducer from './slices/siteEntrySlice';
+import toolSliceReducer from './slices/toolSlice';
+import equipmentSliceReducer from './slices/equipmentSlice';
+
+import announcementReducer from './slices/announcementSlice';
+import rfiSliceReducer from './slices/rfiSlice.js'
+
 import defectReducer from "./slices/defectSlice";
 import annotationReducer from "./slices/annotationSlice";
 
@@ -26,6 +32,10 @@ export const store = configureStore({
       inductions:inductionReducer,
       reports:incidentReportReducer,
       entries:siteEntrySliceReducer,
+      tools: toolSliceReducer,
+      equipments: equipmentSliceReducer,
+      announcements:announcementReducer,
+      rfi:rfiSliceReducer,
        defects: defectReducer,
       annotations: annotationReducer
   }

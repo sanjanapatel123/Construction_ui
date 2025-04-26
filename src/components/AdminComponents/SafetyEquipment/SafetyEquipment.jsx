@@ -3,6 +3,7 @@ import { Container, Row, Col, Form, Button, Table } from "react-bootstrap";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../../utils/axiosInstance";
 
 const SafetyEquipment = () => {
   const [formData, setFormData] = useState({
@@ -52,16 +53,16 @@ const SafetyEquipment = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const isValid = formData.equipmentChecklist.every((item) => item.condition);
-    if (!isValid) {
-      toast.error("Please select a condition for all equipment items.");
-      return;
-    }
+    // const isValid = formData.equipmentChecklist.every((item) => item.condition);
+    // if (!isValid) {
+    //   toast.error("Please select a condition for all equipment items.");
+    //   return;
+    // }
 
-    if (!formData.specialInstructions || !formData.equipmentConditionRemarks) {
-      toast.error("Please provide all the required additional details.");
-      return;
-    }
+    // if (!formData.specialInstructions || !formData.equipmentConditionRemarks) {
+    //   toast.error("Please provide all the required additional details.");
+    //   return;
+    // }
 
     const payload = {
       assignmentId: formData.assignmentID,
@@ -70,11 +71,18 @@ const SafetyEquipment = () => {
       assignedTo: formData.assignedTo,
       submissionDeadline: formData.submissionDeadline,
       expectedReturnDate: formData.expectedReturnDate,
-      equipmentChecklist: formData.equipmentChecklist.map((item) => ({
-        equipment: item.equipment,
-        quantity: item.quantity,
-        condition: item.condition,
-      })),
+      // equipmentChecklist: formData.equipmentChecklist.map((item) => ({
+      //   equipment: item.equipment,
+      //   quantity: item.quantity,
+      //   condition: item.condition,
+      // })),
+      equipmentChecklist: formData.equipmentChecklist
+        .filter((item) => item.selected) // <-- Only selected equipment
+        .map((item) => ({
+          equipment: item.equipment,
+          quantity: item.quantity,
+          condition: item.condition,
+        })),
       additionalDetails: formData.specialInstructions,
       specialInstructions: formData.specialInstructions,
       equipmentConditionRemarks: formData.equipmentConditionRemarks,
@@ -82,10 +90,15 @@ const SafetyEquipment = () => {
       employeeSignature: "signature_url_5", // Replace with actual signature URL
       supervisorSignature: "signature_url_6", // Replace with actual signature URL
     };
+    if (payload.equipmentChecklist.length === 0) {
+      toast.error("Please select at least one equipment before submitting.");
+      return;
+    }
+
     console.log("Submitting payload", payload);
 
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         "https://hrb5wx2v-8000.inc1.devtunnels.ms/api/safety",
         payload,
         {
@@ -96,6 +109,7 @@ const SafetyEquipment = () => {
       );
       console.log("Success:", response.data);
       toast.success("Assignment submitted successfully!");
+      navigate("/safety-equipment");
     } catch (error) {
       toast.error("Failed to submit assignment. Please try again.");
       console.error("Error submitting assignment:", error);
