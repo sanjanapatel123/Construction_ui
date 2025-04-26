@@ -628,8 +628,8 @@ function PlantMachinery() {
   const navigate = useNavigate();
   const { tools, loading, error } = useSelector((state) => state.tools);
   const { equipments } = useSelector((state) => state.equipments);
-  const filteredequipments = equipments.PlantMachinery;
-  console.log(filteredequipments)
+  // const filteredequipments = equipments.PlantMachinery;
+  // console.log(filteredequipments)
   //  const filteredequipments = Array.i  sArray(equipments.PlantMachinery) && equipments.PlantMachinery.filter((equipment) => equipment.name.toLowerCase().includes(searchTerm.toLowerCase()));
    console.log("equipment",equipments);
 
@@ -678,9 +678,9 @@ function PlantMachinery() {
     navigate("/view-service", { state: { service } });
   };
 
-  const handleViewDetails = (equipment) => {
-    navigate("/equipment-details", { state: { equipment } });
-  };
+  // const handleViewDetails = (equipment) => {
+  //   navigate("/equipment-details/:id", { state: { equipment } });
+  // };
 
   const handleShowModal = (service) => {
     setSelectedService(service);
@@ -769,14 +769,14 @@ function PlantMachinery() {
               <th>Type</th>
               <th>Status</th>
               <th>Location</th>
-              <th>Last Inspection</th>
+              {/* <th>Last Inspection</th> */}
               <th className="pe-4">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {equipmentData.map((item) => (
-              <tr key={item.id} className="py-3">
-                <td className="ps-4 py-3">{item.id}</td>
+            {equipments.map((item) => (
+              <tr key={item._id} className="py-3">
+                <td className="ps-4 py-3">{item.equipmentID}</td>
                 <td className="py-3">{item.name}</td>
                 <td className="py-3">Heavy Equipment</td>
                 <td className="py-3">
@@ -791,22 +791,22 @@ function PlantMachinery() {
                   </span>
                 </td>
                 <td className="py-3">{item.location}</td>
-                <td className="py-3">{item.nextMaintenance}</td>
+                {/* <td className="py-3">{item.nextMaintenance}</td> */}
                 <td className="pe-4 py-3">
                   <div className="d-flex gap-2">
                     <button
-                      onClick={() => handleViewDetails(item)}
+                      onClick={() =>  navigate("/equipment-details/:id")}
                       className="btn btn-sm btn-outline-dark"
                     >
                       Details
                     </button>
-                    <button
+                    {/* <button
                       onClick={() => handleShowModal(item)}
                       id="btn_itp"
                       className="btn btn-sm btn-dark"
                     >
                       Schedule
-                    </button>
+                    </button> */}
                   </div>
                 </td>
               </tr>

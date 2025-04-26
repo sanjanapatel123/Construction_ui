@@ -1,10 +1,20 @@
-import React from "react";
-import { useLocation, Link } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useLocation, Link, useParams } from "react-router-dom";
 import { Button } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchEquipment } from "../../../redux/slices/equipmentSlice";
 
 const EquipmentDetailsPage = () => {
-  const location = useLocation();
-  const { equipment } = location.state; // Get equipment data passed from the previous page
+  const dispatch = useDispatch();
+  const { id } = useParams();
+  const { equipments,loading , error } = useSelector((state) => state.equipments);
+  const equipment = equipments.find((eq) => eq._id === id);
+    console.log("equipments details",equipment);
+
+ 
+  useEffect(() => {
+    dispatch(fetchEquipment());
+  })
 
   if (!equipment) {
     return <div>Equipment not found</div>;
