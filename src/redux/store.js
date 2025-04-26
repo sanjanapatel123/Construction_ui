@@ -12,6 +12,7 @@ import inductionReducer from './slices/inductionSlice';
 import incidentReportReducer from './slices/incidentReportSlice';
 import siteEntrySliceReducer from './slices/siteEntrySlice';
 import defectReducer from "./slices/defectSlice";
+import annotationReducer from "./slices/annotationSlice";
 
 export const store = configureStore({
   reducer: {
@@ -26,5 +27,6 @@ export const store = configureStore({
       reports:incidentReportReducer,
       entries:siteEntrySliceReducer,
        defects: defectReducer,
+      annotations: annotationReducer
   }
 });

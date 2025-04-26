@@ -1,21 +1,27 @@
 import React, { useState } from 'react';
 import './NewAnnotationForm.css';
-const NewAnnotationForm = ({ addAnnotation, closeModal }) => {
+import { useDispatch } from 'react-redux';
+import { createAnnotation } from '../../../redux/slices/annotationSlice';
+
+const NewAnnotationForm = ({ closeModal }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [author, setAuthor] = useState('');
 
+  const dispatch = useDispatch();
+  
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    // Create the new annotation object
     const newAnnotation = {
       title,
       description,
-      author,
-      timestamp: new Date().toISOString(),
+      author :"Unknown",
     };
 
-    // Call the function passed as a prop to add the annotation
-    addAnnotation(newAnnotation);
+    // Dispatch the createAnnotation action to the Redux store
+    dispatch(createAnnotation(newAnnotation)); // Dispatch thunk here
 
     // Clear the form fields after submission
     setTitle('');
@@ -27,8 +33,8 @@ const NewAnnotationForm = ({ addAnnotation, closeModal }) => {
   };
 
   return (
-    <div className="modal">
-      <div className="modal-content  flex items-center justify-center">
+    <div className="modal1">
+      <div className="modal-content1 ">
         <h3>Add a New Annotation</h3>
         <form onSubmit={handleSubmit}>
           <div className='flex flex-col'>
@@ -50,18 +56,8 @@ const NewAnnotationForm = ({ addAnnotation, closeModal }) => {
             ></textarea>
           </div>
 
-          <div className='flex flex-col'>
-            <label>Author</label>
-            <input
-              type="text"
-              value={author}
-              onChange={(e) => setAuthor(e.target.value)}
-              required
-            />
-          </div>
-
-          <button type="submit" className='btn'>Save Annotation</button>
-          <button type="button" className='btn' onClick={closeModal}>Close</button>
+          <button type="submit" className='btn1'>Save Annotation</button>
+          <button type="button" className='btn1' onClick={closeModal}>Close</button>
         </form>
       </div>
     </div>

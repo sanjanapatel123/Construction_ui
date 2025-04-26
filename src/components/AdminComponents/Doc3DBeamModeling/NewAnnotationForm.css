@@ -1,5 +1,5 @@
 /* Modal Background */
-.modal {
+.modal1 {
     position: fixed;
     top: 0;
     left: 0;
@@ -13,7 +13,7 @@
   }
   
   /* Modal Content */
-  .modal-content {
+  .modal-content1 {
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
@@ -22,7 +22,7 @@
   }
   
   /* Modal Buttons */
-  .btn {
+  .btn1 {
     padding: 10px;
     margin-top: 10px;
     background-color: #4960d8;
