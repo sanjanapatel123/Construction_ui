@@ -255,6 +255,19 @@ export const updateEquipment = createAsyncThunk(
   }
 );
 
+export const getequipmentById = createAsyncThunk( 
+  'equipment/getequipmentById',
+  async (id, thunkAPI) => {
+    try {
+      const response = await axiosInstance.get(`${apiUrl}/equipment/${id}`);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data || error.message || "Error fetching equipment");
+    }
+  })
+  
+
+
 // Delete Equipment
 export const deleteEquipment = createAsyncThunk(
   'equipment/deleteEquipment',
@@ -330,6 +343,18 @@ const equipmentSlice = createSlice({
         state.equipments = state.equipments.filter(eq => eq._id !== action.payload);
       })
       .addCase(deleteEquipment.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      })
+      .addCase(getequipmentById.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(getequipmentById.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.equipments = action.payload;
+      })
+      .addCase(getequipmentById.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
       });

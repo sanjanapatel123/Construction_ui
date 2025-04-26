@@ -943,7 +943,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addequipment, updateequipment, getequipmentById } from "../../../redux/slices/equipmentSlice";
+import { addEquipment, updateEquipment, getequipmentById } from "../../../redux/slices/equipmentSlice";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Button } from "react-bootstrap";
@@ -954,7 +954,7 @@ function AddEquipment() {
   const { id } = useParams();
   const equipmentId = id;
 
-  const { loading, error } = useSelector((state) => state.equipment);
+  const { loading, error } = useSelector((state) => state.equipments);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -1021,17 +1021,17 @@ function AddEquipment() {
 
     try {
       if (equipmentId) {
-        await dispatch(updateequipment({ id: equipmentId, updatedEntry: form })).unwrap()
+        await dispatch(updateEquipment({ id: equipmentId, updatedEntry: form })).unwrap()
           .then(() => {
             toast.success("Equipment updated successfully!");
-            navigate("/equipmentList");
+            navigate("/PlantMachinery");
           })
           .catch(() => {
             toast.error("Failed to update equipment!");
-            navigate("/equipmentList");
+            navigate("/PlantMachinery");
           });
       } else {
-        await dispatch(addequipment(form)).unwrap()
+        await dispatch(addEquipment(form)).unwrap()
           .then(() => {
             toast.success("Equipment added successfully!");
             navigate("/equipmentList");
