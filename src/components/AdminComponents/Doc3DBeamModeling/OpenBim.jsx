@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import BIMViewer from './BimViewer';
 import Toolbar from './ToolBar';
+import NewAnnotationForm from './NewAnnotationForm';
 const OpenBim = () => {
   const [activeModelTab, setActiveModelTab] = useState('building');
   const [activeSidePanel, setActiveSidePanel] = useState('details');
@@ -9,6 +10,15 @@ const OpenBim = () => {
 
   const [activeTool, setActiveTool] = useState('select');
   const [selectedElement, setSelectedElement] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+   
+  const openModal = () => {
+    setIsModalOpen(true); // Open modal
+  };
+  const closeModal = () => {
+    setIsModalOpen(false); // Close modal
+  };
 
   const handleToolSelect = (tool) => {
     setActiveTool(tool);
@@ -285,7 +295,7 @@ const OpenBim = () => {
         </div>
       )}
       {/* Section Plane Controls (when section tool is active) */}
-      {activeTool === 'section' && (
+      {/* {activeTool === 'section' && (
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md text-sm flex items-center gap-4">
           <div className="flex items-center gap-2">
             <span>X:</span>
@@ -300,7 +310,7 @@ const OpenBim = () => {
             <input type="range" className="w-24" />
           </div>
         </div>
-      )}
+      )} */}
     </div>
   </div>
 </div>
@@ -532,9 +542,12 @@ const OpenBim = () => {
               <div>
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-medium text-gray-800">Annotations</h3>
-                  <button className="text-sm text-indigo-600 hover:text-indigo-800 cursor-pointer">
+                  <button className="text-sm text-indigo-600 hover:text-indigo-800 cursor-pointer" onClick={openModal}>
                     <i className="fas fa-plus mr-1"></i> New
                   </button>
+                  {isModalOpen && (
+        <NewAnnotationForm   closeModal={closeModal} />
+      )}
                 </div>
                 <div className="space-y-3">
                   <div className="p-3 bg-gray-50 rounded-md border border-gray-200">

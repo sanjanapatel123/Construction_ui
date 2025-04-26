@@ -243,13 +243,53 @@ const BIMViewer = ({ modelUrl, activeTool }) => {
   };
 
   return (
-    <div>
-      <div ref={sceneRef} style={{ width: '100%', height: '500px', backgroundColor: '#fff', cursor: activeTool === 'measure' ? 'none' : 'default' }} />
-      {selectedElement && <div>Selected: {selectedElement.name || 'Object'}</div>}
-      {distance && <div>Distance: {distance} units</div>}
-      {activeTool === 'screenshot' && <button onClick={takeScreenshot}>Take Screenshot</button>}
+    <div style={{ position: 'relative' }}>
+      <div
+        ref={sceneRef}
+        style={{
+          width: '100%',
+          height: '500px',
+          backgroundColor: '#fff',
+          cursor: activeTool === 'measure' ? 'none' : 'default',
+        }}
+      />
+      
+      {/* UI Overlay */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 10,
+          left: 10,
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          color: '#fff',
+          padding: '10px',
+          borderRadius: '8px',
+          fontSize: '14px',
+          zIndex: 100,
+        }}
+      >
+        {selectedElement && <div><strong>Selected:</strong> {selectedElement.name || 'Object'}</div>}
+        {distance && <div><strong>Distance:</strong> {distance} units</div>}
+        {activeTool === 'screenshot' && (
+          <button
+            onClick={takeScreenshot}
+            style={{
+              marginTop: '8px',
+              padding: '6px 10px',
+              backgroundColor: '#28a745',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+            }}
+          >
+            Take Screenshot
+          </button>
+        )}
+      </div>
     </div>
   );
+  
 };
 
 export default BIMViewer;
