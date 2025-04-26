@@ -9,6 +9,13 @@ import sitereviewReducer from "./slices/sitereviewSlice";
 import inductionReducer from './slices/inductionSlice';
 import incidentReportReducer from './slices/incidentReportSlice';
 import siteEntrySliceReducer from './slices/siteEntrySlice';
+import toolSliceReducer from './slices/toolSlice';
+import equipmentSliceReducer from './slices/equipmentSlice';
+
+import announcementReducer from './slices/announcementSlice';
+import rfiSliceReducer from './slices/rfiSlice.js'
+
+
 export const store = configureStore({
   reducer: {
       projects: projectReducer,
@@ -18,6 +25,10 @@ export const store = configureStore({
       sitereview: sitereviewReducer,
       inductions:inductionReducer,
       reports:incidentReportReducer,
-      entries:siteEntrySliceReducer
+      entries:siteEntrySliceReducer,
+      tools: toolSliceReducer,
+      equipments: equipmentSliceReducer,
+      announcements:announcementReducer,
+      rfi:rfiSliceReducer
   }
 });

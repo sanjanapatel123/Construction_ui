@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import axiosInstance from "../../../utils/axiosInstance";
-import { apiUrl } from "../../../utils/config";
+import { useDispatch } from 'react-redux';
+import { createRFI } from "../../../redux/slices/rfiSlice";
 
 function AddRFIs() {
+    const dispatch= useDispatch
+    ()
   const [formData, setFormData] = useState({
-    projectName: "",
-    InspectionType: "",
-    Inspector: "",
-    Date: "",
-    InspectionItems: [{ itemDescription: "", status: false, comments: "" }],
-    additionalNotes: "",
+    subject: "",
+    priority: "",
+    due_date: "",
+    assignee: "",
+    department: "",
+    description: "",
     image: [],
   });
 
@@ -22,57 +24,35 @@ function AddRFIs() {
     }));
   };
 
-  const handleInspectionItemChange = (index, e) => {
-    const { name, value, type, checked } = e.target;
-    const updatedItems = [...formData.InspectionItems];
-    updatedItems[index][name] = type === "checkbox" ? checked : value;
-    setFormData((prev) => ({ ...prev, InspectionItems: updatedItems }));
-  };
 
-  const addInspectionItem = () => {
+
+  const handleFileUpload = (e) => {
+    const files = Array.from(e.target.files);
     setFormData((prev) => ({
       ...prev,
-      InspectionItems: [
-        ...prev.InspectionItems,
-        { itemDescription: "", status: false, comments: "" },
-      ],
+      image: [...prev.image, ...files],
     }));
   };
-
-  const handleFileUpload = async (e) => {
-    const files = e.target.files;
-    const uploadedUrls = [];
-
-    for (const file of files) {
-      const form = new FormData();
-      form.append("file", file);
-      form.append("upload_preset", "YOUR_UPLOAD_PRESET"); // Cloudinary preset
-      form.append("folder", "itp_uploads");
-
-      const res = await axiosInstance.post(
-        `https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload`,
-        form
-      );
-      uploadedUrls.push(res.data.secure_url);
-    }
-
-    setFormData((prev) => ({
-      ...prev,
-      image: [...prev.image, ...uploadedUrls],
-    }));
-  };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axiosInstance.post(`${apiUrl}/itps`, formData);
-      console.log("ITP Created:", response.data);
-      alert("ITP submitted successfully!");
-    } catch (error) {
-      console.error("Submission failed:", error);
-      alert("Failed to submit ITP.");
-    }
+  
+    const submitData = new FormData();
+    submitData.append("subject", formData.subject);
+    submitData.append("priority", formData.priority);
+    submitData.append("due_date", formData.due_date);
+    submitData.append("assignee", formData.assignee);
+    submitData.append("department", formData.department);
+    submitData.append("description", formData.description);
+  
+    formData.image.forEach((file) => {
+      submitData.append("image", file);
+    });
+    // Dispatch the thunk with your formData object
+    dispatch(createRFI(formData));
+  
   };
+  
 
   return (
     <div className="container-fluid p-4">
@@ -89,14 +69,12 @@ function AddRFIs() {
       <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-sm">
         <div className="mb-3">
           <label className="form-label">Subject</label>
-          <input
-            type="text"
+          <input type="text"
             className="form-control"
             name="subject"
             value={formData.subject}
             onChange={handleInputChange}
-            required
-          />
+            required/>
         </div>
 
         <div className="row mb-3">
@@ -106,8 +84,7 @@ function AddRFIs() {
               className="form-select"
               name="priority"
               value={formData.priority}
-              onChange={handleInputChange}
-            >
+              onChange={handleInputChange}>
               <option>High</option>
               <option>Medium</option>
               <option>Low</option>
@@ -118,8 +95,8 @@ function AddRFIs() {
             <input
               type="date"
               className="form-control"
-              name="dueDate"
-              value={formData.dueDate}
+              name="due_date"
+              value={formData.due_date}
               onChange={handleInputChange}
               required
             />

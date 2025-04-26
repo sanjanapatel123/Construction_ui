@@ -1,18 +1,52 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { addtool, getalltool, updatetool } from "../../../redux/slices/toolSlice";
 
 function AddToolRegistry() {
+  const dispatch = useDispatch();
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const { tools, loading, error } = useSelector((state) => state.tools);
+
   const [formData, setFormData] = useState({
-    toolId: "",
-    toolName: "",
+    toolID: "",
+    name: "",
     manufacturer: "",
-    category: "Power Tools",
+    category: "",
     purchaseDate: "",
-    condition: "New",
+    condition: "",
     notes: "",
-    location: "Main Construction Site",
+    location: "",
   });
+
+  useEffect(() => {
+    if (id) {
+      dispatch(getalltool());
+    }
+  }, [id, dispatch]);
+
+  useEffect(() => {
+    if (id && tools.length > 0) {
+      const existingEntry = tools.find((entry) => entry._id === id);
+      if (existingEntry) {
+        setFormData({
+          toolID: existingEntry.toolID,
+          name: existingEntry.name,
+          manufacturer: existingEntry.manufacturer,
+          category: existingEntry.category,
+          purchaseDate: existingEntry.purchaseDate.split("T")[0],
+          condition: existingEntry.condition,
+          notes: existingEntry.notes,
+          location: existingEntry.location,
+        });
+      }
+    }
+  }, [id, tools]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -24,11 +58,29 @@ function AddToolRegistry() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted:", formData);
-  };
 
-  const navigate = useNavigate();
+    if (id) {
+      dispatch(updatetool({ id, updatedtool: formData }))
+        .unwrap()
+        .then(() => {
+          toast.success("Tool Updated Successfully!");
+          navigate("/plantMachinery");
+        })
+        .catch(() => {
+          toast.error("Failed to update Tool!");
+        });
+    } else {
+      dispatch(addtool(formData))
+        .unwrap()
+        .then(() => {
+          toast.success("Tool Added successfully");
+          navigate("/plantMachinery");
+        })
+        .catch(() => {
+          toast.error("Error in creating tool");
+        });
+    }
+  };
 
   return (
     <div
@@ -39,10 +91,11 @@ function AddToolRegistry() {
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h4 className="fw-semibold">Add New Tool</h4>
           <button
-            onClick={() => navigate(-1)}
-            className="btn " style={{backgroundColor:"#0d6efd",color:"white"}}
+            onClick={() => navigate("/PlantMachinery")}
+            className="btn"
+            style={{ backgroundColor: "#0d6efd", color: "white" }}
           >
-            <i class="fa-solid fa-arrow-left me-2"></i> Back to Overview
+            <i className="fa-solid fa-arrow-left me-2"></i> Back to Overview
           </button>
         </div>
 
@@ -53,8 +106,8 @@ function AddToolRegistry() {
               <input
                 type="text"
                 className="form-control"
-                name="toolId"
-                value={formData.toolId}
+                name="toolID"
+                value={formData.toolID}
                 onChange={handleInputChange}
                 required
               />
@@ -64,8 +117,8 @@ function AddToolRegistry() {
               <input
                 type="text"
                 className="form-control"
-                name="toolName"
-                value={formData.toolName}
+                name="name"
+                value={formData.name}
                 onChange={handleInputChange}
                 required
               />
@@ -91,11 +144,13 @@ function AddToolRegistry() {
                 name="category"
                 value={formData.category}
                 onChange={handleInputChange}
+                required
               >
-                <option>Power Tools</option>
-                <option>Hand Tools</option>
-                <option>Measuring Tools</option>
-                <option>Safety Equipment</option>
+                <option value="">Select Category</option>
+                <option value="Power Tools">Power Tools</option>
+                <option value="Hand Tools">Hand Tools</option>
+                <option value="Measuring Tools">Measuring Tools</option>
+                <option value="Safety Equipment">Safety Equipment</option>
               </select>
             </div>
           </div>
@@ -119,11 +174,13 @@ function AddToolRegistry() {
                 name="condition"
                 value={formData.condition}
                 onChange={handleInputChange}
+                required
               >
-                <option>New</option>
-                <option>Good</option>
-                <option>Fair</option>
-                <option>Poor</option>
+                <option value="">Select Condition</option>
+                <option value="New">New</option>
+                <option value="Good">Good</option>
+                <option value="Fair">Fair</option>
+                <option value="Poor">Poor</option>
               </select>
             </div>
           </div>
@@ -146,21 +203,24 @@ function AddToolRegistry() {
               name="location"
               value={formData.location}
               onChange={handleInputChange}
+              required
             >
-              <option>Main Construction Site</option>
-              <option>Warehouse</option>
-              <option>Workshop</option>
+              <option value="">Select Location</option>
+              <option value="Main Construction Site">Main Construction Site</option>
+              <option value="Warehouse">Warehouse</option>
+              <option value="Workshop">Workshop</option>
             </select>
           </div>
 
           <div className="mt-4 d-flex gap-2 justify-content-end">
-            <button type="button" className="btn btn-light">
-              Cancel
-            </button>
+            <Link to="/plantMachinery">
+              <button type="button" className="btn btn-light">
+                Cancel
+              </button>
+            </Link>
             <Button
               style={{ backgroundColor: "#0052CC" }}
               type="submit"
-              // className="btn btn-dark"
             >
               Save Tool
             </Button>

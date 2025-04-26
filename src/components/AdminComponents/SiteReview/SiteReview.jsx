@@ -1,7 +1,7 @@
 
 
 
-import React, { useState } from "react";
+import React, { use, useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
 
 
@@ -16,7 +16,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import Swal from 'sweetalert2'
 
 ChartJS.register(
   CategoryScale,
@@ -29,32 +30,77 @@ ChartJS.register(
   Legend
 );
 import { Table ,Button} from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {fetchsitereview, deletesitereview} from "../../../redux/slices/sitereviewSlice";
 
 
 function SiteReview() {
-  // const siteReviews = [
-  //   {
-  //     siteName: "Site A",
-  //     reviewDate: "Apr 20, 2025",
-  //     reviewerName: "John Smith",
-  //     complianceStatus: "Compliant",
-  //   },
-  //   {
-  //     siteName: "Site B",
-  //     reviewDate: "Apr 18, 2025",
-  //     reviewerName: "Sarah Smith",
-  //     complianceStatus: "Non-Compliant",
-  //   },
-  //   {
-  //     siteName: "Site C",
-  //     reviewDate: "Apr 19, 2025",
-  //     reviewerName: "David Brown",
-  //     complianceStatus: "Compliant",
-  //   },
-  // ];
+ 
+  
+  const dispatch = useDispatch();
+  const siteReviews = [
+    {
+      siteName: "Site A",
+      reviewDate: "Apr 20, 2025",
+      reviewerName: "John Smith",
+      complianceStatus: "Compliant",
+    },
+    {
+      siteName: "Site B",
+      reviewDate: "Apr 18, 2025",
+      reviewerName: "Sarah Smith",
+      complianceStatus: "Non-Compliant",
+    },
+    {
+      siteName: "Site C",
+      reviewDate: "Apr 19, 2025",
+      reviewerName: "David Brown",
+      complianceStatus: "Compliant",
+    },
+  ];
 
   const { sitereview, loading, error } = useSelector((state) => state.sitereview);
+  console.log ("sitereview", sitereview);
+
+  useEffect(() => {
+    dispatch(fetchsitereview());
+  }, [dispatch])
+
+  
+
+  const HandleDelete = (id) => {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          dispatch(deletesitereview(id))
+            .then(() => {
+              Swal.fire(
+                'Deleted!',
+                'The site entry has been deleted.',
+                'success'
+              );
+              dispatch(fetchsitereview());  // Refresh the table after delete
+            })
+            .catch((error) => {
+              Swal.fire(
+                'Error!',
+                'Something went wrong.',
+                'error'
+              );
+            });
+        }
+      });
+    };
+
+  const filteredsitereview = Array.isArray(sitereview?.data) ? sitereview.data : [];
+
   const [categories, setCategories] = useState({
     safety: {
       PPE_Compliance: false,
@@ -148,10 +194,18 @@ function SiteReview() {
     </tr>
   ) : 
 
-sitereview.map((review, index) => (
-  <tr key={index}>
+
+  ( filteredsitereview?.length === 0 ? (
+    <tr>
+      <td colSpan="5" className="text-center py-3">
+        No site reviews found.
+      </td>
+    </tr>
+  ):
+    filteredsitereview?.map((review, index) => (
+  <tr key={review._id}>
     <td>{review.siteName}</td>
-    <td>{review.reviewDate}</td>
+    <td>{new Date(review.reviewDate).toLocaleDateString()}</td> 
     <td>{review.reviewerName}</td>
     <td>
       <span
@@ -185,18 +239,19 @@ sitereview.map((review, index) => (
     </td> */}
 
     <td>
-      <Link to={`/editReview/${index}`}>
+      <Link to={`/AddSiteReview/${review._id}`}>
         <button className="btn text-primary ">
           <i class="fa-solid fa-pen-to-square"></i>
         </button>
       </Link>
 
-      <button className="btn text-danger">
+      <button className="btn text-danger" onClick={()  => HandleDelete(review._id)}>
         <i class="fa-solid fa-trash"></i>
       </button>
     </td>
   </tr>
-))
+)))
+
               }
             
             </tbody>
