@@ -52,7 +52,7 @@ const OpenBim = () => {
     <div className="flex flex-col h-screen bg-gray-100" style={{marginTop: "0px"}}>
       {/* Top Navigation Bar */}
       <Toolbar setTool={handleToolSelect} />
-      <AddElementModal/>
+      {/* <AddElementModal/> */}
       <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 z-10">
         <div className="flex items-center gap-4">
           <a
