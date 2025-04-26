@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Button, Row, Col } from "react-bootstrap";
+import { Form, Button, Row, Col ,Modal} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const AddNewTask = () => {
@@ -12,6 +12,17 @@ const AddNewTask = () => {
     category: "Safety",
     status: "Pending",
   });
+
+  const [categories, setCategories] = useState([
+    "Safety",
+    "Documentation",
+    "Equipment",
+    "Quality",
+    "Training",
+  ]);
+
+  const [showModal, setShowModal] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -28,15 +39,25 @@ const AddNewTask = () => {
     console.log("Task Saved:", taskDetails);
   };
 
+  const handleSaveCategory = () => {
+    if (newCategory.trim() !== "") {
+      setCategories([...categories, newCategory.trim()]);
+      setTaskDetails((prev) => ({ ...prev, category: newCategory.trim() }));
+      setNewCategory("");
+      setShowModal(false);
+    }
+  };
+
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4 mt-4">
         <h2>Create New Task</h2>
         <button
           onClick={() => navigate(-1)}
-          className="btn "style={{backgroundColor:"#0d6efd",color:"white"}}
+          className="btn "
+          style={{ backgroundColor: "#0d6efd", color: "white" }}
         >
-         <i class="fa-solid fa-arrow-left me-2"></i> Back to Overview
+          <i class="fa-solid fa-arrow-left me-2"></i> Back to Overview
         </button>
       </div>
       <Form>
@@ -67,19 +88,15 @@ const AddNewTask = () => {
 
         {/* Assigned To */}
         <Form.Group className="mb-3">
-  <Form.Label>Assigned To</Form.Label>
-  <Form.Select
-    name="assignedTo"
-   
-  >
-    <option value="">Select assignee</option>
-    <option value="John Doe">John Doe</option>
-    <option value="Jane Smith">Jane Smith</option>
-    <option value="Alex Johnson">Alex Johnson</option>
-    {/* Add more options as needed */}
-  </Form.Select>
-</Form.Group>
-
+          <Form.Label>Assigned To</Form.Label>
+          <Form.Select name="assignedTo">
+            <option value="">Select assignee</option>
+            <option value="John Doe">John Doe</option>
+            <option value="Jane Smith">Jane Smith</option>
+            <option value="Alex Johnson">Alex Johnson</option>
+            {/* Add more options as needed */}
+          </Form.Select>
+        </Form.Group>
 
         {/* Due Date */}
         <Form.Group className="mb-3">
@@ -132,18 +149,27 @@ const AddNewTask = () => {
         {/* Category */}
         <Form.Group className="mb-3">
           <Form.Label>Category</Form.Label>
-          <Form.Control
-            as="select"
-            name="category"
-            value={taskDetails.category}
-            onChange={handleInputChange}
-          >
-            <option>Safety</option>
-            <option>Documentation</option>
-            <option>Equipment</option>
-            <option>Quality</option>
-            <option>Training</option>
-          </Form.Control>
+          <div className="d-flex align-items-center">
+            <Form.Control
+              as="select"
+              name="category"
+              value={taskDetails.category}
+              onChange={handleInputChange}
+            >
+              {categories.map((cat, index) => (
+                <option key={index} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </Form.Control>
+            <Button
+              variant="success"
+              className="ms-2"
+              onClick={() => setShowModal(true)}
+            >
+              <i className="fa fa-plus"></i>
+            </Button>
+          </div>
         </Form.Group>
 
         {/* Status */}
@@ -166,6 +192,31 @@ const AddNewTask = () => {
           Save Task
         </Button>
       </Form>
+
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Add New Category</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group>
+            <Form.Label>Category Name</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter new category"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleSaveCategory}>
+            Save
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
