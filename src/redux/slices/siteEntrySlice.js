@@ -111,6 +111,8 @@ const siteEntrySlice = createSlice({
   state.loading = true;
 })
 .addCase(updateSiteEntry.fulfilled, (state, action) => {
+  console.log("updaed entry", action.payload);
+
   state.loading = false;
   const index = state.entries.findIndex(item => item._id === action.payload._id);
   if (index !== -1) {

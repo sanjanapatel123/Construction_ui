@@ -156,6 +156,10 @@ function App() {
             <Route path="/AddToolRegistry" element={<AddToolRegistry />} />
             <Route path="/AddToolRegistry/:id" element={<AddToolRegistry />} />
             <Route path="/AddEquipment" element={<AddEquipment />} />
+            <Route path="/AddEquipment/:id" element={<AddEquipment />} />
+
+            <Route path="/equipment-details/:id" element={<EquipmentDetailsPage />} />
+
             {/* <Route path="/AddServices" element={<AddServices/>} /> */}
             <Route path="/messenger" element={<Messenger />} />
             <Route path="/helpSupport" element={<HelpSupport></HelpSupport>} />
@@ -288,10 +292,10 @@ function App() {
             <Route path="/AddToolRegistry" element={<AddToolRegistry />} />
             <Route path="/AddSafety" element={<SafetyEquipment />} />
             <Route path="/view-service" element={<ViewServicePage />} />
-            <Route
+            {/* <Route
               path="/equipment-details"
               element={<EquipmentDetailsPage />}
-            />
+            /> */}
             <Route
               path="/addEquipment"
               element={<SafetyEquipment></SafetyEquipment>}

@@ -647,7 +647,7 @@ function PlantMachinery() {
       )
     : [];
 
-  const handleDelete = (id) => {
+  const handleEquipmentDelete = (id) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -658,11 +658,11 @@ function PlantMachinery() {
       confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        dispatch(deletetool(id))
+        dispatch(deleteEquipment(id))
           .then((response) => {
             if (response.meta.requestStatus === "fulfilled") {
               toast.success("Tool deleted successfully!");
-              dispatch(getalltool());
+              dispatch(fetchEquipment());
             } else {
               toast.error("Failed to delete tool!");
             }
@@ -673,6 +673,9 @@ function PlantMachinery() {
       }
     });
   };
+
+
+
 
   const handleViewService = (service) => {
     navigate("/view-service", { state: { service } });
@@ -753,12 +756,12 @@ function PlantMachinery() {
           placeholder="Search equipment..."
           style={{ maxWidth: "250px" }}
         />
-        <select className="form-select" style={{ width: "150px" }}>
+        {/* <select className="form-select" style={{ width: "150px" }}>
           <option>All Status</option>
           <option>Active</option>
           <option>Maintenance</option>
           <option>Out of Service</option>
-        </select>
+        </select> */}
       </div>
       <div className="table-responsive">
         <table className="table table-hover align-middle mb-0">
@@ -767,19 +770,22 @@ function PlantMachinery() {
               <th className="ps-4">Equipment ID</th>
               <th>Equipment Name</th>
               <th>Type</th>
-              <th>Status</th>
+              {/* <th>Status</th> */}
               <th>Location</th>
               {/* <th>Last Inspection</th> */}
               <th className="pe-4">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {equipments.map((item) => (
+          { 
+          Array.isArray(equipments) && equipments.length > 0 ? (
+            equipments.map((item) => (
+
               <tr key={item._id} className="py-3">
                 <td className="ps-4 py-3">{item.equipmentID}</td>
                 <td className="py-3">{item.name}</td>
                 <td className="py-3">Heavy Equipment</td>
-                <td className="py-3">
+                {/* <td className="py-3">
                   <span
                     className={`badge ${
                       item.status === "Active"
@@ -789,17 +795,24 @@ function PlantMachinery() {
                   >
                     {item.status}
                   </span>
-                </td>
+                </td> */}
                 <td className="py-3">{item.location}</td>
                 {/* <td className="py-3">{item.nextMaintenance}</td> */}
                 <td className="pe-4 py-3">
                   <div className="d-flex gap-2">
+                    
                     <button
-                      onClick={() =>  navigate("/equipment-details/:id")}
+                      onClick={() =>  navigate(`/equipment-details/${item._id}`)}
                       className="btn btn-sm btn-outline-dark"
                     >
                       Details
                     </button>
+                       <Link to={`/AddEquipment/${item._id}`}><button className="btn text-primary p-0">
+                                  <i className="fa-solid fa-pen-to-square"></i>
+                                </button></Link>
+                    <button className="btn text-danger p-0" onClick={()=>handleEquipmentDelete(item._id)}>
+              <i className="fa-solid fa-trash"></i>
+            </button>
                     {/* <button
                       onClick={() => handleShowModal(item)}
                       id="btn_itp"
@@ -810,7 +823,14 @@ function PlantMachinery() {
                   </div>
                 </td>
               </tr>
-            ))}
+            ))) : (
+              <tr>
+                <td colSpan="6" className="text-center">
+                  No equipment found.
+                </td>
+              </tr>
+            )
+            }
           </tbody>
         </table>
         {/* Pagination */}

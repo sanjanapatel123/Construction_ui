@@ -19,6 +19,8 @@ import rfiSliceReducer from './slices/rfiSlice.js'
 
 import defectReducer from "./slices/defectSlice";
 
+import safetyEquipmentSlice from "./slices/safetyEquipmentSlice";
+
 export const store = configureStore({
   reducer: {
       projects: projectReducer,
@@ -36,5 +38,6 @@ export const store = configureStore({
       announcements:announcementReducer,
       rfi:rfiSliceReducer,
        defects: defectReducer,
+       safetyequipments: safetyEquipmentSlice,
   }
 });

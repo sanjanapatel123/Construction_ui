@@ -26,23 +26,23 @@ const EquipmentDetailsPage = () => {
       <div className="bg-white p-4 rounded shadow-sm">
         <h5>Equipment Name: {equipment.name}</h5>
         <p>
-          <strong>Equipment ID:</strong> {equipment.id}
+          <strong>Equipment ID:</strong> {equipment.equipmentID}
         </p>
         <p>
           <strong>Type:</strong> {equipment.type}
         </p>
-        <p>
+        {/* <p>
           <strong>Status:</strong> {equipment.status}
-        </p>
+        </p> */}
         <p>
           <strong>Location:</strong> {equipment.location}
         </p>
-        <p>
+        {/* <p>
           <strong>Last Inspection:</strong> {equipment.lastInspection}
         </p>
         <p>
           <strong>Next Maintenance:</strong> {equipment.nextMaintenance}
-        </p>
+        </p> */}
 
         <div className="d-flex gap-2 mt-4">
           <Link to="/PlantMachinery">
