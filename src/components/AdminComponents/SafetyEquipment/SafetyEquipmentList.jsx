@@ -165,7 +165,7 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Button, Table, Form } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { fetchsafetyEquipment } from "../../../redux/slices/safetyEquipmentSlice";
+import { fetchsafetyEquipment, deletesafetyEquipment } from "../../../redux/slices/safetyEquipmentSlice";
 
 
 const SafetyEquipmentList = () => {
@@ -226,6 +226,36 @@ const SafetyEquipmentList = () => {
     })
   : [];
 
+   const HandleDelete = (id) => {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          dispatch(deletesafetyEquipment(id))
+            .then(() => {
+              Swal.fire(
+                'Deleted!',
+                'The site entry has been deleted.',
+                'success'
+              );
+              dispatch(fetchsafetyEquipment());  // Refresh the table after delete
+            })
+            .catch((error) => {
+              Swal.fire(
+                'Error!',
+                'Something went wrong.',
+                'error'
+              );
+            });
+        }
+      });
+    };
   
 
   return (
@@ -315,7 +345,7 @@ const SafetyEquipmentList = () => {
                       
                       
                      
-                      <button className="btn text-dark p-0">
+                      <button className="btn text-dark p-0" onClick={() => HandleDelete(item._id)}>
                         <i className="fas fa-trash text-danger"></i>
                       </button>
                     </div>

@@ -22,6 +22,8 @@ import annotationReducer from "./slices/annotationSlice";
 
 import safetyEquipmentSlice from "./slices/safetyEquipmentSlice";
 import documentSlice from "./slices/documentSlice"
+import taskManagementSlice from "./slices/taskManagement"
+
 
 export const store = configureStore({
   reducer: {
@@ -43,5 +45,6 @@ export const store = configureStore({
        safetyequipments: safetyEquipmentSlice,
       annotations: annotationReducer,
       document: documentSlice,
+      task : taskManagementSlice,
   }
 });
