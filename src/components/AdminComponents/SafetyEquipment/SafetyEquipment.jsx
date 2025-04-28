@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../utils/axiosInstance";
+import { apiUrl } from "../../../utils/config";
 
 const SafetyEquipment = () => {
   const [formData, setFormData] = useState({
@@ -98,15 +99,11 @@ const SafetyEquipment = () => {
     console.log("Submitting payload", payload);
 
     try {
-      const response = await axiosInstance.post(
-        "https://hrb5wx2v-8000.inc1.devtunnels.ms/api/safety",
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await axiosInstance.post(`${apiUrl}/safety`, payload, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       console.log("Success:", response.data);
       toast.success("Assignment submitted successfully!");
       navigate("/safety-equipment");
