@@ -6,7 +6,7 @@ import NewAnnotationForm from './NewAnnotationForm';
 import { fetchAnnotations , deleteAnnotation} from '../../../redux/slices/annotationSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import AddElementModal from './AddElimentModal';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, set } from 'date-fns';
 const OpenBim = () => {
   const [activeModelTab, setActiveModelTab] = useState('building');
   const [activeSidePanel, setActiveSidePanel] = useState('details');
@@ -16,16 +16,20 @@ const OpenBim = () => {
   const [selectedElement, setSelectedElement] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editAnnotation, setEditAnnotation] = useState(null);
-  
    const dispatch = useDispatch();
+  const delete_annotation  = (id) => {
+     dispatch(deleteAnnotation(id));
+    dispatch(fetchAnnotations());
+};
    useEffect(() => {
     dispatch(fetchAnnotations());
-  }, [dispatch]);
+    
+  }, [isModalOpen,dispatch]);
  
+  const annotations = useSelector((state) => state.annotations.annotations.data);
 
   // Use the selector to get the annotations state
-  const annotations = useSelector((state) => state.annotations.annotations.data);
-  console.log(annotations);
+   
   const handleEditAnnotation = (element) => {
     setEditAnnotation(element); // set the element to edit
     setIsModalOpen(true);
@@ -34,6 +38,7 @@ const OpenBim = () => {
     setIsModalOpen(true); // Open modal
   };
   const closeModal = () => {
+    setEditAnnotation(null);
     setIsModalOpen(false); // Close modal
   };
 
@@ -50,10 +55,7 @@ const OpenBim = () => {
       setActiveSidePanel('details');
     }
   };
-  const delete_annotation  = (id) => {
-      dispatch(deleteAnnotation(id));
-      dispatch(fetchAnnotations()); 
-  };
+  
 
   return (
     <div className="flex flex-col h-screen bg-gray-100" style={{marginTop: "0px"}}>
