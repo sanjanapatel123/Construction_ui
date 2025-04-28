@@ -61,6 +61,7 @@ function ToolboxTalks() {
   }, []);
   return (
     <div>
+      <h3 className="mt-2 mb-0">Toolbox Talk</h3>
       <div
         className="container-fluid bg-light p-4"
         style={{ fontFamily: "Arial, sans-serif" }}
@@ -97,115 +98,154 @@ function ToolboxTalks() {
           ))}
         </div>
 
+        <div className="row">
+          <div className="col-12 bg-white p-4 rounded shadow-sm">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h6 className="mb-0">Toolbox Talks</h6>
+              <Link to={"/AddToolboxTalks"}>
+                {" "}
+                <button id="btn_itp" className="btn btn-dark">
+                  Create New Talk
+                </button>
+              </Link>
+            </div>
+
+            {/* Filters */}
+            <div className="d-flex gap-2 flex-wrap mb-3">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search talks..."
+                style={{ maxWidth: "200px" }}
+              />
+              <select className="form-select" style={{ maxWidth: "160px" }}>
+                <option>All Projects</option>
+              </select>
+              <input
+                type="date"
+                className="form-control"
+                style={{ maxWidth: "160px" }}
+              />
+            </div>
+
+            {/* Tabs */}
+            <ul className="nav nav-tabs mb-3">
+              <li className="nav-item">
+                <button
+                  className="nav-link active"
+                  data-bs-toggle="tab"
+                  data-bs-target="#scheduled"
+                >
+                  Scheduled Talks
+                </button>
+              </li>
+              <li className="nav-item">
+                <button
+                  className="nav-link"
+                  data-bs-toggle="tab"
+                  data-bs-target="#completed"
+                >
+                  Completed Talks
+                </button>
+              </li>
+            </ul>
+
+            {/* Tab Content */}
+          </div>
+        </div>
 
         <div className="tab-content">
-              <div className="tab-pane fade show active" id="scheduled">
-                <div className="table-responsive">
-                <table className="table table-hover align-middle">
-                  <thead>
-                    <tr>
-                      <th>Topic</th>
-                      <th>Date & Time</th>
-                      <th>Assigned Team</th>
-                      <th>Status</th>
-                      <th>Actions</th>
+          <div className="tab-pane fade show active" id="scheduled">
+            <div className="table-responsive">
+              <table className="table table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th>Topic</th>
+                    <th>Date & Time</th>
+                    <th>Assigned Team</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    {
+                      topic: "Safe Working at Heights",
+                      category: "Safety",
+                      datetime: "2024-02-20 09:00 AM",
+                      team: "Construction Team A",
+                      participants: 15,
+                      status: "Upcoming",
+                      badge: "warning",
+                    },
+                    {
+                      topic: "Equipment Safety Protocol",
+                      category: "Equipment Use",
+                      datetime: "2024-02-21 10:30 AM",
+                      team: "Operation Team B",
+                      participants: 12,
+                      status: "In Progress",
+                      badge: "info",
+                    },
+                    {
+                      topic: "Site Compliance Update",
+                      category: "Compliance",
+                      datetime: "2024-02-22 02:00 PM",
+                      team: "All Site Personnel",
+                      participants: 25,
+                      status: "Upcoming",
+                      badge: "warning",
+                    },
+                  ].map((talk, idx) => (
+                    <tr key={idx}>
+                      <td>
+                        {talk.topic}
+                        <br />
+                        <small className="text-muted">{talk.category}</small>
+                      </td>
+                      <td>{talk.datetime}</td>
+                      <td>
+                        {talk.team}
+                        <br />
+                        <small>{talk.participants} participants</small>
+                      </td>
+                      <td>
+                        <span className={`badge bg-${talk.badge}`}>
+                          {talk.status}
+                        </span>
+                      </td>
+                      <td>
+                        <a href="#" className="me-3 text-primery" title="Edit">
+                          <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
+                        <a href="#" className="text-danger" title="Delete">
+                          <i class="fa-solid fa-trash"></i>
+                        </a>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      {
-                        topic: "Safe Working at Heights",
-                        category: "Safety",
-                        datetime: "2024-02-20 09:00 AM",
-                        team: "Construction Team A",
-                        participants: 15,
-                        status: "Upcoming",
-                        badge: "warning",
-                      },
-                      {
-                        topic: "Equipment Safety Protocol",
-                        category: "Equipment Use",
-                        datetime: "2024-02-21 10:30 AM",
-                        team: "Operation Team B",
-                        participants: 12,
-                        status: "In Progress",
-                        badge: "info",
-                      },
-                      {
-                        topic: "Site Compliance Update",
-                        category: "Compliance",
-                        datetime: "2024-02-22 02:00 PM",
-                        team: "All Site Personnel",
-                        participants: 25,
-                        status: "Upcoming",
-                        badge: "warning",
-                      },
-                    ].map((talk, idx) => (
-                      <tr key={idx}>
-                        <td>
-                          {talk.topic}
-                          <br />
-                          <small className="text-muted">{talk.category}</small>
-                        </td>
-                        <td>{talk.datetime}</td>
-                        <td>
-                          {talk.team}
-                          <br />
-                          <small>{talk.participants} participants</small>
-                        </td>
-                        <td>
-                          <span className={`badge bg-${talk.badge}`}>
-                            {talk.status}
-                          </span>
-                        </td>
-                        <td>
-                          <a
-                            href="#"
-                            className="me-3 text-primery"
-                            title="Edit"
-                          >
-                            <i class="fa-solid fa-pen-to-square"></i>
-                          </a>
-                          <a href="#" className="text-danger" title="Delete">
-                            <i class="fa-solid fa-trash"></i>
-                          </a>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                </div>
-                <div className="d-flex justify-content-end mb-3">
-                  <Button
-                    size="sm"
-                    variant="outline-secondary"
-                    className="me-2"
-                  >
-                    Previous
-                  </Button>
-                  <Button size="sm" variant="primary" className="ms-2">
-                    1
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline-secondary"
-                    className="ms-2"
-                  >
-                    2
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline-secondary"
-                    className="ms-2"
-                  >
-                    Next
-                  </Button>
-                </div>
-              </div>
-              <div className="tab-pane fade" id="completed">
-                <p className="text-muted">No completed talks yet.</p>
-              </div>
+                  ))}
+                </tbody>
+              </table>
             </div>
+            <div className="d-flex justify-content-end mb-3">
+              <Button size="sm" variant="outline-secondary" className="me-2">
+                Previous
+              </Button>
+              <Button size="sm" variant="primary" className="ms-2">
+                1
+              </Button>
+              <Button size="sm" variant="outline-secondary" className="ms-2">
+                2
+              </Button>
+              <Button size="sm" variant="outline-secondary" className="ms-2">
+                Next
+              </Button>
+            </div>
+          </div>
+          <div className="tab-pane fade" id="completed">
+            <p className="text-muted">No completed talks yet.</p>
+          </div>
+        </div>
         {/* Main Grid: Left & Right */}
         <div className="row gx-3 gy-3 mb-4">
           <div className="col-md-8 d-flex flex-column gap-3">
@@ -294,62 +334,6 @@ function ToolboxTalks() {
         </div>
 
         {/* Toolbox Talks Table */}
-        <div className="row">
-          <div className="col-12 bg-white p-4 rounded shadow-sm">
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <h6 className="mb-0">Toolbox Talks</h6>
-              <Link to={"/AddToolboxTalks"}>
-                {" "}
-                <button id="btn_itp" className="btn btn-dark">
-                  Create New Talk
-                </button>
-              </Link>
-            </div>
-
-            {/* Filters */}
-            <div className="d-flex gap-2 flex-wrap mb-3">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Search talks..."
-                style={{ maxWidth: "200px" }}
-              />
-              <select className="form-select" style={{ maxWidth: "160px" }}>
-                <option>All Projects</option>
-              </select>
-              <input
-                type="date"
-                className="form-control"
-                style={{ maxWidth: "160px" }}
-              />
-            </div>
-
-            {/* Tabs */}
-            <ul className="nav nav-tabs mb-3">
-              <li className="nav-item">
-                <button
-                  className="nav-link active"
-                  data-bs-toggle="tab"
-                  data-bs-target="#scheduled"
-                >
-                  Scheduled Talks
-                </button>
-              </li>
-              <li className="nav-item">
-                <button
-                  className="nav-link"
-                  data-bs-toggle="tab"
-                  data-bs-target="#completed"
-                >
-                  Completed Talks
-                </button>
-              </li>
-            </ul>
-
-            {/* Tab Content */}
-          
-          </div>
-        </div>
       </div>
     </div>
   );

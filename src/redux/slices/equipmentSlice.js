@@ -1,209 +1,3 @@
-// import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-// import { apiUrl } from "../../utils/config";
-// import axiosInstance from "../../utils/axiosInstance";
-
-// export const  addEquipment = createAsyncThunk(
-//     'equipment/addEquipment',
-//     async (formData, thunkAPI) => {
-//         try{
-//             const response = await axiosInstance.post(`${apiUrl}/equipment`, formData,
-//               {
-//                 headers: { "Content-Type": "multipart/form-data" }
-//               }
-//             );
-//             return response.data;
-//         }catch(error){
-//             return thunkAPI.rejectWithValue(error.response?.data || error.message || "error creating tool")
-//         }
-// })
-
-// export const fetchEquipment = createAsyncThunk(
-//     'equipment/fetchEquipment',
-//     async (_, thunkAPI) => {
-//         try{
-//             const response = await axiosInstance.get(`${apiUrl}/equipment`);
-//             return response.data;
-//         }catch(error){
-//             return thunkAPI.rejectWithValue(error.response?.data || error.message || "Unauthorized access")
-//         }
-//     }
-// )
-
-
-// const equipmentSlice = createSlice({
-//     name: 'equipment',
-//     initialState: {
-//         equipments: [],
-//         status: 'idle',
-//         error: null
-//     },
-//     reducers: {},
-
-//     extraReducers: (builder) => {
-//         builder
-//         .addCase(addEquipment.pending, (state) => {
-//             state.status = 'loading';
-//             state.error = null;
-//         })
-
-//           .addCase(addEquipment.fulfilled, (state, action) => {
-//             state.equipments.push(action.payload);
-//           })
-//           .addCase(addEquipment.rejected, (state, action) => {
-//             state.status = 'failed';
-//             state.error = action.payload;
-//           })
-//           .addCase(fetchEquipment.pending, (state) => {
-//             state.status = 'loading';
-//             state.error = null;
-//           })
-//           .addCase(fetchEquipment.fulfilled, (state, action) => {
-//             state.equipments = action.payload;
-//           })
-//           .addCase(fetchEquipment.rejected, (state, action) => {          
-//             state.status = 'failed';
-//             state.error = action.payload;
-//           })
-//       },
-
-    
-// })
-
-// export default equipmentSlice.reducer
-
-
-// import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-// import { apiUrl } from "../../utils/config";
-// import axiosInstance from "../../utils/axiosInstance";
-
-// // Add Equipment
-// export const addEquipment = createAsyncThunk(
-//   'equipment/addEquipment',
-//   async (formData, thunkAPI) => {
-//     try {
-//       const response = await axiosInstance.post(`${apiUrl}/equipment`, formData, {
-//         headers: { "Content-Type": "multipart/form-data" }
-//       });
-//       return response.data;
-//     } catch (error) {
-//       return thunkAPI.rejectWithValue(error.response?.data || error.message || "Error creating equipment");
-//     }
-//   }
-// );
-
-// // Fetch Equipment
-// export const fetchEquipment = createAsyncThunk(
-//   'equipment/fetchEquipment',
-//   async (_, thunkAPI) => {
-//     try {
-//       const response = await axiosInstance.get(`${apiUrl}/equipment`);
-//       return response.data;
-//     } catch (error) {
-//       return thunkAPI.rejectWithValue(error.response?.data || error.message || "Unauthorized access");
-//     }
-//   }
-// );
-
-// // Update Equipment
-// export const updateEquipment = createAsyncThunk(
-//   'equipment/updateEquipment',
-//   async ({ id, updatedData }, thunkAPI) => {
-//     try {
-//       const response = await axiosInstance.put(`${apiUrl}/equipment/${id}`, updatedData);
-//       return response.data;
-//     } catch (error) {
-//       return thunkAPI.rejectWithValue(error.response?.data || error.message || "Error updating equipment");
-//     }
-//   }
-// );
-
-// // Delete Equipment
-// export const deleteEquipment = createAsyncThunk(
-//   'equipment/deleteEquipment',
-//   async (id, thunkAPI) => {
-//     try {
-//       await axiosInstance.delete(`${apiUrl}/equipment/${id}`);
-//       return id;
-//     } catch (error) {
-//       return thunkAPI.rejectWithValue(error.response?.data || error.message || "Error deleting equipment");
-//     }
-//   }
-// );
-
-// // Slice
-// const equipmentSlice = createSlice({
-//   name: 'equipment',
-//   initialState: {
-//     equipments: [],
-//     status: 'idle',
-//     error: null
-//   },
-//   reducers: {},
-
-//   extraReducers: (builder) => {
-//     builder
-//       // ADD
-//       .addCase(addEquipment.pending, (state) => {
-//         state.status = 'loading';
-//         state.error = null;
-//       })
-//       .addCase(addEquipment.fulfilled, (state, action) => {
-//         state.status = 'succeeded';
-//         state.equipments.push(action.payload);
-//       })
-//       .addCase(addEquipment.rejected, (state, action) => {
-//         state.status = 'failed';
-//         state.error = action.payload;
-//       })
-
-//       // FETCH
-//       .addCase(fetchEquipment.pending, (state) => {
-//         state.status = 'loading';
-//         state.error = null;
-//       })
-//       .addCase(fetchEquipment.fulfilled, (state, action) => {
-//         state.status = 'succeeded';
-//         state.equipments = action.payload;
-//       })
-//       .addCase(fetchEquipment.rejected, (state, action) => {
-//         state.status = 'failed';
-//         state.error = action.payload;
-//       })
-
-//       // UPDATE
-//       .addCase(updateEquipment.pending, (state) => {
-//         state.status = 'loading';
-//         state.error = null;
-//       })
-//       .addCase(updateEquipment.fulfilled, (state, action) => {
-//         state.status = 'succeeded';
-//         const index = state.equipments.findIndex(eq => eq._id === action.payload._id);
-//         if (index !== -1) {
-//           state.equipments[index] = action.payload;
-//         }
-//       })
-//       .addCase(updateEquipment.rejected, (state, action) => {
-//         state.status = 'failed';
-//         state.error = action.payload;
-//       })
-
-//       // DELETE
-//       .addCase(deleteEquipment.pending, (state) => {
-//         state.status = 'loading';
-//         state.error = null;
-//       })
-//       .addCase(deleteEquipment.fulfilled, (state, action) => {
-//         state.status = 'succeeded';
-//         state.equipments = state.equipments.filter(eq => eq._id !== action.payload);
-//       })
-//       .addCase(deleteEquipment.rejected, (state, action) => {
-//         state.status = 'failed';
-//         state.error = action.payload;
-//       });
-//   }
-// });
-
-// export default equipmentSlice.reducer;
 
 
 
@@ -233,6 +27,7 @@ export const fetchEquipment = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const response = await axiosInstance.get(`${apiUrl}/equipment`);
+      console.log("Response from API:", response);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data || error.message || "Unauthorized access");
@@ -245,7 +40,7 @@ export const updateEquipment = createAsyncThunk(
   'equipment/updateEquipment',
   async ({ id, updatedData }, thunkAPI) => {
     try {
-      const response = await axiosInstance.put(`${apiUrl}/equipment/${id}`, updatedData, {
+      const response = await axiosInstance.patch(`${apiUrl}/equipment/${id}`, updatedData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
       return response.data;
@@ -283,7 +78,7 @@ export const deleteEquipment = createAsyncThunk(
 
 // Slice
 const equipmentSlice = createSlice({
-  name: 'equipment',
+  name: 'equipments',
   initialState: {
     equipments: [],
     status: 'idle',
@@ -298,7 +93,7 @@ const equipmentSlice = createSlice({
       })
       .addCase(addEquipment.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.equipments =action.payload;
+        state.equipments.push(action.payload);
       })
       .addCase(addEquipment.rejected, (state, action) => {
         state.status = 'failed';
