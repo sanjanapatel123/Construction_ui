@@ -1,12 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Button, Row, Col ,Modal} from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { fetchTasks, updateTask, addTask } from "../../../redux/slices/taskManagement";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AddNewTask = () => {
+  const dispatch = useDispatch();
+  const { tasks, loading ,error} = useSelector((state) => state.task);
+
+  const { id } = useParams();
+  console.log(id)
   const [taskDetails, setTaskDetails] = useState({
-    title: "",
+    taskTitle: "",
     description: "",
-    assignedTo: "",
+    assignTo: "",
     dueDate: "",
     priority: "High",
     category: "Safety",
@@ -34,8 +43,55 @@ const AddNewTask = () => {
   };
 
   const navigate = useNavigate();
+
+
+
+  useEffect(() => {
+      if (id) {
+        dispatch(fetchTasks());
+      }
+    }, [id, dispatch]);
+    
+    useEffect(() => {
+      if (id && tasks.length > 0) {
+        const existingEntry = tasks.find((task) => task._id === id);
+        console.log("existing ",existingEntry)
+        console.log("assgn", existingEntry.assignTo)
+        if (existingEntry) {
+          setTaskDetails({
+            taskTitle: existingEntry.taskTitle,
+            description: existingEntry?.description,
+            assignTo: existingEntry.assignTo._id,
+            dueDate: existingEntry.dueDate,
+            priority: existingEntry.priority,
+            category: existingEntry.category,
+            status: existingEntry.status,
+          });
+        }
+      }
+    }, [id, tasks]);
   // Handle form submission (Save Task)
-  const handleSaveTask = () => {
+  const handleSubmit = (e) => {
+
+    e.preventDefault();
+
+    if( id ) {
+      dispatch(updateTask({ id,updatedForm: taskDetails})).unwrap().then(() => {
+        toast.success("Task Updated Successfully!");
+      })
+      .catch(() => {
+        toast.error("Failed to update task!");
+      });
+    }
+    else{
+      dispatch(addTask(taskDetails)).unwrap().then(() => {
+        toast.success("Task Added Successfully!");
+      })
+      .catch(() => {
+        toast.error("Failed to add task!");
+      });
+    }
+
     console.log("Task Saved:", taskDetails);
   };
 
@@ -51,7 +107,7 @@ const AddNewTask = () => {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4 mt-4">
-        <h2>Create New Task</h2>
+        <h2> { id ? "Update Task" : "Create New Task"}</h2>
         <button
           onClick={() => navigate(-1)}
           className="btn "
@@ -67,8 +123,8 @@ const AddNewTask = () => {
           <Form.Control
             type="text"
             placeholder="Enter task title"
-            name="title"
-            value={taskDetails.title}
+            name="taskTitle"
+            value={taskDetails.taskTitle}
             onChange={handleInputChange}
           />
         </Form.Group>
@@ -89,10 +145,10 @@ const AddNewTask = () => {
         {/* Assigned To */}
         <Form.Group className="mb-3">
           <Form.Label>Assigned To</Form.Label>
-          <Form.Select name="assignedTo">
+          <Form.Select name="assignTo" value={taskDetails.assignTo} onChange={handleInputChange}>
             <option value="">Select assignee</option>
-            <option value="John Doe">John Doe</option>
-            <option value="Jane Smith">Jane Smith</option>
+            <option value="68078c13c78a4e929267accc">John Doe</option>
+            <option value="68078c13c78a4e929267accc">Jane Smith</option>
             <option value="Alex Johnson">Alex Johnson</option>
             {/* Add more options as needed */}
           </Form.Select>
@@ -121,7 +177,7 @@ const AddNewTask = () => {
                 value="High"
                 checked={taskDetails.priority === "High"}
                 onChange={handleInputChange}
-              />
+         />
             </Col>
             <Col>
               <Form.Check
@@ -188,7 +244,7 @@ const AddNewTask = () => {
         </Form.Group>
 
         {/* Submit Button */}
-        <Button variant="primary" onClick={handleSaveTask}>
+        <Button variant="primary" onClick={handleSubmit}>
           Save Task
         </Button>
       </Form>

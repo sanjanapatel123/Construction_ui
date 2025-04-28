@@ -1,42 +1,48 @@
-import React, { use, useState } from 'react';
+import React, { useState } from 'react';
 import './NewAnnotationForm.css';
 import { useDispatch } from 'react-redux';
-import { createAnnotation, fetchAnnotations } from '../../../redux/slices/annotationSlice';
+import { createAnnotation, fetchAnnotations, updateAnnotation } from '../../../redux/slices/annotationSlice';
 
-const NewAnnotationForm = ({ closeModal }) => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [author, setAuthor] = useState('');
+const NewAnnotationForm = ({ closeModal, editData }) => {
+  const [title, setTitle] = useState(editData?.title || '');
+  const [description, setDescription] = useState(editData?.description || '');
+  const [author, setAuthor] = useState(editData?.author || '');
 
   const dispatch = useDispatch();
-  
-  const handleSubmit = (event) => {
+
+  const handleSubmit =  (event) => {
     event.preventDefault();
 
-    // Create the new annotation object
     const newAnnotation = {
       title,
       description,
-      author :"Unknown",
+      author: author || 'Unknown',
     };
 
-    // Dispatch the createAnnotation action to the Redux store
-    dispatch(createAnnotation(newAnnotation)); // Dispatch thunk here
-    dispatch(fetchAnnotations())
+    if (editData) {
+      // If editing, dispatch update
+      dispatch(updateAnnotation({ id: editData._id, updatedData: newAnnotation }));
+    } else {
+      // If adding new, dispatch create
+       dispatch(createAnnotation(newAnnotation));
+    }
 
-    // Clear the form fields after submission
+    // Refresh list after action
+       dispatch(fetchAnnotations());
+
+    // Clear form (optional)
     setTitle('');
     setDescription('');
     setAuthor('');
 
-    // Close the modal after adding the annotation
+    // Close the modal
     closeModal();
   };
 
   return (
     <div className="modal1">
-      <div className="modal-content1 ">
-        <h3>Add a New Annotation</h3>
+      <div className="modal-content1">
+        <h3>{editData ? 'Edit Annotation' : 'Add a New Annotation'}</h3>
         <form onSubmit={handleSubmit}>
           <div className='flex flex-col'>
             <label>Title</label>
@@ -57,7 +63,9 @@ const NewAnnotationForm = ({ closeModal }) => {
             ></textarea>
           </div>
 
-          <button type="submit" className='btn1'>Save Annotation</button>
+          <button type="submit" className='btn1'>
+            {editData ? 'Update Annotation' : 'Save Annotation'}
+          </button>
           <button type="button" className='btn1' onClick={closeModal}>Close</button>
         </form>
       </div>

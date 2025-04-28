@@ -168,6 +168,7 @@ function App() {
             <Route path="/helpSupport" element={<HelpSupport></HelpSupport>} />
             <Route path="/TaskDashboard" element={<TaskManagement />} />
             <Route path="/create-task" element={<AddNewTask />} />
+            <Route path="/updatetask/:id" element={<AddNewTask />} />
             <Route path="/announcements" element={<Announcements />} />
             <Route path="/AddAnnouncements" element={<AddAnnouncements />} />
             <Route path="/rfis" element={<RFIs />} />

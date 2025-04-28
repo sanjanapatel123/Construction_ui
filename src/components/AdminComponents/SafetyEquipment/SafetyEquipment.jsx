@@ -306,11 +306,11 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { addsafetyEquipment, deletesafetyEquipment, fetchsafetyEquipment, updatesafetyEquipment } from "../../../redux/slices/safetyEquipmentSlice";
 import axiosInstance from "../../../utils/axiosInstance";
 import { apiUrl } from "../../../utils/config";
-import { useParams } from "react-router-dom";
-import { addsafetyEquipment, fetchsafetyEquipment, updatesafetyEquipment } from "../../../redux/slices/safetyEquipmentSlice";
+
 import { useDispatch, useSelector } from "react-redux";
 
 const SafetyEquipment = () => {
@@ -401,36 +401,10 @@ const SafetyEquipment = () => {
     setFormData({ ...formData, equipmentChecklist: updatedChecklist });
   };
 
-  const HandleDelete = (id) => {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(deletesitereview(id))
-          .then(() => {
-            Swal.fire(
-              'Deleted!',
-              'The site entry has been deleted.',
-              'success'
-            );
-            dispatch(fetchsitereview());  // Refresh the table after delete
-          })
-          .catch((error) => {
-            Swal.fire(
-              'Error!',
-              'Something went wrong.',
-              'error'
-            );
-          });
-      }
-    });
-  };
+ 
+
+
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();

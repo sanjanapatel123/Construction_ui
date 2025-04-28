@@ -8,8 +8,7 @@ export const fetchAnnotations = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`${apiUrl}/annotation`);
-      return response.data;  // Ensure that this returns the correct structure
-      
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
@@ -26,7 +25,7 @@ export const createAnnotation = createAsyncThunk(
           'Content-Type': 'multipart/form-data',
         },
       });
-      return response.data;  // Ensure response contains the created annotation
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
@@ -38,8 +37,25 @@ export const deleteAnnotation = createAsyncThunk(
   'annotation/deleteAnnotation',
   async (id, { rejectWithValue }) => {
     try {
-       await axiosInstance.delete(`${apiUrl}/annotation/${id}`);
-      return id; // Returning the id to delete it from the state
+      await axiosInstance.delete(`${apiUrl}/annotation/${id}`);
+      return id;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// 📌 UPDATE an annotation
+export const updateAnnotation = createAsyncThunk(
+  'annotation/updateAnnotation',
+  async ({ id, updatedData }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.patch(`${apiUrl}/annotation/${id}`, updatedData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      return response.data; // return updated annotation
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
@@ -50,7 +66,7 @@ const annotationSlice = createSlice({
   name: 'annotation',
   initialState: {
     annotations: [],
-    status: 'idle', // Default status
+    status: 'idle',
     error: null,
   },
   reducers: {},
@@ -68,10 +84,9 @@ const annotationSlice = createSlice({
         state.status = 'failed';
         state.error = action.payload;
       })
-      
+
       // 📌 Create Annotation
       .addCase(createAnnotation.fulfilled, (state, action) => {
-        // If not already present, add the new annotation
         state.annotations.push(action.payload);
       })
       .addCase(createAnnotation.rejected, (state, action) => {
@@ -82,10 +97,24 @@ const annotationSlice = createSlice({
       // 📌 Delete Annotation
       .addCase(deleteAnnotation.fulfilled, (state, action) => {
         state.annotations = state.annotations.filter(
-          (annotation) => annotation.id !== action.payload  // Ensure using the correct field
+          (annotation) => annotation.id !== action.payload
         );
       })
       .addCase(deleteAnnotation.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      })
+
+      // 📌 Update Annotation
+      .addCase(updateAnnotation.fulfilled, (state, action) => {
+        const index = state.annotations.findIndex(
+          (annotation) => annotation.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.annotations[index] = action.payload; // Replace with updated one
+        }
+      })
+      .addCase(updateAnnotation.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
       });
