@@ -22,6 +22,7 @@ import annotationReducer from "./slices/annotationSlice";
 
 import safetyEquipmentSlice from "./slices/safetyEquipmentSlice";
 import documentSlice from "./slices/documentSlice"
+import toolboxTalkReducer from "./slices/toolboxTalkSlice";
 
 export const store = configureStore({
   reducer: {
@@ -43,5 +44,6 @@ export const store = configureStore({
        safetyequipments: safetyEquipmentSlice,
       annotations: annotationReducer,
       document: documentSlice,
+        toolboxTalks: toolboxTalkReducer,
   }
 });
