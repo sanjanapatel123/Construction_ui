@@ -15,17 +15,21 @@ const OpenBim = () => {
   const [activeTool, setActiveTool] = useState('select');
   const [selectedElement, setSelectedElement] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editAnnotation, setEditAnnotation] = useState(null);
   
    const dispatch = useDispatch();
    useEffect(() => {
     dispatch(fetchAnnotations());
   }, [dispatch]);
-
+ 
 
   // Use the selector to get the annotations state
   const annotations = useSelector((state) => state.annotations.annotations.data);
   console.log(annotations);
-
+  const handleEditAnnotation = (element) => {
+    setEditAnnotation(element); // set the element to edit
+    setIsModalOpen(true);
+  };
   const openModal = () => {
     setIsModalOpen(true); // Open modal
   };
@@ -567,7 +571,7 @@ const OpenBim = () => {
                     <i className="fas fa-plus mr-1"></i> New
                   </button>
                   {isModalOpen && (
-        <NewAnnotationForm   closeModal={closeModal} />
+        <NewAnnotationForm   closeModal={closeModal} editData={editAnnotation} />
       )}
                 </div>
                 <div className="space-y-3">{
@@ -582,7 +586,7 @@ const OpenBim = () => {
                         <div className="text-xs text-gray-500">By: {annotation?.author}</div>
                         <div className="flex gap-2">
                           
-                          <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
+                          <button className="text-gray-500 hover:text-gray-700 cursor-pointer" onClick={() => handleEditAnnotation(annotation)}>
                             <i className="fas fa-edit"></i>
                           </button>
                           <button className="text-gray-500 hover:text-gray-700 cursor-pointer" onClick={() => delete_annotation(annotation?._id)}>
