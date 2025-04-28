@@ -23,6 +23,7 @@ import elementReducer from "./slices/elementSlice";
 
 import safetyEquipmentSlice from "./slices/safetyEquipmentSlice";
 import documentSlice from "./slices/documentSlice"
+import toolboxTalkReducer from "./slices/toolboxTalkSlice";
 import taskManagementSlice from "./slices/taskManagement"
 
 
@@ -46,8 +47,9 @@ export const store = configureStore({
       annotations: annotationReducer,
       elements: elementReducer,
        safetyequipments: safetyEquipmentSlice,
-      annotations: annotationReducer,
+      // annotations: annotationReducer,
       document: documentSlice,
+        toolboxTalks: toolboxTalkReducer,
       task : taskManagementSlice,
   }
 });
