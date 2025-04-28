@@ -38,9 +38,9 @@ export const fetchEquipment = createAsyncThunk(
 // Update Equipment
 export const updateEquipment = createAsyncThunk(
   'equipment/updateEquipment',
-  async ({ id, updatedData }, thunkAPI) => {
+  async ({ id, equipmentData }, thunkAPI) => {
     try {
-      const response = await axiosInstance.patch(`${apiUrl}/equipment/${id}`, updatedData, {
+      const response = await axiosInstance.patch(`${apiUrl}/equipment/${id}`, equipmentData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
       return response.data;
