@@ -308,6 +308,9 @@ import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
 import { addsafetyEquipment, deletesafetyEquipment, fetchsafetyEquipment, updatesafetyEquipment } from "../../../redux/slices/safetyEquipmentSlice";
+import axiosInstance from "../../../utils/axiosInstance";
+import { apiUrl } from "../../../utils/config";
+
 import { useDispatch, useSelector } from "react-redux";
 
 const SafetyEquipment = () => {
@@ -434,6 +437,13 @@ const SafetyEquipment = () => {
     };
 
     try {
+      const response = await axiosInstance.post(`${apiUrl}/safety`, payload, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("Success:", response.data);
+      toast.success("Assignment submitted successfully!");
       if (id) {
         // Update
         await dispatch(updatesafetyEquipment({ id, updatedForm: payload })).unwrap()

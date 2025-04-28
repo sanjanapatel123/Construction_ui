@@ -1,95 +1,216 @@
-import React from 'react';
-import { Form, Button, Row, Col } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { Form, Button, Row, Col } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { apiUrl } from "../../../utils/config";
+import axiosInstance from "../../../utils/axiosInstance";
+import { toast } from "react-toastify";
 
 function AddToolboxTalks() {
+  const [formData, setFormData] = useState({
+    title: "",
+    date: "",
+    time: "",
+    presenter: "",
+    participants: [],
+    description: "",
+    status: "Pending", // default status
+    image: null,
+  });
+
+   const [workersList, setWorkersList] = useState([]); 
+
+  // Handle change for normal inputs
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  // Handle participants (multiple select)
+  const handleParticipantsChange = (e) => {
+    const selectedOptions = Array.from(e.target.selectedOptions).map(
+      (option) => option.value
+    );
+    setFormData((prevData) => ({
+      ...prevData,
+      participants: selectedOptions,
+    }));
+  };
+
+  // Handle file upload
+  const handleFileChange = (e) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      image: e.target.files[0],
+    }));
+  };
+
+  // Submit form
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const payload = new FormData();
+      payload.append("title", formData.title);
+      payload.append("date", formData.date);
+      payload.append("time", formData.time);
+      payload.append("presenter", formData.presenter);
+      payload.append("participants", formData.participants.join(", ")); // convert array to comma-separated
+      payload.append("description", formData.description);
+      payload.append("status", formData.status);
+      if (formData.image) {
+        payload.append("image", formData.image);
+      }
+
+      const response = await axiosInstance.post(`${apiUrl}/toolbox`, payload, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("Toolbox Talk Created Successfully:", response.data);
+      toast.success("Toolbox Talk Created Successfully!");
+      // You can redirect or clear form here
+    } catch (error) {
+      console.error("Error creating Toolbox Talk:", error);
+      toast.error("Failed to create Toolbox Talk.");
+    }
+  };
+
   return (
-    <div>
-        <div className="container mt-2">
-            <div className="mx-auto" >
-                <Form className="p-4 border rounded bg-white shadow-sm">
-                    <div className='d-flex justify-content-between'>
-                <h4 className="mb-4 fw-semibold">Create New Toolbox Talk</h4>
-                <Link to="/toolbox"><button className='btn ' style={{backgroundColor:"#0d6efd",color:"white"}}><i class="fa-solid fa-arrow-left me-2"></i>Back</button></Link>
-                </div>
-                    <Form.Group className="mb-3">
-                        <Form.Label className="fw-semibold">Title</Form.Label>
-                        <Form.Control type="text" placeholder="E.g., Safe Lifting Techniques" />
-                    </Form.Group>
+    <div className="container mt-2">
+      <div className="mx-auto">
+        <Form
+          className="p-4 border rounded bg-white shadow-sm"
+          onSubmit={handleSubmit}
+        >
+          <div className="d-flex justify-content-between">
+            <h4 className="mb-4 fw-semibold">Create New Toolbox Talk</h4>
+            <Link to="/toolbox">
+              <button
+                className="btn"
+                style={{ backgroundColor: "#0d6efd", color: "white" }}
+              >
+                <i className="fa-solid fa-arrow-left me-2"></i>Back
+              </button>
+            </Link>
+          </div>
 
-                    <Row className="mb-3">
-                        <Col>
-                            <Form.Group>
-                                <Form.Label className="fw-semibold">Date</Form.Label>
-                                <Form.Control type="date" />
-                            </Form.Group>
-                        </Col>
-                        <Col>
-                            <Form.Group>
-                                <Form.Label className="fw-semibold">Time</Form.Label>
-                                <Form.Control type="time" />
-                            </Form.Group>
-                        </Col>
-                    </Row>
+          <Form.Group className="mb-3">
+            <Form.Label className="fw-semibold">Title</Form.Label>
+            <Form.Control
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              placeholder="E.g., Safe Lifting Techniques"
+            />
+          </Form.Group>
 
-                    <Row className="mb-3">
-                        <Col>
-                            <Form.Group>
-                                <Form.Label className="fw-semibold">Presenter</Form.Label>
-                                <Form.Select>
-                                    <option>Select Presenter</option>
-                                </Form.Select>
-                            </Form.Group>
-                        </Col>
-                        <Col>
-                            <Form.Group>
-                                <Form.Label className="fw-semibold">Participants</Form.Label>
-                                <Form.Select multiple style={{ height: '122px' }}>
-                                    <option>Team A</option>
-                                    <option>Team B</option>
-                                    <option>Team C</option>
-                                    <option>John Smith</option>
-                                    <option>Sarah Johnson</option>
-                                </Form.Select>
-                            </Form.Group>
-                        </Col>
-                    </Row>
+          <Row className="mb-3">
+            <Col>
+              <Form.Group>
+                <Form.Label className="fw-semibold">Date</Form.Label>
+                <Form.Control
+                  type="date"
+                  name="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Label className="fw-semibold">Time</Form.Label>
+                <Form.Control
+                  type="time"
+                  name="time"
+                  value={formData.time}
+                  onChange={handleChange}
+                />
+              </Form.Group>
+            </Col>
+          </Row>
 
-                    <Form.Group className="mb-3">
-                        <Form.Label className="fw-semibold">Description & Objectives</Form.Label>
-                        <Form.Control as="textarea" placeholder="Add objectives & key discussion points" rows={4} />
-                    </Form.Group>
+          <Row className="mb-3">
+            <Col>
+              <Form.Group>
+                <Form.Label className="fw-semibold">Presenter</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="presenter"
+                  value={formData.presenter}
+                  onChange={handleChange}
+                  placeholder="Enter presenter name"
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Label className="fw-semibold">Participants</Form.Label>
+                <Form.Select
+                  multiple
+                  style={{ height: "122px" }}
+                  value={formData.participants}
+                  onChange={handleParticipantsChange}
+                >
+                  {workersList.map((worker) => (
+                    <option key={worker._id} value={worker._id}>
+                      {worker.firstName} {worker.lastName}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+            </Col>
+          </Row>
 
-                    <Form.Group className="mb-3">
-                        <Form.Label className="fw-semibold">Attachments</Form.Label>
-                        <div className="border p-3 rounded d-flex align-items-center justify-content-center" style={{ height: '70px', cursor: 'pointer' }}>
-                            <i className="bi bi-upload fs-4 me-2"></i>
-                            <span className="text-muted">Upload file</span>
-                        </div>
-                    </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label className="fw-semibold">
+              Description & Objectives
+            </Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={4}
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Add objectives & key discussion points"
+            />
+          </Form.Group>
 
-                    <Form.Group className="form-check mb-4">
-                        <Form.Check
-                            type="checkbox"
-                            label="Mark as Mandatory Attendance"
-                            className="fw-semibold"
-                        />
-                    </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label className="fw-semibold">Attachments</Form.Label>
+            <Form.Control
+              type="file"
+              name="image"
+              onChange={handleFileChange}
+            />
+          </Form.Group>
 
-                    <div className="d-flex justify-content-end">
-                        <Button variant="light" className="me-2 px-4">
-                            Cancel
-                        </Button>
-                        <Button variant="primary" className="px-4">
-                            Save & Schedule
-                        </Button>
-                    </div>
-                </Form>
-            </div>
-        </div>
+          {/* Optional: Checkbox for Mandatory Attendance */}
+          {/* <Form.Group className="form-check mb-4">
+            <Form.Check
+              type="checkbox"
+              label="Mark as Mandatory Attendance"
+              className="fw-semibold"
+            />
+          </Form.Group> */}
 
+          <div className="d-flex justify-content-end">
+            <Button variant="light" className="me-2 px-4" type="button">
+              Cancel
+            </Button>
+            <Button variant="primary" className="px-4" type="submit">
+              Save & Schedule
+            </Button>
+          </div>
+        </Form>
+      </div>
     </div>
-  )
+  );
 }
 
-export default AddToolboxTalks
+export default AddToolboxTalks;

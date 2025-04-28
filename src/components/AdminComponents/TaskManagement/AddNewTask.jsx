@@ -55,11 +55,13 @@ const AddNewTask = () => {
     useEffect(() => {
       if (id && tasks.length > 0) {
         const existingEntry = tasks.find((task) => task._id === id);
+        console.log("existing ",existingEntry)
+        console.log("assgn", existingEntry.assignTo)
         if (existingEntry) {
           setTaskDetails({
             taskTitle: existingEntry.taskTitle,
             description: existingEntry?.description,
-            assignTo: existingEntry.assignTo,
+            assignTo: existingEntry.assignTo._id,
             dueDate: existingEntry.dueDate,
             priority: existingEntry.priority,
             category: existingEntry.category,
@@ -105,7 +107,7 @@ const AddNewTask = () => {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4 mt-4">
-        <h2>Create New Task</h2>
+        <h2> { id ? "Update Task" : "Create New Task"}</h2>
         <button
           onClick={() => navigate(-1)}
           className="btn "
@@ -145,8 +147,8 @@ const AddNewTask = () => {
           <Form.Label>Assigned To</Form.Label>
           <Form.Select name="assignTo" value={taskDetails.assignTo} onChange={handleInputChange}>
             <option value="">Select assignee</option>
-            <option value="09797976">John Doe</option>
-            <option value="Jane Smith">Jane Smith</option>
+            <option value="68078c13c78a4e929267accc">John Doe</option>
+            <option value="68078c13c78a4e929267accc">Jane Smith</option>
             <option value="Alex Johnson">Alex Johnson</option>
             {/* Add more options as needed */}
           </Form.Select>

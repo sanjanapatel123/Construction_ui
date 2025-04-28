@@ -167,11 +167,26 @@ export const deletesafetyEquipment = createAsyncThunk(
   }
 );
 
+
+// ✅ FETCH SINGLE
+export const fetchSingleSafetyEquipment = createAsyncThunk(
+  "safety/fetchSingleSafetyEquipment",
+  async (id, thunkAPI) => {
+    try {
+      const response = await axiosInstance.get(`${apiUrl}/safety/${id}`);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data || error.message || "error fetching single safetyEquipment");
+    }
+  }
+);
+
 // SLICE
 const safetyEquipmentSlice = createSlice({
   name: "safetyEquipment",
   initialState: {
     safetyequipments: [],
+     singleSafetyEquipment: null, 
     loading: false,
     error: null,
   },
@@ -191,6 +206,21 @@ const safetyEquipmentSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
+        // ✅ FETCH SINGLE
+      .addCase(fetchSingleSafetyEquipment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSingleSafetyEquipment.fulfilled, (state, action) => {
+        state.loading = false;
+        state.singleSafetyEquipment = action.payload;
+      })
+      .addCase(fetchSingleSafetyEquipment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
 
       // FETCH
       .addCase(fetchsafetyEquipment.pending, (state) => {

@@ -81,6 +81,7 @@ import SuperadminSetting from "./components/SuperAdmin/SuperadminSetting";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SafetyEquipmentList from "./components/AdminComponents/SafetyEquipment/SafetyEquipmentList";
+import SafetyEquipmentDetails from "./components/AdminComponents/SafetyEquipment/SafetyEquipmentDetails";
 
 function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
@@ -165,6 +166,7 @@ function App() {
             <Route path="/helpSupport" element={<HelpSupport></HelpSupport>} />
             <Route path="/TaskDashboard" element={<TaskManagement />} />
             <Route path="/create-task" element={<AddNewTask />} />
+            <Route path="/updatetask/:id" element={<AddNewTask />} />
             <Route path="/announcements" element={<Announcements />} />
             <Route path="/AddAnnouncements" element={<AddAnnouncements />} />
             <Route path="/rfis" element={<RFIs />} />
@@ -293,6 +295,8 @@ function App() {
             <Route path="/AddSafety" element={<SafetyEquipment />} />
             <Route path="/AddSafety/:id" element={<SafetyEquipment />} />
            <Route path="/view-service" element={<ViewServicePage />} />
+           <Route path="/safety-equipment/:id" element={<SafetyEquipmentDetails />} />
+
             {/* <Route
               path="/equipment-details"
               element={<EquipmentDetailsPage />}
