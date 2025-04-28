@@ -164,7 +164,7 @@
 import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Button, Table, Form } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { fetchsafetyEquipment } from "../../../redux/slices/safetyEquipmentSlice";
 
 
@@ -177,6 +177,7 @@ const SafetyEquipmentList = () => {
 
   const dispatch = useDispatch();
 
+  const navigate = useNavigate();
   useEffect(() => {
     dispatch(fetchsafetyEquipment());
   }, [dispatch]);
@@ -256,9 +257,9 @@ const SafetyEquipmentList = () => {
             onChange={(e) => setFilterCondition(e.target.value)}
           >
             <option value="">Filter by Condition</option>
-            <option>New</option>
-            <option>Used</option>
-            <option>Damaged</option>
+            <option value="new">New</option>
+            <option value="used">Used</option>
+            <option value="damaged">Damaged</option>
           </Form.Select>
         </Col>
         <Col md={4}>
@@ -305,12 +306,15 @@ const SafetyEquipmentList = () => {
                   <td>{item.assignedBy}</td>
                   <td>
                     <div className="d-flex gap-2">
-                      <button className="btn text-primary p-0">
+                    <button className="btn text-info p-0">
+                        <i className="fa fa-eye "></i>
+                        </button>
+                      <button className="btn text-primary p-0" onClick={() => navigate(`/AddSafety/${item._id}`)}>
                         <i className="fa-solid fa-pen-to-square"></i>
                       </button>
-                      <button className="btn text-info p-0">
-                        <i className="fa-solid fa-eye"></i>
-                      </button>
+                      
+                      
+                     
                       <button className="btn text-dark p-0">
                         <i className="fas fa-trash text-danger"></i>
                       </button>

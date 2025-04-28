@@ -291,7 +291,8 @@ function App() {
             <Route path="/PlantMachinery" element={<PlantMachinery />} />
             <Route path="/AddToolRegistry" element={<AddToolRegistry />} />
             <Route path="/AddSafety" element={<SafetyEquipment />} />
-            <Route path="/view-service" element={<ViewServicePage />} />
+            <Route path="/AddSafety/:id" element={<SafetyEquipment />} />
+           <Route path="/view-service" element={<ViewServicePage />} />
             {/* <Route
               path="/equipment-details"
               element={<EquipmentDetailsPage />}
