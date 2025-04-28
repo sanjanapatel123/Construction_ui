@@ -81,6 +81,7 @@ import SuperadminSetting from "./components/SuperAdmin/SuperadminSetting";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SafetyEquipmentList from "./components/AdminComponents/SafetyEquipment/SafetyEquipmentList";
+import SafetyEquipmentDetails from "./components/AdminComponents/SafetyEquipment/SafetyEquipmentDetails";
 
 function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
@@ -156,6 +157,10 @@ function App() {
             <Route path="/AddToolRegistry" element={<AddToolRegistry />} />
             <Route path="/AddToolRegistry/:id" element={<AddToolRegistry />} />
             <Route path="/AddEquipment" element={<AddEquipment />} />
+            <Route path="/AddEquipment/:id" element={<AddEquipment />} />
+
+            <Route path="/equipment-details/:id" element={<EquipmentDetailsPage />} />
+
             {/* <Route path="/AddServices" element={<AddServices/>} /> */}
             <Route path="/messenger" element={<Messenger />} />
             <Route path="/helpSupport" element={<HelpSupport></HelpSupport>} />
@@ -287,11 +292,14 @@ function App() {
             <Route path="/PlantMachinery" element={<PlantMachinery />} />
             <Route path="/AddToolRegistry" element={<AddToolRegistry />} />
             <Route path="/AddSafety" element={<SafetyEquipment />} />
-            <Route path="/view-service" element={<ViewServicePage />} />
-            <Route
+            <Route path="/AddSafety/:id" element={<SafetyEquipment />} />
+           <Route path="/view-service" element={<ViewServicePage />} />
+           <Route path="/safety-equipment/:id" element={<SafetyEquipmentDetails />} />
+
+            {/* <Route
               path="/equipment-details"
               element={<EquipmentDetailsPage />}
-            />
+            /> */}
             <Route
               path="/addEquipment"
               element={<SafetyEquipment></SafetyEquipment>}

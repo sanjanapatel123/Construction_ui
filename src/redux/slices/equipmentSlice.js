@@ -245,7 +245,7 @@ export const updateEquipment = createAsyncThunk(
   'equipment/updateEquipment',
   async ({ id, updatedData }, thunkAPI) => {
     try {
-      const response = await axiosInstance.put(`${apiUrl}/equipment/${id}`, updatedData, {
+      const response = await axiosInstance.patch(`${apiUrl}/equipment/${id}`, updatedData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
       return response.data;
@@ -298,7 +298,7 @@ const equipmentSlice = createSlice({
       })
       .addCase(addEquipment.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.equipments =action.payload;
+        state.equipments.push(action.payload);
       })
       .addCase(addEquipment.rejected, (state, action) => {
         state.status = 'failed';
