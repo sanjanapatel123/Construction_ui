@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Button, Dropdown, Form } from 'react-bootstrap';
+import { useDispatch,useSelector } from 'react-redux';
+import { createElement,fetchElements } from '../../../redux/slices/elementSlice';
 
 const AddElementModal = ({ closeModal }) => {
   const [show, setShow] = useState(false);
   const [category, setCategory] = useState('');
   const [element, setElement] = useState('');
-  const [details, setDetails] = useState({
-    name: '',
-    description: '', 
-    dimensions: '',
-  });
+  const [details, setDetails] = useState('');
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -20,6 +18,13 @@ const AddElementModal = ({ closeModal }) => {
   const structuralElements = ['Columns', 'Beams', 'Floors'];
   const mepSystems = ['HVAC', 'Plumbing', 'Electrical'];
 
+  const dispatch = useDispatch();
+ useEffect(()=>{
+  dispatch(fetchElements());
+ })
+//  const elements = useSelector((state) => state);
+//  console.log(elements)
+
   const handleCategorySelect = (selectedCategory) => {
     setCategory(selectedCategory);
     setElement(''); // Reset the element when category changes
@@ -29,16 +34,17 @@ const AddElementModal = ({ closeModal }) => {
     setElement(selectedElement);
   };
 
-  const handleDetailChange = (e) => {
-    const { name, value } = e.target;
-    setDetails({
-      ...details,
-      [name]: value,
-    });
-  };
+  // const handleDetailChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setDetails({
+  //     ...details,
+  //     [name]: value,
+  //   });
+  // };
 
   const handleAddElement = () => {
     // Handle adding the element here
+    dispatch(createElement({ category, element, details }));
     console.log('Element added:', category, element, details);
   { closeModal };
   };
@@ -113,8 +119,8 @@ const AddElementModal = ({ closeModal }) => {
                   <Form.Control
                     type="text"
                     name="description"
-                    value={details.description}
-                    onChange={handleDetailChange}
+                    value={details}
+                    onChange={(e)=>{setDetails(e.target.value)}}
                     placeholder="Enter Details"
                     as="textarea"
                     rows={5}

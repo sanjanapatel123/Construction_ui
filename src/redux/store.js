@@ -19,7 +19,7 @@ import rfiSliceReducer from './slices/rfiSlice.js'
 
 import defectReducer from "./slices/defectSlice";
 import annotationReducer from "./slices/annotationSlice";
-
+import elementReducer from "./slices/elementSlice";
 export const store = configureStore({
   reducer: {
       projects: projectReducer,
@@ -37,6 +37,7 @@ export const store = configureStore({
       announcements:announcementReducer,
       rfi:rfiSliceReducer,
        defects: defectReducer,
-      annotations: annotationReducer
+      annotations: annotationReducer,
+      elements: elementReducer
   }
 });
