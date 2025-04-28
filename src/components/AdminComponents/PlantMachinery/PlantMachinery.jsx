@@ -523,12 +523,12 @@ function PlantMachinery() {
       <h3 className="mb-4">Plant & Machinery</h3>
       {/* Statistics Overview */}
       <div className="row g-3 mb-4">
-        <div className="col-md-3">
+        <div className="col-md-4">
           <div className="bg-white p-3 rounded shadow-sm">
             <div className="d-flex justify-content-between align-items-center">
               <div>
                 <h6 className="text-muted mb-1">Total Equipment</h6>
-                <h3 className="mb-0">248</h3>
+                <h3 className="mb-0">{equipments.length}</h3>
               </div>
               <div className="bg-light rounded p-2">
                 <i className="fas fa-tools fa-lg text-dark"></i>
@@ -536,25 +536,25 @@ function PlantMachinery() {
             </div>
           </div>
         </div>
-        <div className="col-md-3">
+        {/* <div className="col-md-3">
           <div className="bg-white p-3 rounded shadow-sm">
             <div className="d-flex justify-content-between align-items-center">
               <div>
                 <h6 className="text-muted mb-1">Active Equipment</h6>
-                <h3 className="mb-0">186</h3>
+                <h3 className="mb-0">{equipments.filter((equipment) => equipment.status === "Active").length}</h3>
               </div>
               <div className="bg-light rounded p-2">
                 <i className="fas fa-check-circle fa-lg text-success"></i>
               </div>
             </div>
           </div>
-        </div>
-        <div className="col-md-3">
+        </div> */}
+        <div className="col-md-4">
           <div className="bg-white p-3 rounded shadow-sm">
             <div className="d-flex justify-content-between align-items-center">
               <div>
                 <h6 className="text-muted mb-1">Total Tools</h6>
-                <h3 className="mb-0">127</h3>
+                <h3 className="mb-0">{tools.length}</h3>
               </div>
               <div className="bg-light rounded p-2">
                 <i className="fas fa-wrench fa-lg text-warning"></i>
@@ -562,7 +562,7 @@ function PlantMachinery() {
             </div>
           </div>
         </div>
-        <div className="col-md-3">
+        <div className="col-md-4">
           <div className="bg-white p-3 rounded shadow-sm">
             <div className="d-flex justify-content-between align-items-center">
               <div>

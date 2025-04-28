@@ -11,7 +11,7 @@ export const fetchITPs = createAsyncThunk('itps/fetchITPs', async (_, { rejectWi
     const response = await axiosInstance.get(`${apiUrl}/itps/`);
     return response.data;
   } catch (error) {
-    toast.error("Failed to fetch ITPs");
+   
     return rejectWithValue(error?.response?.data?.message || "Failed to fetch ITPs");
   }
 });

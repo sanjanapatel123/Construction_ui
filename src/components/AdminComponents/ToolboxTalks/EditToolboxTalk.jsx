@@ -44,6 +44,7 @@ function EditToolboxTalk() {
       try {
         const toolboxRes = await axiosInstance.get(`${apiUrl}/toolbox/${id}`);
         const data = toolboxRes.data.data;
+        console.log(data);
 
         setFormData({
           title: data.title || "",

@@ -315,6 +315,8 @@ function App() {
             <Route path="/messenger" element={<Messenger />} />
             <Route path="/announcements" element={<Announcements />} />
             <Route path="/AddAnnouncements" element={<AddAnnouncements />} />
+            <Route path="/EditAnnouncements/:id" element={<AddAnnouncements />} />
+
             <Route path="/rfis" element={<RFIs />} />
             <Route path="/AddRFIs" element={<AddRFIs />} />
             <Route path="/toolbox" element={<ToolboxTalks />} />
