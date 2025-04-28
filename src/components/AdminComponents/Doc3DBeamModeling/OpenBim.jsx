@@ -5,7 +5,8 @@ import Toolbar from './ToolBar';
 import NewAnnotationForm from './NewAnnotationForm';
 import { fetchAnnotations , deleteAnnotation} from '../../../redux/slices/annotationSlice';
 import { useDispatch, useSelector } from 'react-redux';
-// import AddElementModal from './AddElimentModal';
+import AddElementModal from './AddElimentModal';
+import { formatDistanceToNow } from 'date-fns';
 const OpenBim = () => {
   const [activeModelTab, setActiveModelTab] = useState('building');
   const [activeSidePanel, setActiveSidePanel] = useState('details');
@@ -23,11 +24,8 @@ const OpenBim = () => {
 
   // Use the selector to get the annotations state
   const annotations = useSelector((state) => state.annotations.annotations.data);
+  console.log(annotations);
 
-  // Log the annotations state when it updates
-  useEffect(() => {
-    console.log("Annotations data:", annotations);
-  }, [annotations]);
   const openModal = () => {
     setIsModalOpen(true); // Open modal
   };
@@ -221,10 +219,13 @@ const OpenBim = () => {
           </div>
 
           <div className="p-4 border-t border-gray-200">
-            <button className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-indigo-700 !rounded-button whitespace-nowrap">
-              <i className="fas fa-plus"></i>
-              Add Element
-            </button>
+            {/* <button className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-indigo-700 !rounded-button whitespace-nowrap"> */}
+              {/* <i className="fas fa-plus"></i> */}
+              {/* Add Element */}
+            {/* </button> */}
+            
+                  
+        <AddElementModal/>
           </div>
         </div>
                 {/* Left Toolbar */}
@@ -570,21 +571,21 @@ const OpenBim = () => {
       )}
                 </div>
                 <div className="space-y-3">{
-                  annotations.map((annotation) => (
-                    <div key={annotation.id} className="p-3 bg-gray-50 rounded-md border border-gray-200">
+                  annotations?.map((annotation) => (
+                    <div key={annotation?._id} className="p-3 bg-gray-50 rounded-md border border-gray-200">
                       <div className="flex justify-between items-start mb-2">
-                        <div className="font-medium text-gray-800">{annotation.title}</div>
-                        <div className="text-xs text-gray-500">3d ago</div>
+                        <div className="font-medium text-gray-800">{annotation?.title}</div>
+                        <div className="text-xs text-gray-500"> {formatDistanceToNow(new Date(annotation?.createdAt))}</div>
                       </div>
-                      <p className="text-sm text-gray-600 mb-2">{annotation.description}</p>
+                      <p className="text-sm text-gray-600 mb-2">{annotation?.description}</p>
                       <div className="flex justify-between items-center">
-                        <div className="text-xs text-gray-500">By: {annotation.author}</div>
+                        <div className="text-xs text-gray-500">By: {annotation?.author}</div>
                         <div className="flex gap-2">
                           
                           <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
                             <i className="fas fa-edit"></i>
                           </button>
-                          <button className="text-gray-500 hover:text-gray-700 cursor-pointer" onClick={() => delete_annotation(annotation._id)}>
+                          <button className="text-gray-500 hover:text-gray-700 cursor-pointer" onClick={() => delete_annotation(annotation?._id)}>
                             <i className="fas fa-trash"></i>
                           </button>
                         </div>
