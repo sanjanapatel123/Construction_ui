@@ -14,7 +14,7 @@ const EquipmentDetailsPage = () => {
  
   useEffect(() => {
     dispatch(fetchEquipment());
-  })
+  }, [dispatch])
 
   if (!equipment) {
     return <div>Equipment not found</div>;
