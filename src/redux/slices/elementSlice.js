@@ -7,7 +7,7 @@ export const fetchElements = createAsyncThunk(
   'element/fetchElements',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get(`${apiUrl}/buildingCategory `);
+      const response = await axiosInstance.get(`${apiUrl}/buildingCategory`);
       return response.data;  // Ensure that this returns the correct structure
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -22,7 +22,7 @@ export const createElement = createAsyncThunk(
     try {
       const response = await axiosInstance.post(`${apiUrl}/buildingCategory`, submissionData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type':  'application/json',  
         },
       });
       return response.data;  // Ensure response contains the created element

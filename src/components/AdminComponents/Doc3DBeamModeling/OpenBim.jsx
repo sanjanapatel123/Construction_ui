@@ -6,11 +6,13 @@ import NewAnnotationForm from './NewAnnotationForm';
 import { fetchAnnotations , deleteAnnotation} from '../../../redux/slices/annotationSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import AddElementModal from './AddElimentModal';
-import { formatDistanceToNow, set } from 'date-fns';
+import { formatDistanceToNow} from 'date-fns';
+import { fetchElements } from '../../../redux/slices/elementSlice';
 const OpenBim = () => {
   const [activeModelTab, setActiveModelTab] = useState('building');
   const [activeSidePanel, setActiveSidePanel] = useState('details');
   const [viewMode, setViewMode] = useState('solid');
+  const [details ,  setDetails] = useState("Select an element in the model to view its details");
 
   const [activeTool, setActiveTool] = useState('select');
   const [selectedElement, setSelectedElement] = useState(null);
@@ -25,7 +27,11 @@ const OpenBim = () => {
     dispatch(fetchAnnotations());
     
   }, [isModalOpen,dispatch]);
- 
+  useEffect(()=>{
+    dispatch(fetchElements());
+  },[]);
+  const elements = useSelector((state)=>state?.elements?.elements?.data);
+  console.log("elements",elements);
   const annotations = useSelector((state) => state.annotations.annotations.data);
 
   // Use the selector to get the annotations state
@@ -158,77 +164,122 @@ const OpenBim = () => {
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            <div className="px-3">
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-2 px-2">
-                  <span className="text-sm font-medium text-gray-700">Building Elements</span>
-                  <i className="fas fa-chevron-down text-gray-500 text-xs"></i>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
+  {/* {elements?.map((item) => { */}
+    {/* return ( */}
+      <div className="px-3" > {/* Ensure key is unique */}
+        {/* Building Elements Section */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2 px-2">
+            <span className="text-sm font-medium text-gray-700">Building Elements</span>
+            <i className="fas fa-chevron-down text-gray-500 text-xs"></i>
+          </div>
+          {elements && elements[0]?.subcategories?.map((el) => {
+            return (
+              <div className="space-y-1" key={el?.name}> {/* Ensure key is unique */}
+
+                {el?.name === "Walls" && (
+                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer" onClick={()=>{setDetails(el?.description)}}>
                     <i className="fas fa-square-full text-blue-500 mr-2"></i>
                     Walls
                   </div>
-                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
+                )}
+
+                {el?.name === "Doors" && (
+                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer" onClick={()=>{setDetails(el?.description)}}>
                     <i className="fas fa-door-open text-red-500 mr-2"></i>
                     Doors
                   </div>
-                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
+                )}
+
+                {el?.name === "Windows" && (
+                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer" onClick={()=>{setDetails(el?.description)}}>
                     <i className="fas fa-window-maximize text-cyan-500 mr-2"></i>
                     Windows
                   </div>
-                </div>
+                )}
               </div>
+            );
+          })}
+        </div>
 
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-2 px-2">
-                  <span className="text-sm font-medium text-gray-700">Structural Elements</span>
-                  <i className="fas fa-chevron-down text-gray-500 text-xs"></i>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
-                    <i className="fas fa-columns text-purple-500 mr-2"></i>
-                    Columns
-                  </div>
-                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
-                    <i className="fas fa-grip-lines text-green-500 mr-2"></i>
-                    Beams
-                  </div>
-                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
-                    <i className="fas fa-layer-group text-yellow-500 mr-2"></i>
-                    Floors
-                  </div>
-                </div>
-              </div>
+        {/* Structural Elements Section */}
+         <div className="mb-6">
+  <div className="flex items-center justify-between mb-2 px-2">
+    <span className="text-sm font-medium text-gray-700">Structural Elements</span>
+    <i className="fas fa-chevron-down text-gray-500 text-xs"></i>
+  </div>
+  {elements && elements[1]?.subcategories?.map((el) => {
+    return (
+      <div className="space-y-1" key={el?.name}> {/* Ensure key is unique */}
 
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-2 px-2">
-                  <span className="text-sm font-medium text-gray-700">MEP Systems</span>
-                  <i className="fas fa-chevron-down text-gray-500 text-xs"></i>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
-                    <i className="fas fa-wind text-blue-400 mr-2"></i>
-                    HVAC
-                  </div>
-                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
-                    <i className="fas fa-faucet text-indigo-400 mr-2"></i>
-                    Plumbing
-                  </div>
-                  <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
-                    <i className="fas fa-bolt text-orange-400 mr-2"></i>
-                    Electrical
-                  </div>
-                </div>
-              </div>
-            </div>
+        {el?.name === "Columns" && (
+          <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer" onClick={()=>{setDetails(el?.description)}}>
+            <i className="fas fa-columns text-purple-500 mr-2"></i>
+            Columns
           </div>
+        )}
+
+        {el?.name === "Beams" && (
+          <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer" onClick={()=>{setDetails(el?.description)}}>
+            <i className="fas fa-grip-lines text-green-500 mr-2"></i>
+            Beams
+          </div>
+        )}
+
+        {el?.name === "Floors" && (
+          <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer"onClick={()=>{setDetails(el?.description)}}>
+            <i className="fas fa-layer-group text-yellow-500 mr-2"></i>
+            Floors
+          </div>
+        )}
+      </div>
+    );
+  })}
+</div>
+
+
+        {/* MEP Systems Section */}
+        <div className="mb-6">
+  <div className="flex items-center justify-between mb-2 px-2">
+    <span className="text-sm font-medium text-gray-700">MEP Systems</span>
+    <i className="fas fa-chevron-down text-gray-500 text-xs"></i>
+  </div>
+  {elements && elements[2]?.subcategories?.map((el) => {
+    return (
+      <div className="space-y-1" key={el?.name}> {/* Ensure key is unique */}
+
+        {el?.name === "HVAC" && (
+          <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer" onClick={()=>{setDetails(el?.description)}}>
+            <i className="fas fa-wind text-blue-400 mr-2"></i>
+            HVAC
+          </div>
+        )}
+
+        {el?.name === "Plumbing" && (
+          <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer" onClick={()=>{setDetails(el?.description)}}>
+            <i className="fas fa-faucet text-indigo-400 mr-2"></i>
+            Plumbing
+          </div>
+        )}
+
+        {el?.name === "Electrical" && (
+          <div className="flex items-center px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer" onClick={()=>{setDetails(el?.description)}}>
+            <i className="fas fa-bolt text-orange-400 mr-2"></i>
+            Electrical
+          </div>
+        )}
+      </div>
+    );
+  })}
+</div>
+
+      </div>
+    
+</div>
+
 
           <div className="p-4 border-t border-gray-200">
-            {/* <button className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-indigo-700 !rounded-button whitespace-nowrap"> */}
-              {/* <i className="fas fa-plus"></i> */}
-              {/* Add Element */}
-            {/* </button> */}
+            
             
                   
         <AddElementModal/>
@@ -433,8 +484,8 @@ const OpenBim = () => {
                   </>
                 ) : (
                   <div className="h-full flex flex-col items-center justify-center text-gray-500 p-6">
-                    <i className="fas fa-mouse-pointer text-4xl mb-4"></i>
-                    <p className="text-center">Select an element in the model to view its details</p>
+                    <i className="fas  text-4xl mb-4"></i>
+                    <p className="text-center"> {details}</p>
                   </div>
                 )}
               </div>
