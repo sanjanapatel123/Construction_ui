@@ -82,6 +82,8 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SafetyEquipmentList from "./components/AdminComponents/SafetyEquipment/SafetyEquipmentList";
 import SafetyEquipmentDetails from "./components/AdminComponents/SafetyEquipment/SafetyEquipmentDetails";
+import EditToolboxTalk from "./components/AdminComponents/ToolboxTalks/EditToolboxTalk";
+
 
 function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
@@ -166,6 +168,7 @@ function App() {
             <Route path="/helpSupport" element={<HelpSupport></HelpSupport>} />
             <Route path="/TaskDashboard" element={<TaskManagement />} />
             <Route path="/create-task" element={<AddNewTask />} />
+            <Route path="/updatetask/:id" element={<AddNewTask />} />
             <Route path="/announcements" element={<Announcements />} />
             <Route path="/AddAnnouncements" element={<AddAnnouncements />} />
             <Route path="/rfis" element={<RFIs />} />
@@ -238,6 +241,8 @@ function App() {
             <Route path="/toolbox" element={<ToolboxTalks />} />
             <Route path="/AddToolboxTalks" element={<AddToolboxTalks />} />
             <Route path="/Calendar" element={<Calendar />} />
+            <Route path="/edit-toolbox/:id" element={<EditToolboxTalk />} />
+
             <Route
               path="/Calendar_createnewtask"
               element={<Calendar_createnewtask />}
@@ -295,7 +300,6 @@ function App() {
             <Route path="/AddSafety/:id" element={<SafetyEquipment />} />
            <Route path="/view-service" element={<ViewServicePage />} />
            <Route path="/safety-equipment/:id" element={<SafetyEquipmentDetails />} />
-
             {/* <Route
               path="/equipment-details"
               element={<EquipmentDetailsPage />}
@@ -311,6 +315,8 @@ function App() {
             <Route path="/messenger" element={<Messenger />} />
             <Route path="/announcements" element={<Announcements />} />
             <Route path="/AddAnnouncements" element={<AddAnnouncements />} />
+            <Route path="/EditAnnouncements/:id" element={<AddAnnouncements />} />
+
             <Route path="/rfis" element={<RFIs />} />
             <Route path="/AddRFIs" element={<AddRFIs />} />
             <Route path="/toolbox" element={<ToolboxTalks />} />
@@ -350,6 +356,7 @@ function App() {
         </div>
       </div>
     </div>
+    // kkk
   );
 }
 function AppWrapper() {

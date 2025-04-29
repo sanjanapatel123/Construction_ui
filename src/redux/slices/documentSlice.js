@@ -22,7 +22,11 @@ export const addDocument = createAsyncThunk(
   "documents/addDocument",
   async (documentData, thunkAPI) => {
     try {
-      const response = await axiosInstance.post(`${apiUrl}/documents`, documentData);
+      const response = await axiosInstance.post(`${apiUrl}/documents`, documentData, 
+        {
+          headers: { "Content-Type": "multipart/form-data" }
+        }
+      );
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -37,7 +41,11 @@ export const updateDocument = createAsyncThunk(
   "documents/updateDocument",
   async ({ id, updatedData }, thunkAPI) => {
     try {
-      const response = await axiosInstance.patch(`${apiUrl}/documents/${id}`, updatedData);
+      const response = await axiosInstance.patch(`${apiUrl}/documents/${id}`, updatedData, 
+        {
+          headers: { "Content-Type": "multipart/form-data" }
+        }
+      );
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(

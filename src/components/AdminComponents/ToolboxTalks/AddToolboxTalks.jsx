@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Button, Row, Col } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
 import { apiUrl } from "../../../utils/config";
 import axiosInstance from "../../../utils/axiosInstance";
 import { toast } from "react-toastify";
@@ -14,11 +13,29 @@ function AddToolboxTalks() {
     presenter: "",
     participants: [],
     description: "",
-    status: "Pending", // default status
+    status: "", // default status
     image: null,
   });
 
-   const [workersList, setWorkersList] = useState([]); 
+    const Navigate = useNavigate();
+  const [workersList, setWorkersList] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axiosInstance.get(
+          "https://hrb5wx2v-8000.inc1.devtunnels.ms/api/users"
+        );
+        setWorkersList(response.data.data.users);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        toast.error("Failed to fetch users.");
+      }
+    };
+
+    fetchUsers();
+  }, []);
+  console.log(workersList);
 
   // Handle change for normal inputs
   const handleChange = (e) => {
@@ -58,13 +75,13 @@ function AddToolboxTalks() {
       payload.append("date", formData.date);
       payload.append("time", formData.time);
       payload.append("presenter", formData.presenter);
-      payload.append("participants", formData.participants.join(", ")); // convert array to comma-separated
+      payload.append("participants", formData.participants.join(", "));
       payload.append("description", formData.description);
       payload.append("status", formData.status);
       if (formData.image) {
         payload.append("image", formData.image);
       }
-
+      console.log(payload);
       const response = await axiosInstance.post(`${apiUrl}/toolbox`, payload, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -73,9 +90,9 @@ function AddToolboxTalks() {
 
       console.log("Toolbox Talk Created Successfully:", response.data);
       toast.success("Toolbox Talk Created Successfully!");
-      // You can redirect or clear form here
+      Navigate("/toolbox"); // Redirect to the toolbox page after successful creation
     } catch (error) {
-      console.error("Error creating Toolbox Talk:", error);
+      console.error("Error creating Toolbox Talk:", error.response || error);
       toast.error("Failed to create Toolbox Talk.");
     }
   };
@@ -98,17 +115,37 @@ function AddToolboxTalks() {
               </button>
             </Link>
           </div>
+          <Row className="mb-3">
+            <Col>
+              <Form.Group className="mb-3">
+                <Form.Label className="fw-semibold">Title</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  placeholder="E.g., Safe Lifting Techniques"
+                />
+              </Form.Group>
+            </Col>
 
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-semibold">Title</Form.Label>
-            <Form.Control
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              placeholder="E.g., Safe Lifting Techniques"
-            />
-          </Form.Group>
+            <Col>
+              <Form.Group className="mb-3">
+                <Form.Label className="fw-semibold">Status</Form.Label>
+                <Form.Select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  aria-label="Select status"
+                >
+                  <option value="">Select Status</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Completed">Completed</option>
+                  <option value="In Progress">In Progress</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+          </Row>
 
           <Row className="mb-3">
             <Col>
@@ -139,13 +176,21 @@ function AddToolboxTalks() {
             <Col>
               <Form.Group>
                 <Form.Label className="fw-semibold">Presenter</Form.Label>
-                <Form.Control
-                  type="text"
+                <Form.Select
                   name="presenter"
                   value={formData.presenter}
                   onChange={handleChange}
-                  placeholder="Enter presenter name"
-                />
+                >
+                  <option value="">Select Presenter</option>
+                  {workersList.map((worker) => (
+                    <option
+                      key={worker._id}
+                      value={`${worker.firstName} ${worker.lastName}`}
+                    >
+                      {worker.firstName} {worker.lastName}
+                    </option>
+                  ))}
+                </Form.Select>
               </Form.Group>
             </Col>
             <Col>
@@ -158,7 +203,10 @@ function AddToolboxTalks() {
                   onChange={handleParticipantsChange}
                 >
                   {workersList.map((worker) => (
-                    <option key={worker._id} value={worker._id}>
+                    <option
+                      key={worker._id}
+                      value={`${worker.firstName} ${worker.lastName}`}
+                    >
                       {worker.firstName} {worker.lastName}
                     </option>
                   ))}

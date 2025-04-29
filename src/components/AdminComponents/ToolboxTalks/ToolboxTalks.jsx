@@ -2,10 +2,26 @@ import React, { useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
 import { Link } from "react-router-dom";
 import { Button } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchToolboxTalks,
+  deleteToolbox,
+} from "../../../redux/slices/toolboxTalkSlice";
 
 function ToolboxTalks() {
+  const dispatch = useDispatch();
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
+
+  const { talks, loading, error } = useSelector((state) => state.toolboxTalks);
+
+  useEffect(() => {
+    dispatch(fetchToolboxTalks());
+  }, [dispatch]);
+
+  const handleDelete = (id) => {
+    dispatch(deleteToolbox(id));
+  };
 
   useEffect(() => {
     const ctx = chartRef.current.getContext("2d");
@@ -168,59 +184,53 @@ function ToolboxTalks() {
                   </tr>
                 </thead>
                 <tbody>
-                  {[
-                    {
-                      topic: "Safe Working at Heights",
-                      category: "Safety",
-                      datetime: "2024-02-20 09:00 AM",
-                      team: "Construction Team A",
-                      participants: 15,
-                      status: "Upcoming",
-                      badge: "warning",
-                    },
-                    {
-                      topic: "Equipment Safety Protocol",
-                      category: "Equipment Use",
-                      datetime: "2024-02-21 10:30 AM",
-                      team: "Operation Team B",
-                      participants: 12,
-                      status: "In Progress",
-                      badge: "info",
-                    },
-                    {
-                      topic: "Site Compliance Update",
-                      category: "Compliance",
-                      datetime: "2024-02-22 02:00 PM",
-                      team: "All Site Personnel",
-                      participants: 25,
-                      status: "Upcoming",
-                      badge: "warning",
-                    },
-                  ].map((talk, idx) => (
-                    <tr key={idx}>
+                  {loading && (
+                    <tr>
+                      <td colSpan="5">Loading...</td>
+                    </tr>
+                  )}
+                  {error && (
+                    <tr>
+                      <td colSpan="5">Error: {error}</td>
+                    </tr>
+                  )}
+                  {talks.map((talk) => (
+                    <tr key={talk._id}>
                       <td>
-                        {talk.topic}
+                        {talk.title}
                         <br />
-                        <small className="text-muted">{talk.category}</small>
+                        <small className="text-muted">{talk.description}</small>
                       </td>
-                      <td>{talk.datetime}</td>
+                      <td>{new Date(talk.date).toLocaleString()}</td>
                       <td>
-                        {talk.team}
+                        {talk.presenter.firstName} {talk.presenter.lastName}
                         <br />
-                        <small>{talk.participants} participants</small>
+                        <small>{talk.participants.length} participants</small>
                       </td>
                       <td>
-                        <span className={`badge bg-${talk.badge}`}>
+                        <span
+                          className={`badge bg-${
+                            talk.status === "Completed" ? "success" : "warning"
+                          }`}
+                        >
                           {talk.status}
                         </span>
                       </td>
                       <td>
-                        <a href="#" className="me-3 text-primery" title="Edit">
-                          <i class="fa-solid fa-pen-to-square"></i>
-                        </a>
-                        <a href="#" className="text-danger" title="Delete">
-                          <i class="fa-solid fa-trash"></i>
-                        </a>
+                        <Link
+                          to={`/edit-toolbox/${talk._id}`}
+                          className="me-3 text-primary"
+                          title="Edit"
+                        >
+                          <i className="fa-solid fa-pen-to-square"></i>
+                        </Link>
+                        <Link
+                          className="text-danger"
+                          title="Delete"
+                          onClick={() => handleDelete(talk._id)}
+                        >
+                          <i className="fa-solid fa-trash"></i>
+                        </Link>
                       </td>
                     </tr>
                   ))}
