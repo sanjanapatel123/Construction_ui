@@ -5,6 +5,7 @@ import { apiUrl } from '../../utils/config'
 export const createRFI = createAsyncThunk(
   'rfi/createRFI',
   async (submitData, thunkAPI) => {
+    console.log(submitData)
     try {
       const response = await axiosInstance.post(
         `${apiUrl}/rfi`,

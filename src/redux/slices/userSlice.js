@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 export const fetchUsers = createAsyncThunk("users/fetchUsers", async (_, thunkAPI) => {
   try {
     const response = await axiosInstance.get(`${apiUrl}/users`);
-    // console.log("Users response:", response); // Log the response data
+    console.log("Users response:", response.data.data); // Log the response data
     return response.data.data.users;
   } catch (error) {
     return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to fetch users");

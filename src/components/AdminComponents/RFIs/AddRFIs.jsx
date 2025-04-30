@@ -7,7 +7,7 @@ import { fetchUsers } from "../../../redux/slices/userSlice";
 
 function AddRFIs() {
 
-  const { users } = useSelector((state) => state.users);
+  const { data:users } = useSelector((state) => state.users);
   console.log(users)
   const dispatch = useDispatch();
 
@@ -56,7 +56,7 @@ function AddRFIs() {
       submitData.append("image", file);
     });
     // Dispatch the thunk with your formData object
-    dispatch(createRFI(formData));
+    dispatch(createRFI( submitData ));
   };
 
 
@@ -170,7 +170,8 @@ function AddRFIs() {
               onChange={handleInputChange}
             >
             {
-              users?.data?.users?.map((user) => (
+              users?.map((user) => (
+                
                 <option key={user._id} value={user._id}> {user.firstName} {user.lastName
 }</option>
               ))
