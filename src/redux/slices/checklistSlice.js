@@ -19,7 +19,7 @@ export const fetchChecklistDetails = createAsyncThunk(
       const response = await axiosInstance.get(`${apiUrl}/checklists/${id}`);
       return response.data;
     } catch (error) {
-      toast.error("Failed to fetch ITP details");
+      toast.error(" details");
       return rejectWithValue(error?.response?.data?.message || "Failed to fetch ITP details");
     }
   }

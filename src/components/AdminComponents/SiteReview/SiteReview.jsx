@@ -181,7 +181,7 @@ function SiteReview() {
             <thead className="bg-light">
               <tr>
                 <th>Site Name/Location</th>
-                <th>Review Date & Time</th>
+                <th>Review Date </th>
                 <th>Reviewer Name</th>
                 <th>Compliance Status</th>
                 <th>Actions</th>
