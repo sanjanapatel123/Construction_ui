@@ -13,6 +13,7 @@ const OpenBim = () => {
   const [activeSidePanel, setActiveSidePanel] = useState('details');
   const [viewMode, setViewMode] = useState('solid');
   const [details ,  setDetails] = useState("Select an element in the model to view its details");
+  const [searchElement, setSearchElement] = useState('');
 
   const [activeTool, setActiveTool] = useState('select');
   const [selectedElement, setSelectedElement] = useState(null);
@@ -33,6 +34,7 @@ const OpenBim = () => {
   const elements = useSelector((state)=>state?.elements?.elements?.data);
   console.log("elements",elements);
   const annotations = useSelector((state) => state.annotations.annotations.data);
+  
 
   // Use the selector to get the annotations state
    
@@ -157,6 +159,9 @@ const OpenBim = () => {
               <input
                 type="text"
                 placeholder="Search elements..."
+                name="search"
+                value={searchElement}
+                onChange={(e) => setSearchElement(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
               <i className="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
@@ -173,7 +178,7 @@ const OpenBim = () => {
             <span className="text-sm font-medium text-gray-700">Building Elements</span>
             <i className="fas fa-chevron-down text-gray-500 text-xs"></i>
           </div>
-          {elements && elements[0]?.subcategories?.map((el) => {
+          {elements && elements[0]?.subcategories?.filter((el) => el?.name?.toLowerCase().includes(searchElement.toLowerCase())).map((el) => {
             return (
               <div className="space-y-1" key={el?.name}> {/* Ensure key is unique */}
 
@@ -208,7 +213,7 @@ const OpenBim = () => {
     <span className="text-sm font-medium text-gray-700">Structural Elements</span>
     <i className="fas fa-chevron-down text-gray-500 text-xs"></i>
   </div>
-  {elements && elements[1]?.subcategories?.map((el) => {
+  {elements && elements[1]?.subcategories?.filter((el) => el?.name?.toLowerCase().includes(searchElement.toLowerCase())).map((el) => {
     return (
       <div className="space-y-1" key={el?.name}> {/* Ensure key is unique */}
 
@@ -244,7 +249,7 @@ const OpenBim = () => {
     <span className="text-sm font-medium text-gray-700">MEP Systems</span>
     <i className="fas fa-chevron-down text-gray-500 text-xs"></i>
   </div>
-  {elements && elements[2]?.subcategories?.map((el) => {
+  {elements && elements[2]?.subcategories?.filter((el)=>{return el?.name?.toLowerCase().includes(searchElement.toLowerCase())}).map((el) => {
     return (
       <div className="space-y-1" key={el?.name}> {/* Ensure key is unique */}
 
