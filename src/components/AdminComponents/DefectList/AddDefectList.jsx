@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import { toast } from "react-toastify";
 import axiosInstance from "../../../utils/axiosInstance";
@@ -115,7 +115,15 @@ function AddDefectList() {
             />
           </div>
           <div className="col-md-6">
-            <label className="form-label">Project Name</label>
+            <label className="form-label">
+              Project Name{" "}
+              <Link to={"/add-project"}>
+                <i
+                  className="fa fa-plus ms-2"
+                  style={{ cursor: "pointer", color: "#0d6efd" }}
+                ></i>
+              </Link>
+            </label>
             {loading ? (
               <div>Loading projects...</div>
             ) : (

@@ -7,7 +7,7 @@ import {
   FaCloudUploadAlt,
   FaCopy,
 } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { apiUrl } from "../../../utils/config";
 import axiosInstance from "../../../utils/axiosInstance";
 import { useDispatch, useSelector } from "react-redux";
@@ -225,7 +225,13 @@ const AddITPs = () => {
           <div className="col-md-6">
             <Form.Group controlId="projectName">
               <Form.Label className="fw-semibold small">
-                Project Name
+                Project Name{" "}
+                <Link to={"/add-project"}>
+                  <i
+                    className="fa fa-plus ms-2"
+                    style={{ cursor: "pointer", color: "#0d6efd" }}
+                  ></i>
+                </Link>
               </Form.Label>
               <Form.Select
                 name="projectName"

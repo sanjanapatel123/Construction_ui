@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import { apiUrl } from "../../../utils/config"; // Define your API base URL here
 import axiosInstance from "../../../utils/axiosInstance"; // Create axios instance with base URL
@@ -141,7 +141,15 @@ function AddChecklists() {
               />
             </div>
             <div className="col-md-6">
-              <label className="form-label">Project</label>
+              <label className="form-label">
+                Project{" "}
+                <Link to={"/add-project"}>
+                  <i
+                    className="fa fa-plus ms-2"
+                    style={{ cursor: "pointer", color: "#0d6efd" }}
+                  ></i>
+                </Link>
+              </label>
               {loading ? (
                 <div>Loading projects...</div>
               ) : (

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { fetchProjects } from "../../../redux/slices/projectSlice";
 import { createSwms } from "../../../redux/slices/swmsSlice";
@@ -184,6 +184,12 @@ function AddnewSms() {
           <div className="mb-3 col-md-6">
             <label htmlFor="project" className="form-label">
               Project
+              <Link to={"/add-project"}>
+                <i
+                  className="fa fa-plus ms-2"
+                  style={{ cursor: "pointer", color: "#0d6efd" }}
+                ></i>
+              </Link>
             </label>
             <select
               className="form-select"
