@@ -35,15 +35,12 @@ function Messenger() {
       setLoadingMessages(true);
       setMessageError(null); // Reset error state
       try {
-        const response = await axiosInstance.get(
-          `https://hrb5wx2v-8000.inc1.devtunnels.ms/api/chat`,
-          {
-            params: {
-              senderId: currentUserId,
-              receiverId: selectedUser._id,
-            },
-          }
-        );
+        const response = await axiosInstance.get(`${apiUrl}/chat`, {
+          params: {
+            senderId: currentUserId,
+            receiverId: selectedUser._id,
+          },
+        });
         console.log("fetched Messages response:", response.data); // Debugging line
 
         const fetchedMessages =
@@ -96,32 +93,26 @@ function Messenger() {
 
     try {
       // First, check if a chat already exists between the sender and receiver
-      const chatResponse = await axiosInstance.get(
-        `https://hrb5wx2v-8000.inc1.devtunnels.ms/api/chat`,
-        {
-          params: {
-            senderId: currentUserId,
-            receiverId: selectedUser._id,
-          },
-        }
-      );
+      const chatResponse = await axiosInstance.get(`${apiUrl}/chat`, {
+        params: {
+          senderId: currentUserId,
+          receiverId: selectedUser._id,
+        },
+      });
 
       let chatData = chatResponse.data.data;
 
       // If no chat exists, create a new chat
       if (!chatData) {
-        const createChatResponse = await axiosInstance.post(
-          `https://hrb5wx2v-8000.inc1.devtunnels.ms/api/chat`,
-          {
-            users: [currentUserId, selectedUser._id],
-          }
-        );
+        const createChatResponse = await axiosInstance.post(`${apiUrl}/chat`, {
+          users: [currentUserId, selectedUser._id],
+        });
         chatData = createChatResponse.data.data; // Get the newly created chat data
       }
 
       // Now send the message
       const messageResponse = await axiosInstance.post(
-        `https://hrb5wx2v-8000.inc1.devtunnels.ms/api/chat/sendMessage`,
+        `${apiUrl}/chat/sendMessage`,
         payload
       );
 
@@ -135,6 +126,40 @@ function Messenger() {
       }
     } catch (error) {
       console.error("Error:", error.response?.data || error.message);
+    }
+  };
+
+  const handleDeleteChat = async () => {
+    if (!selectedUser) return;
+
+    try {
+      // Step 1: Get existing chat ID between users
+      const chatResponse = await axiosInstance.get(`${apiUrl}/chat`, {
+        params: {
+          senderId: currentUserId,
+          receiverId: selectedUser._id,
+        },
+      });
+
+      const existingChat = chatResponse.data.data?.find((chat) =>
+        chat.users.some((u) => u._id === selectedUser._id)
+      );
+
+      if (!existingChat) {
+        alert("No existing chat found.");
+        return;
+      }
+
+      // Step 2: Delete the chat using chat ID
+      await axiosInstance.delete(`${apiUrl}/chat/${existingChat._id}`);
+
+      // Step 3: Update state
+      setMessages([]);
+      setSelectedUser(null);
+      alert("Chat deleted successfully.");
+    } catch (err) {
+      console.error("Failed to delete chat:", err);
+      alert("Error deleting chat.");
     }
   };
 
@@ -183,7 +208,7 @@ function Messenger() {
         {/* Right Panel - Chat Box */}
         <div className="col-md-8 d-flex flex-column p-0">
           {/* Header */}
-          <div className="d-flex align-items-center border-bottom p-3">
+          {/* <div className="d-flex align-items-center border-bottom p-3">
             <img
               src={`https://i.pravatar.cc/40?img=11`}
               alt="User"
@@ -201,6 +226,38 @@ function Messenger() {
                 Construction management system
               </small>
             </div>
+          </div> */}
+
+          <div className="d-flex align-items-center justify-content-between border-bottom p-3">
+            <div className="d-flex align-items-center">
+              <img
+                src={`https://i.pravatar.cc/40?img=11`}
+                alt="User"
+                className="rounded-circle me-2"
+                width="40"
+                height="40"
+              />
+              <div>
+                <div className="fw-bold">
+                  {selectedUser
+                    ? `${selectedUser.firstName} ${selectedUser.lastName}`
+                    : "Select a chat"}
+                </div>
+                <small className="text-muted">
+                  Construction management system
+                </small>
+              </div>
+            </div>
+
+            {selectedUser && (
+              <button
+                className="btn btn-sm btn-outline-danger"
+                onClick={handleDeleteChat}
+                title="Delete Chat"
+              >
+                🗑️
+              </button>
+            )}
           </div>
 
           {/* Messages */}

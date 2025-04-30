@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useDispatch } from 'react-redux';
+import { useDispatch } from "react-redux";
 import { createRFI } from "../../../redux/slices/rfiSlice";
 
 function AddRFIs() {
-    const dispatch= useDispatch
-    ()
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     subject: "",
     priority: "",
@@ -24,8 +23,6 @@ function AddRFIs() {
     }));
   };
 
-
-
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
     setFormData((prev) => ({
@@ -33,10 +30,10 @@ function AddRFIs() {
       image: [...prev.image, ...files],
     }));
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const submitData = new FormData();
     submitData.append("subject", formData.subject);
     submitData.append("priority", formData.priority);
@@ -44,37 +41,85 @@ function AddRFIs() {
     submitData.append("assignee", formData.assignee);
     submitData.append("department", formData.department);
     submitData.append("description", formData.description);
-  
+
     formData.image.forEach((file) => {
       submitData.append("image", file);
     });
     // Dispatch the thunk with your formData object
     dispatch(createRFI(formData));
-  
   };
-  
+
+  const handleAutofill = async () => {
+    try {
+      const response = await fetch(
+        `https://constructionaimicroservice-production.up.railway.app/autofill`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ form_type: "rfis" }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data?.suggested_data) {
+        const {
+          subject,
+          priority,
+          due_date,
+          assignee,
+          department,
+          description,
+        } = data.suggested_data;
+
+        setFormData((prev) => ({
+          ...prev,
+          subject: subject || "",
+          priority: priority || "",
+          due_date: due_date ? due_date.substring(0, 10) : "",
+          assignee: assignee || "",
+          department: department || "",
+          description: description || "",
+        }));
+      }
+    } catch (error) {
+      console.error("Autofill error:", error);
+      alert("Failed to fetch autofill data");
+    }
+  };
 
   return (
     <div className="container-fluid p-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h5 className="fw-bold mb-0">New RFI</h5>
-        <Link to="/rfis">
-          {" "}
-          <button className="btn set_btn text-white">
-            <i class="fa-solid fa-arrow-left me-2"></i>Back
+        <div className="d-flex gap-2 text-nowrap">
+          <button
+            className="btn bg-primary text-white"
+            onClick={handleAutofill}
+          >
+            autoFill
           </button>
-        </Link>
+          <Link to="/rfis">
+            <button className="btn set_btn text-white">
+              <i class="fa-solid fa-arrow-left me-2"></i>Back
+            </button>
+          </Link>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-sm">
         <div className="mb-3">
           <label className="form-label">Subject</label>
-          <input type="text"
+          <input
+            type="text"
             className="form-control"
             name="subject"
             value={formData.subject}
             onChange={handleInputChange}
-            required/>
+            required
+          />
         </div>
 
         <div className="row mb-3">
@@ -84,7 +129,8 @@ function AddRFIs() {
               className="form-select"
               name="priority"
               value={formData.priority}
-              onChange={handleInputChange}>
+              onChange={handleInputChange}
+            >
               <option>High</option>
               <option>Medium</option>
               <option>Low</option>
