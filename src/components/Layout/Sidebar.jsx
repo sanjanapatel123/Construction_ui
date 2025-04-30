@@ -23,7 +23,6 @@ import {
   MdAnnouncement,
 } from "react-icons/md";
 
-
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [openMenuIndex, setOpenMenuIndex] = useState(null);
   const [activeMenuIndex, setActiveMenuIndex] = useState(null);
@@ -136,7 +135,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       path: "/helpSupport",
     },
 
-
     {
       title: "Dashboard",
       icon: <FaHome className="menu-icon" />,
@@ -186,7 +184,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
   const filteredMenuItems = menuItems.filter((item) => {
     if (roledata === "admin") {
-      return true;
+      const hiddenAdminPaths = [
+        "/super-admin-dashboard",
+        "/Plan-Package",
+        "/Plan-request",
+        "/user-info",
+        "/super-admin-setting",
+      ];
+      return !hiddenAdminPaths.includes(item.path);
     } else if (roledata === "superadmin") {
       const superAdminMenuItems = [
         "/super-admin-dashboard",
@@ -242,7 +247,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     }
     return false;
   });
-  
 
   return (
     <div className={`sidebar ${isOpen ? "expanded" : "collapsed"}`}>
@@ -308,7 +312,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </li>
         ))}
       </ul>
-
     </div>
   );
 };

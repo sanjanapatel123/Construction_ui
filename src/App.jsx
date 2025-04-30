@@ -83,6 +83,8 @@ import SafetyEquipmentList from "./components/AdminComponents/SafetyEquipment/Sa
 import SafetyEquipmentDetails from "./components/AdminComponents/SafetyEquipment/SafetyEquipmentDetails";
 import EditToolboxTalk from "./components/AdminComponents/ToolboxTalks/EditToolboxTalk";
 import RFIs from "./components/AdminComponents/RFIs/RFIs";
+import EditUser from "./components/AdminComponents/UserManagement/EditUser";
+import ViewUser from "./components/AdminComponents/UserManagement/ViewUser";
 
 
 function App() {
@@ -242,6 +244,9 @@ function App() {
             <Route path="/AddToolboxTalks" element={<AddToolboxTalks />} />
             <Route path="/Calendar" element={<Calendar />} />
             <Route path="/edit-toolbox/:id" element={<EditToolboxTalk />} />
+            <Route path="/edit-user/:id" element={<EditUser />} />
+            <Route path="/users/view/:id" element={<ViewUser />} />
+
 
             <Route
               path="/Calendar_createnewtask"

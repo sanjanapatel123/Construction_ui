@@ -1,7 +1,63 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUsers, deleteUser } from "../../../redux/slices/userSlice"; // Adjust the import path as necessary
 
 function UserManagement() {
+  const dispatch = useDispatch();
+  const { data: users, loading, error } = useSelector((state) => state.users);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState("All");
+  const [sortField, setSortField] = useState("firstName");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [uniqueRoles, setUniqueRoles] = useState([]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 5;
+
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const roles = [...new Set(users.map((user) => user.role))];
+    setUniqueRoles(roles);
+  }, [users]);
+
+  //  console.log("Users →", users);
+  const handleDelete = (userId) => {
+    dispatch(deleteUser(userId));
+  };
+  // if (loading) {
+  //   return <div>Loading...</div>;
+  // }
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  const filteredUsers = users
+    .filter((user) => {
+      const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+      const matchesSearch = fullName.includes(searchQuery.toLowerCase());
+      const matchesRole = roleFilter === "All" || user.role === roleFilter;
+
+      return matchesSearch && matchesRole;
+    })
+    .sort((a, b) => {
+      if (sortOrder === "asc") {
+        return a[sortField]?.localeCompare?.(b[sortField]) || 0;
+      } else {
+        return b[sortField]?.localeCompare?.(a[sortField]) || 0;
+      }
+    });
+
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+
   return (
     <div>
       <div className="container-sm">
@@ -28,6 +84,8 @@ function UserManagement() {
                       type="text"
                       className="form-control"
                       placeholder="Search users..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </div>
                   <div className="d-flex gap-2">
@@ -37,50 +95,27 @@ function UserManagement() {
                         type="button"
                         data-bs-toggle="dropdown"
                       >
-                        All Roles
+                        {roleFilter === "All" ? "All Roles" : roleFilter}
                       </button>
                       <ul className="dropdown-menu">
                         <li>
-                          <a className="dropdown-item" href="#">
+                          <button
+                            className="dropdown-item"
+                            onClick={() => setRoleFilter("All")}
+                          >
                             All Roles
-                          </a>
+                          </button>
                         </li>
-                        <li>
-                          <a className="dropdown-item" href="#">
-                            Admin
-                          </a>
-                        </li>
-                        <li>
-                          <a className="dropdown-item" href="#">
-                            Manager
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="dropdown">
-                      <button
-                        className="btn btn-outline-secondary dropdown-toggle"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                      >
-                        All Status
-                      </button>
-                      <ul className="dropdown-menu">
-                        <li>
-                          <a className="dropdown-item" href="#">
-                            All Status
-                          </a>
-                        </li>
-                        <li>
-                          <a className="dropdown-item" href="#">
-                            Active
-                          </a>
-                        </li>
-                        <li>
-                          <a className="dropdown-item" href="#">
-                            Pending
-                          </a>
-                        </li>
+                        {uniqueRoles.map((role) => (
+                          <li key={role}>
+                            <button
+                              className="dropdown-item"
+                              onClick={() => setRoleFilter(role)}
+                            >
+                              {role.charAt(0).toUpperCase() + role.slice(1)}
+                            </button>
+                          </li>
+                        ))}
                       </ul>
                     </div>
                   </div>
@@ -93,36 +128,21 @@ function UserManagement() {
                       <tr>
                         <th className="ps-4">Name</th>
                         <th>Role</th>
-                        <th>Status</th>
+                        <th>Department</th>
+                        {/* <th>Status</th> */}
                         <th>Last Active</th>
                         <th className="pe-4">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {[
-                        {
-                          name: "Sarah Wilson",
-                          role: "Project Manager",
-                          status: "Active",
-                          lastActive: "2 hours ago",
-                        },
-                        {
-                          name: "Mike Johnson",
-                          role: "Engineer",
-                          status: "Active",
-                          lastActive: "5 hours ago",
-                        },
-                        {
-                          name: "Emily Brown",
-                          role: "Contractor",
-                          status: "Pending",
-                          lastActive: "1 day ago",
-                        },
-                      ].map((user, index) => (
+                      {currentUsers.map((user, index) => (
                         <tr key={index} className="bg-white border-bottom">
                           <td className="ps-4 py-3 border-bottom">
                             <img
-                              src="https://img.freepik.com/free-psd/3d-icon-social-media-app_23-2150049569.jpg"
+                              src={
+                                user.image?.[0] ||
+                                "https://www.aquasafemine.com/wp-content/uploads/2018/06/dummy-woman-570x570.png"
+                              }
                               alt="user"
                               className="rounded-circle me-2"
                               style={{
@@ -131,28 +151,46 @@ function UserManagement() {
                                 objectFit: "cover",
                               }}
                             />
-                            {user.name}
+                            {user.firstName} {user.lastName}
                           </td>
                           <td className="py-3 border-bottom">{user.role}</td>
                           <td className="py-3 border-bottom">
+                            {user.department}
+                          </td>
+                          {/* <td className="py-3 border-bottom">
                             <span
                               className={`badge ${
-                                user.status === "Active"
+                                user.color === "#FF5733"
                                   ? "bg-success"
                                   : "bg-warning text-dark"
                               }`}
                             >
-                              {user.status}
+                              Active
                             </span>
-                          </td>
+                          </td> */}
                           <td className="py-3 border-bottom">
-                            {user.lastActive}
+                            {new Date(user.updatedAt).toLocaleString()}
                           </td>
                           <td className="pe-4 py-3 border-bottom">
-                            <button className="btn text-primary p-0 me-2">
+                            <Link
+                              to={`/users/view/${user._id}`}
+                              className="btn text-primary p-0 me-2"
+                            >
+                              <i
+                                className="fas fa-eye text-info "
+                                style={{ fontSize: "15px" }}
+                              ></i>
+                            </Link>
+                            <Link
+                              to={`/edit-user/${user._id}`}
+                              className="btn text-primary p-0 me-2"
+                            >
                               <i className="fa-solid fa-pen-to-square"></i>
-                            </button>
-                            <button className="btn text-danger p-0">
+                            </Link>
+                            <button
+                              onClick={() => handleDelete(user._id)}
+                              className="btn text-danger p-0"
+                            >
                               <i className="fa-solid fa-trash"></i>
                             </button>
                           </td>
@@ -165,26 +203,44 @@ function UserManagement() {
                 {/* Pagination */}
                 <nav className="mt-4 d-flex justify-content-end">
                   <ul className="pagination">
-                    <li className="page-item disabled">
-                      <span className="page-link">Previous</span>
+                    <li
+                      className={`page-item ${
+                        currentPage === 1 ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() => setCurrentPage((prev) => prev - 1)}
+                      >
+                        Previous
+                      </button>
                     </li>
-                    <li className="page-item active">
-                      <span className="page-link">1</span>
-                    </li>
-                    <li className="page-item">
-                      <a className="page-link" href="#">
-                        2
-                      </a>
-                    </li>
-                    <li className="page-item">
-                      <a className="page-link" href="#">
-                        3
-                      </a>
-                    </li>
-                    <li className="page-item">
-                      <a className="page-link" href="#">
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <li
+                        key={i}
+                        className={`page-item ${
+                          currentPage === i + 1 ? "active" : ""
+                        }`}
+                      >
+                        <button
+                          className="page-link"
+                          onClick={() => setCurrentPage(i + 1)}
+                        >
+                          {i + 1}
+                        </button>
+                      </li>
+                    ))}
+                    <li
+                      className={`page-item ${
+                        currentPage === totalPages ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() => setCurrentPage((prev) => prev + 1)}
+                      >
                         Next
-                      </a>
+                      </button>
                     </li>
                   </ul>
                 </nav>
@@ -198,4 +254,3 @@ function UserManagement() {
 }
 
 export default UserManagement;
-
