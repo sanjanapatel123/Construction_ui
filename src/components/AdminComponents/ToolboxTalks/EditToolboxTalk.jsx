@@ -49,7 +49,7 @@ function EditToolboxTalk() {
           title: data.title || "",
           date: data.date ? data.date.substring(0, 10) : "", // date format YYYY-MM-DD
           time: data.time || "",
-          presenter: data.presenter || "",
+          presenter: data.presenter?._id || "",
           participants: data.participants || [],
           description: data.description || "",
           status: data.status || "",
@@ -94,6 +94,39 @@ function EditToolboxTalk() {
   };
 
   // Update API
+  //   const handleSubmit = async (e) => {
+  //     e.preventDefault();
+  //     try {
+  //       const payload = new FormData();
+  //       payload.append("title", formData.title);
+  //       payload.append("date", formData.date);
+  //       payload.append("time", formData.time);
+  //      payload.append("presenter", formData.presenter || "");
+  //       payload.append("participants", JSON.stringify(formData.participants));
+  //       payload.append("description", formData.description);
+  //       payload.append("status", formData.status);
+  //       if (formData.image) {
+  //         payload.append("image", formData.image);
+  //       }
+
+  //       const response = await axiosInstance.patch(
+  //         `${apiUrl}/toolbox/${id}`,
+  //         payload,
+  //         {
+  //           headers: {
+  //             "Content-Type": "multipart/form-data",
+  //           },
+  //         }
+  //       );
+
+  //       toast.success("Toolbox Talk updated successfully!");
+  //       navigate("/toolbox"); // After update, redirect to toolbox list
+  //     } catch (error) {
+  //       console.error(error);
+  //       toast.error("Failed to update toolbox talk!");
+  //     }
+  //   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -101,8 +134,13 @@ function EditToolboxTalk() {
       payload.append("title", formData.title);
       payload.append("date", formData.date);
       payload.append("time", formData.time);
-      payload.append("presenter", formData.presenter._id || "");
-      payload.append("participants", JSON.stringify(formData.participants));
+      payload.append("presenter", formData.presenter || "");
+
+      // Correct way to append multiple participants
+      formData.participants.forEach((participantId) => {
+        payload.append("participants", participantId);
+      });
+
       payload.append("description", formData.description);
       payload.append("status", formData.status);
       if (formData.image) {
@@ -120,7 +158,7 @@ function EditToolboxTalk() {
       );
 
       toast.success("Toolbox Talk updated successfully!");
-      navigate("/toolbox"); // After update, redirect to toolbox list
+      navigate("/toolbox");
     } catch (error) {
       console.error(error);
       toast.error("Failed to update toolbox talk!");
@@ -195,7 +233,7 @@ function EditToolboxTalk() {
               <Form.Label>Presenter</Form.Label>
               <Form.Select
                 name="presenter"
-                value={formData.presenter._id || ""}
+                value={formData.presenter || ""}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,

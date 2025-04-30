@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import { deleteIncidentReport, getIncidentReports } from "../../../redux/slices/incidentReportSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Swal from 'sweetalert2';
+
+
 const safetyProtocols = [
   { id: 1, text: "Initial containment measures implemented", completed: true },
   { id: 2, text: "Safety team notified", completed: true },
@@ -34,7 +36,7 @@ const timelineEvents = [
 
 function IncidentReports() {
   const {reports}= useSelector((state)=>state.reports)
-  console.log(reports)
+  // console.log(reports)
   const dispatch= useDispatch()
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("All Types");

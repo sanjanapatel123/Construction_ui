@@ -30,10 +30,10 @@ function SWMS() {
   // console.log(projects)
 
    const  projects  = useSelector((state) => state.projects.data);
-    console.log(projects);
+    // console.log(projects);
 
 
-  console.log("sWMS" ,swms)
+  // console.log("sWMS" ,swms)
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -132,7 +132,7 @@ const handleDelete = (id) => {
     if (result.isConfirmed) {
       dispatch(deleteswms(id))
         .then((response) => {
-          {console.log(response)}
+          // {console.log(response)}
           if (response.meta.requestStatus === "fulfilled") {
             // showSuccessToast("SWMS deleted successfully!");
             dispatch(getallSwms());
@@ -150,7 +150,7 @@ const handleDelete = (id) => {
 
 const getProjectName = (projectId) => {
   const project = projects.find((p) => p.id === projectId);
-  console.log("getproject",project);
+  // console.log("getproject",project);
   return project ? project.name : "Unknown Project";
 };
  

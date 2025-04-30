@@ -1,12 +1,33 @@
 import React, { useEffect, useState } from "react";
+import { Dialog } from "@headlessui/react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { LineChart, Line, PieChart, Pie, Tooltip, Legend, ResponsiveContainer, CartesianGrid, XAxis, YAxis, Cell,} from "recharts";
-import { FaClipboard, FaClock, FaCheckCircle, FaExclamationCircle,} from "react-icons/fa";
+import {
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Cell,
+} from "recharts";
+import {
+  FaClipboard,
+  FaClock,
+  FaCheckCircle,
+  FaExclamationCircle,
+} from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import { deleteRFI, fetchRFI } from "../../../redux/slices/rfiSlice";
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
+import axiosInstance from "../../../utils/axiosInstance";
+import { Modal } from "react-bootstrap";
+
 const lineChartData = [
   { month: "Jan", Submitted: 20, Resolved: 18 },
   { month: "Feb", Submitted: 30, Resolved: 25 },
@@ -24,6 +45,10 @@ const pieChartData = [
 ];
 
 function RFIs() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [question, setQuestion] = useState("");
+  const [suggestion, setSuggestion] = useState("");
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const { rfi } = useSelector((state) => state.rfi);
 
@@ -75,9 +100,27 @@ function RFIs() {
     },
   ];
 
+  const handleSubmit = async () => {
+    if (!question.trim()) return;
+    setLoading(true);
+    try {
+      const response = await axiosInstance.post(
+        "https://constructionaimicroservice-production.up.railway.app/rfi_suggestions",
+        {
+          question: question,
+        }
+      );
+      setSuggestion(response.data.rfi_suggestion || "No suggestion returned.");
+    } catch (error) {
+      console.error("Error fetching suggestion:", error);
+      setSuggestion("Error fetching suggestion.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="">
+    <div>
       {/* Dashboard Section */}
       <div className="container py-4">
         <h2 className="mb-4">RFI </h2>
@@ -109,108 +152,161 @@ function RFIs() {
         </div>
         {/* Top Stats Cards */}
         <div className="d-flex justify-content-between align-items-center mt-4">
-        <h4 className="fw-semibold">RFI</h4>
-        <Link to={"/AddRFIs"}>
-          <button
-            className="btn px-3"
-            style={{ backgroundColor: "#0d6efd", color: "white" }}
-          >
-            <i className="fa-solid fa-plus me-2"></i> New RFI
-          </button>
-        </Link>
-      </div>
-    <div className="table-responsive mt-5 mb-4 bg-white p-3 rounded-2">
-  <table className="table table-hover align-middle">
-    <thead>
-      <tr>
-        <th className="ps-4">ID</th>
-        <th>Subject</th>
-        <th>Status</th>
-        <th>Assignee</th>
-        <th className="pe-4">Due Date</th>
-        <th className="pe-4">Priority</th> 
-        <th className="pe-4">Action</th> 
-      </tr>
-    </thead>
-    <tbody>
-  {rfi && rfi.length > 0 ? (
-    rfi
-      .map((item, index) => (
-        <tr key={item._id} className="py-3">
-          <td className="fw-semibold ps-4 py-3">{index + 1}</td>
-          <td className="py-3">{item.subject}</td>
-          <td className="py-3">
-            <span
-              className={`badge ${
-                item.status === "pending"
-                  ? "bg-warning text-dark"
-                  : item.status === "approved"
-                  ? "bg-success"
-                  : "bg-secondary"
-              }`}
+          <h4 className="fw-semibold">RFI</h4>
+
+          <div className="d-flex gap-2">
+            <button
+              className="btn px-3"
+              onClick={() => setIsOpen(true)}
+              style={{ backgroundColor: "#0d6efd", color: "white" }}
             >
-              {item.status}
-            </span>
-          </td>
-          <td className="py-3">{item.assignee}</td>
-          <td className="pe-4 py-3">
-            {new Date(item.due_date).toLocaleDateString("en-GB", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            })}
-          </td>
-          <td className="pe-4 py-3">
-            <span
-              className={`badge ${
-                item.priority === "High"
-                  ? "bg-danger"
-                  : item.priority === "Medium"
-                  ? "bg-warning"
-                  : "bg-success"
-              }`}
+              {" "}
+              Ask RFI Question
+            </button>
+            <Link to={"/AddRFIs"}>
+              <button
+                className="btn px-3"
+                style={{ backgroundColor: "#0d6efd", color: "white" }}
+              >
+                <i className="fa-solid fa-plus me-2"></i> New RFI
+              </button>
+            </Link>
+          </div>
+        </div>
+
+        <Modal
+          show={isOpen}
+          onHide={() => setIsOpen(false)}
+          centered
+          backdrop="static"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Ask a Question</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <input
+              type="text"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="e.g., What are the specs for fire-resistant cables?"
+              className="form-control mb-3"
+            />
+
+            <button
+              onClick={handleSubmit}
+              className="btn btn-primary w-100"
+              disabled={loading}
             >
-              {item.priority}
-            </span>
-          </td>
-          <td>
-          <div>
-                  <Button variant="light" size="sm" className="me-2"> <i className="fas fa-edit text-primary"></i> </Button>
-                      <Button  variant="light"  size="sm"  onClick={()=>HandleDelete(item._id)}>
-                        <i className="fas fa-trash text-danger"></i>
-                      </Button>
-                    </div>
-          </td>
-        </tr>
-      ))
-  ) : (
-    <tr>
-      <td colSpan="6" className="text-center py-3">
-        No RFIs found.
-      </td>
-    </tr>
-  )}
-</tbody>
+              {loading ? "Sending..." : "Send"}
+            </button>
 
-  </table>
+            {suggestion && (
+              <div
+                className="mt-3 bg-light p-3 rounded text-muted"
+                style={{ whiteSpace: "pre-wrap" }}
+              >
+                {suggestion}
+              </div>
+            )}
+          </Modal.Body>
+        </Modal>
+        <div className="table-responsive mt-5 mb-4 bg-white p-3 rounded-2">
+          <table className="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th className="ps-4">ID</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Assignee</th>
+                <th className="pe-4">Due Date</th>
+                <th className="pe-4">Priority</th>
+                <th className="pe-4">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rfi && rfi.length > 0 ? (
+                rfi.map((item, index) => (
+                  <tr key={item._id} className="py-3">
+                    <td className="fw-semibold ps-4 py-3">{index + 1}</td>
+                    <td className="py-3">{item.subject}</td>
+                    <td className="py-3">
+                      <span
+                        className={`badge ${
+                          item.status === "pending"
+                            ? "bg-warning text-dark"
+                            : item.status === "approved"
+                            ? "bg-success"
+                            : "bg-secondary"
+                        }`}
+                      >
+                        {item.status}
+                      </span>
+                    </td>
+                    <td className="py-3">{item.assignee}</td>
+                    <td className="pe-4 py-3">
+                      {new Date(item.due_date).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </td>
+                    <td className="pe-4 py-3">
+                      <span
+                        className={`badge ${
+                          item.priority === "High"
+                            ? "bg-danger"
+                            : item.priority === "Medium"
+                            ? "bg-warning"
+                            : "bg-success"
+                        }`}
+                      >
+                        {item.priority}
+                      </span>
+                    </td>
+                    <td>
+                      <div>
+                        <Button variant="light" size="sm" className="me-2">
+                          {" "}
+                          <i className="fas fa-edit text-primary"></i>{" "}
+                        </Button>
+                        <Button
+                          variant="light"
+                          size="sm"
+                          onClick={() => HandleDelete(item._id)}
+                        >
+                          <i className="fas fa-trash text-danger"></i>
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="text-center py-3">
+                    No RFIs found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
 
-  {/* Pagination (static for now, dynamic karni ho toh boliyo) */}
-  <div className="d-flex justify-content-end">
-    <Button size="sm" variant="outline-secondary" className="me-2">
-      Previous
-    </Button>
-    <Button size="sm" variant="primary" className="ms-2">
-      1
-    </Button>
-    <Button size="sm" variant="outline-secondary" className="ms-2">
-      2
-    </Button>
-    <Button size="sm" variant="outline-secondary" className="ms-2">
-      Next
-    </Button>
-  </div>
-</div>
-
+          {/* Pagination (static for now, dynamic karni ho toh boliyo) */}
+          <div className="d-flex justify-content-end">
+            <Button size="sm" variant="outline-secondary" className="me-2">
+              Previous
+            </Button>
+            <Button size="sm" variant="primary" className="ms-2">
+              1
+            </Button>
+            <Button size="sm" variant="outline-secondary" className="ms-2">
+              2
+            </Button>
+            <Button size="sm" variant="outline-secondary" className="ms-2">
+              Next
+            </Button>
+          </div>
+        </div>
 
         {/* Charts Section */}
         <div className="row mb-4 g-4">

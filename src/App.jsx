@@ -33,7 +33,6 @@ import ViewServicePage from "./components/AdminComponents/PlantMachinery/ViewSer
 import Messenger from "./components/AdminComponents/messenger/Messenger";
 import Announcements from "./components/AdminComponents/announcements/Announcements";
 import AddAnnouncements from "./components/AdminComponents/announcements/AddAnnouncements";
-import RFIs from "./components/AdminComponents/RFIs/RFIs";
 import AddRFIs from "./components/AdminComponents/RFIs/AddRFIs";
 import ToolboxTalks from "./components/AdminComponents/ToolboxTalks/ToolboxTalks";
 import AddToolboxTalks from "./components/AdminComponents/ToolboxTalks/AddToolboxTalks";
@@ -83,6 +82,7 @@ import "react-toastify/dist/ReactToastify.css";
 import SafetyEquipmentList from "./components/AdminComponents/SafetyEquipment/SafetyEquipmentList";
 import SafetyEquipmentDetails from "./components/AdminComponents/SafetyEquipment/SafetyEquipmentDetails";
 import EditToolboxTalk from "./components/AdminComponents/ToolboxTalks/EditToolboxTalk";
+import RFIs from "./components/AdminComponents/RFIs/RFIs";
 
 
 function App() {

@@ -202,7 +202,7 @@ const ITPs = () => {
       <div className="d-flex justify-content-between">
         <h4 className="fw-semibold mb-4">ITP Analytics Overview</h4>
 
-        <Link to={"/AddITPs"} className="ms-auto">
+         <Link to={"/AddITPs"} className="ms-auto">
           <button
             className="btn  px-3"
             onClick={() => {

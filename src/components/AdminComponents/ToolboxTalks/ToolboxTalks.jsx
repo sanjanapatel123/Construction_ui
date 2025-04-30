@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
 import { Link } from "react-router-dom";
 import { Button } from "react-bootstrap";
@@ -7,11 +7,79 @@ import {
   fetchToolboxTalks,
   deleteToolbox,
 } from "../../../redux/slices/toolboxTalkSlice";
+import axiosInstance from "../../../utils/axiosInstance";
 
 function ToolboxTalks() {
   const dispatch = useDispatch();
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
+
+  const [recording, setRecording] = useState(false);
+  const [transcription, setTranscription] = useState("");
+  const [summary, setSummary] = useState("");
+  const [loadingAudio, setLoadingAudio] = useState(false);
+
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+
+  const onStop = async (recordedBlob) => {
+    setLoadingAudio(true);
+    const formData = new FormData();
+    formData.append("audio", recordedBlob.blob, "recording.wav");
+
+    try {
+      const res = await axiosInstance.post(
+        "https://constructionaimicroservice-production.up.railway.app/speechtotext",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      setTranscription(res.data.transcription);
+      setSummary(res.data.summery);
+    } catch (error) {
+      console.error("Transcription failed", error);
+      setTranscription("Error processing audio");
+    } finally {
+      setLoadingAudio(false);
+    }
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioChunksRef.current = [];
+      const mediaRecorder = new MediaRecorder(stream);
+
+      mediaRecorder.ondataavailable = (e) => {
+        audioChunksRef.current.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/wav",
+        });
+        const recordedBlob = { blob: audioBlob }; // mimic ReactMic structure
+        onStop(recordedBlob);
+      };
+
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.start();
+      setRecording(true);
+    } catch (err) {
+      console.error("Failed to start recording:", err);
+    }
+  };
+
+  const stopRecording = () => {
+    if (
+      mediaRecorderRef.current &&
+      mediaRecorderRef.current.state !== "inactive"
+    ) {
+      mediaRecorderRef.current.stop();
+      setRecording(false);
+    }
+  };
 
   const { talks, loading, error } = useSelector((state) => state.toolboxTalks);
 
@@ -262,18 +330,50 @@ function ToolboxTalks() {
             {/* Active Talk Section */}
             <div className="bg-white p-4 rounded shadow-sm">
               <div className="mb-3">
-                <button id="btn_itp" className="btn btn-dark me-2">
-                  <i className="bi bi-record-circle me-1"></i> Start Recording
-                </button>
+                {recording ? (
+                  <button
+                    onClick={stopRecording}
+                    className="btn btn-danger me-2"
+                  >
+                    <i className="bi bi-stop-circle me-1"></i> Stop Recording
+                  </button>
+                ) : (
+                  <button
+                    onClick={startRecording}
+                    className="btn btn-dark me-2"
+                  >
+                    <i className="bi bi-record-circle me-1"></i> Start Recording
+                  </button>
+                )}
                 <button className="btn btn-outline-dark">
                   Take Attendance
                 </button>
               </div>
+
               <div
                 className="border rounded p-3 text-muted"
-                style={{ height: "120px" }}
+                style={{ height: "120px", overflowY: "auto" }}
               >
-                AI Transcription will appear here...
+                {loadingAudio ? (
+                  <p>Processing audio...</p>
+                ) : transcription ? (
+                  <>
+                    <p>
+                      <strong>Transcription:</strong> {transcription}
+                    </p>
+                    <p>
+                      <strong>Summary:</strong>
+                      <br />
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: summary.replace(/\n/g, "<br/>"),
+                        }}
+                      />
+                    </p>
+                  </>
+                ) : (
+                  <p>AI Transcription will appear here...</p>
+                )}
               </div>
             </div>
 

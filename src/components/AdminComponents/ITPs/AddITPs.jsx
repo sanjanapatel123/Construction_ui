@@ -117,16 +117,80 @@ const AddITPs = () => {
     }
   };
 
+  const handleAutofill = async () => {
+    try {
+      const response = await fetch(
+        `https://constructionaimicroservice-production.up.railway.app/autofill`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ form_type: "itps" }),
+        }
+      );
+
+      const result = await response.json();
+      const suggested_data = result?.suggested_data;
+
+      if (!suggested_data) {
+        toast.error("No autofill data found.");
+        return;
+      }
+
+      setFormData({
+        projectName: suggested_data.projectName || "",
+        inspectionType: suggested_data.InspectionType || "",
+        inspector: suggested_data.Inspector || "",
+        activity: suggested_data.activity || "",
+        criteria: suggested_data.criteria || "",
+        status: suggested_data.status || "",
+        inspectionDate: suggested_data.Date
+          ? new Date(suggested_data.Date).toISOString().split("T")[0]
+          : "",
+        additionalNotes: suggested_data.additionalNotes || "",
+        image: [], // Leave empty; do not autofill images
+      });
+
+      const mappedItems = (suggested_data.InspectionItems || []).map(
+        (item) => ({
+          description: item.itemDescription || "",
+          status: item.status ? "Pass" : "Fail",
+          comments: item.comments || "",
+        })
+      );
+
+      setItems(
+        mappedItems.length > 0
+          ? mappedItems
+          : [{ description: "", status: "Pass", comments: "" }]
+      );
+
+      toast.success("Form autofilled successfully.");
+    } catch (error) {
+      console.error("Autofill failed:", error);
+      toast.error("Failed to fetch autofill data.");
+    }
+  };
+
   return (
     <div className="container p-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h3>Inspection Test Plans</h3>
-        <button
-          onClick={() => navigate(-1)}
-          className="btn bg-primary text-white"
-        >
-          <i className="fa-solid fa-arrow-left me-2"></i> Back to Overview
-        </button>
+        <div className="d-flex gap-2 text-nowrap">
+          <button
+            className="btn bg-primary text-white"
+            onClick={handleAutofill}
+          >
+            autoFill
+          </button>
+          <button
+            onClick={() => navigate(-1)}
+            className="btn bg-primary text-white"
+          >
+            <i className="fa-solid fa-arrow-left me-2"></i> Back to Overview
+          </button>
+        </div>
       </div>
       <div className="card p-4 shadow-sm">
         <div className="row g-3 mb-3">
