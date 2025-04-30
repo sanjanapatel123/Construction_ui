@@ -1,0 +1,326 @@
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "react-bootstrap";
+import { toast } from "react-toastify";
+import axiosInstance from "../../../utils/axiosInstance";
+import { apiUrl } from "../../../utils/config";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProjects } from "../../../redux/slices/projectSlice"; // Adjust the import path as necessary
+import { Modal } from "react-bootstrap";
+
+function AddDefectList() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    title: "",
+    project: "",
+    location: "",
+    category: "",
+    assigned: "",
+    priority: "Low",
+    description: "",
+    status: "New",
+    comments: "",
+    date: "",
+  });
+
+  const dispatch = useDispatch();
+  const { data: projects, loading } = useSelector((state) => state.projects);
+  const [categories, setCategories] = useState([
+    "Plumbing",
+    "Electrical",
+    "HVAC",
+  ]);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+
+  // console.log("Projects →", projects);
+
+  useEffect(() => {
+    dispatch(fetchProjects()); // Fetch projects when component mounts
+  }, [dispatch]);
+
+  const [image, setImage] = useState(null);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+
+  const handleSubmit = async () => {
+    const payload = new FormData();
+    payload.append("title", formData.title);
+    payload.append("date", formData.date);
+    payload.append("project", formData.project);
+    payload.append("location", formData.location);
+    payload.append("category", formData.category);
+    payload.append("assigned", formData.assigned);
+    payload.append("priority", formData.priority);
+    payload.append("description", formData.description);
+    payload.append("status", formData.status);
+    payload.append("comments", formData.comments);
+    if (image) payload.append("image", image);
+
+    try {
+      const response = await axiosInstance.post(
+        `${apiUrl}/defectlists`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("Success:", response.data);
+      toast.success("Defect created successfully!");
+      navigate(-1); // back to overview
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to create checklist."
+      );
+    }
+  };
+  return (
+    <div
+      className="container d-flex justify-content-center py-4"
+      style={{ fontFamily: "Inter, sans-serif", fontSize: "14px" }}
+    >
+      <div className="bg-white p-4 rounded shadow-sm w-100">
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h4 className="fw-semibold m-0">Log New Defect</h4>
+          <button
+            onClick={() => navigate(-1)}
+            className="btn"
+            style={{ backgroundColor: "#0d6efd", color: "white" }}
+          >
+            <i className="fa-solid fa-arrow-left me-2"></i> Back to Overview
+          </button>
+        </div>
+
+        {/* Form Inputs */}
+        <div className="row g-3">
+          <div className="col-md-6">
+            <label className="form-label">Defect Title</label>
+            <input
+              type="text"
+              name="title"
+              className="form-control"
+              placeholder="Enter defect title"
+              onChange={handleChange}
+              value={formData.title}
+            />
+          </div>
+          <div className="col-md-6">
+            <label className="form-label">
+              Project Name{" "}
+              <Link to={"/add-project"}>
+                <i
+                  className="fa fa-plus ms-2"
+                  style={{ cursor: "pointer", color: "#0d6efd" }}
+                ></i>
+              </Link>
+            </label>
+            {loading ? (
+              <div>Loading projects...</div>
+            ) : (
+              <select
+                className="form-select"
+                name="project"
+                value={formData.project}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select Project</option>
+                {projects?.map((project) => (
+                  <option key={project._id} value={project._id}>
+                    {project.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+        </div>
+
+        <div className="row g-3 mt-2">
+          <div className="col-md-6">
+            <label className="form-label">Location</label>
+            <input
+              type="text"
+              name="location"
+              className="form-control"
+              placeholder="Enter location"
+              onChange={handleChange}
+              value={formData.location}
+            />
+          </div>
+          <div className="col-md-6">
+            <label className="form-label d-flex justify-content-between align-items-center">
+              <span>Category</span>
+              <i
+                className="fa fa-plus"
+                style={{ cursor: "pointer", color: "#0d6efd" }}
+                onClick={() => setShowCategoryModal(true)}
+              ></i>
+            </label>
+
+            <select
+              name="category"
+              className="form-select"
+              onChange={handleChange}
+              value={formData.category}
+            >
+              <option value="">Select Category</option>
+              {categories.map((cat, index) => (
+                <option key={index} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <Modal
+          show={showCategoryModal}
+          onHide={() => setShowCategoryModal(false)}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Add New Category</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Enter new category"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+            />
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="secondary"
+              onClick={() => setShowCategoryModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                const trimmed = newCategory.trim();
+                if (trimmed && !categories.includes(trimmed)) {
+                  setCategories((prev) => [...prev, trimmed]);
+                  setFormData((prev) => ({ ...prev, category: trimmed }));
+                }
+                setNewCategory("");
+                setShowCategoryModal(false);
+              }}
+            >
+              Save
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        <div className="row g-3 mt-2">
+          <div className="col-md-6">
+            <label className="form-label">Assigned To</label>
+            <input
+              type="text"
+              name="assigned"
+              className="form-control"
+              placeholder="Enter assignee"
+              onChange={handleChange}
+              value={formData.assigned}
+            />
+          </div>
+          <div className="col-md-6">
+            <label className="form-label">Priority</label>
+            <select
+              name="priority"
+              className="form-select"
+              onChange={handleChange}
+              value={formData.priority}
+            >
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="mt-3">
+          <label className="form-label">Description</label>
+          <textarea
+            name="description"
+            className="form-control"
+            placeholder="Describe the defect in detail"
+            rows={4}
+            onChange={handleChange}
+            value={formData.description}
+          />
+        </div>
+
+        <div className="row g-3 mt-3">
+          <div className="col-md-6">
+            <label className="form-label">Status</label>
+            <select
+              name="status"
+              className="form-select"
+              onChange={handleChange}
+              value={formData.status}
+            >
+              <option>New</option>
+              <option>In Progress</option>
+              <option>Resolved</option>
+              <option>Closed</option>
+            </select>
+          </div>
+
+          <div className="col-md-6">
+            <label className="form-label">Due Date</label>
+            <input
+              type="date"
+              className="form-control"
+              name="date"
+              value={formData.date}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        </div>
+
+        <div className="mt-3">
+          <label className="form-label">Attachments</label>
+          <input
+            type="file"
+            className="form-control"
+            onChange={handleFileChange}
+          />
+        </div>
+
+        <div className="mt-3">
+          <label className="form-label">Comments & Notes</label>
+          <textarea
+            name="comments"
+            className="form-control"
+            placeholder="Add any additional comments or notes"
+            rows={3}
+            onChange={handleChange}
+            value={formData.comments}
+          />
+        </div>
+
+        <div className="mt-4 d-flex gap-2">
+          <button className="btn btn-outline-secondary">Save as Draft</button>
+          <Button style={{ backgroundColor: "#0052CC" }} onClick={handleSubmit}>
+            Create defect
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default AddDefectList;

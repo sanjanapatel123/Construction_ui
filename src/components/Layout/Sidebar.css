@@ -1,0 +1,343 @@
+.sidebar {
+    background-color: #ffffff;
+    color: #64748b !important;
+    transition: transform 0.3s ease, width 0.3s ease;
+    position: fixed;
+    height: 100vh;
+    padding: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    border-right: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    left: 0;
+    top: 0;
+    width: 280px;
+}
+
+.sidebar.collapsed {
+    width: 80px;
+}
+
+.toggle-button {
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    /* padding: 10px; */
+    display: none;
+    /* position: absolute; */
+    /* right: -40px; */
+    /* top: 0px; */
+    font-size: 24px;
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+@media screen and (max-width: 768px) {
+    .sidebar-overlay.show {
+        display: block;
+    }
+
+    .sidebar.expanded {
+        width: 100%;
+        max-width: 280px;
+        transform: translateX(0);
+    }
+    
+    .sidebar.collapsed {
+        transform: translateX(-100%);
+        width: 280px;
+    }
+
+    .toggle-button {
+        display: block;
+        background-color: #0052CC;
+        color: rgb(250, 247, 247);
+        /* border-radius: 0 4px 4px 0; */
+        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+        width: 50px;
+        margin-top: 0px;
+        
+    }
+}
+
+    .menu-item {
+      padding: 12px;
+    }
+
+    .submenu-item {
+      padding: 10px;
+    }
+
+    .menu-icon {
+      font-size: 20px;
+    }
+
+    .menu-text {
+      font-size: 14px;
+    }
+   @media screen and (max-width: 480px) {
+    .sidebar.expanded {
+      max-width: 280px;
+    }
+    .menu-item {
+      padding: 10px;
+    }
+  .submenu-item {
+      padding: 8px;
+    }
+    .menu-icon {
+      font-size: 18px;
+    }
+    .menu-text {
+      font-size: 13px;
+    }
+  }
+
+  .sidebar-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 8px;
+    position: sticky;
+    top: 0;
+    background-color: #ffffff;
+    z-index: 1001;
+    width: 100%;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+  }
+
+  .logo-text {
+    font-size: 20px;
+    font-weight: 600;
+    color: #0052CC;
+    letter-spacing: -0.5px;
+  }
+
+  .sidebar.collapsed .logo-text {
+    display: none;
+  }
+  
+  .sidebar.expanded {
+    width: 260px;
+  }
+  
+  .sidebar.collapsed {
+    width: 70px;
+  }
+  
+  .menu {
+    list-style-type: none;
+    padding: 16px 0;
+    margin: 0;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .sidebar.collapsed .menu-item:hover{
+    margin: 0px;
+  }
+  .menu-item:hover{
+    background-color: #f8f9fa;
+    color: #0052CC;
+  }
+  .menu-item:hover .menu-icon {
+    color: #0052CC !important;
+  }
+  .menu-item {
+    display: flex;
+  flex-direction: column;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    margin: 2px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4b5563;
+  }
+  
+  .menu-item.active {
+    background-color: #0052CC;
+    color: white !important;
+    margin: 4px 16px;
+    border-radius: 8px;
+  }
+  
+  .menu-item.active span{
+    color: white;
+    font-weight: 500;
+  }
+
+  .menu-item.active .menu-icon {
+    color: white !important;
+  }
+
+  .menu-link {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    color: inherit;
+    text-decoration: none;
+  }
+  .submenu{
+    background-color: #f8fafc;
+    margin: 0 16px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .menu-icon {
+    margin-right: 12px;
+    font-size: 18px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0052CC;
+    opacity: 0.9;
+  }
+  
+  .menu-i {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+  
+  .menu-text {
+    flex: 1;
+    transition: opacity 0.3s;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    color: #344563;
+  }
+  
+  .sidebar.collapsed .menu-text {
+    display: none;
+  }
+
+  .sidebar.collapsed .menu-item {
+    padding: 12px;
+    justify-content: center;
+  }
+
+  .sidebar.collapsed .menu-icon {
+    margin-right: 0;
+  }
+
+  .sidebar.collapsed .menu-item.active {
+    margin: 4px 8px;
+  }
+  
+  .submenu {
+    list-style-type: none;
+    padding: 0;
+    margin: 4px 0;
+    background-color: transparent;
+    transition: all 0.3s ease;
+    position: relative;
+    margin-left: 28px;
+    max-height: 0;
+    overflow: hidden;
+  }
+  
+  .submenu.open {
+    max-height: 500px;
+    padding: 10px 0;
+  }
+  .submenu.open .submenu-item:hover{
+    background-color: #F4F5F7;
+    color: #0052CC;
+  }
+  .submenu-item.active-submenu-item{
+    background-color: #DEEBFF;
+    color: #0052CC;
+    font-weight: 500;
+  }
+  .submenu-item {
+    cursor: pointer;
+    padding: 8px 16px;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    margin: 2px 0;
+    font-size: 14px;
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+  }
+  
+  .menu-toggle-icon {
+    margin-left: auto;
+    font-size: 12px;
+    color: #64748b;
+    transition: transform 0.3s ease;
+    opacity: 0.7;
+    margin-right: 4px;
+  }
+  
+  .menu-item.open .menu-toggle-icon {
+    transform: rotate(180deg);
+    opacity: 1;
+  }
+  
+  .main-content {
+    flex: 1;
+    padding: 10px 10px;
+    overflow-y: auto;
+    transition: margin-left 0.3s ease;
+    background-color: #f4f4f4;
+  }
+  
+  .menu-link {
+    /* color: #0e4966; */
+    text-decoration: none;
+  }
+  @media (max-width: 576px) {
+    .info-box {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .info-box-icon {
+      margin-right: 0;
+      margin-bottom: 1rem;
+    }
+  
+    .sidebar.expanded {
+      width: 300px;
+    }
+    .sidebar.collapsed {
+      width: 48px;
+    }
+  }  
+  .menu-toggle-icon {
+    margin-left: auto;
+    font-size: 16px;
+    transition: transform 0.3s ease;
+  }
+  
+  .menu-item.open .menu-toggle-icon {
+    transform: rotate(180deg);
+    opacity: 1;
+  }
+
+
+
+
+  /* Navbar */
+  

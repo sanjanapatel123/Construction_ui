@@ -1,0 +1,21 @@
+body {
+  background-color: #f9f9f9;
+}
+
+.badge {
+  font-size: 0.75rem;
+}
+
+.table th,
+.table td {
+  vertical-align: middle;
+}
+
+img.img-fluid {
+  max-height: 600px;
+}
+
+.custom-modal .modal-content {
+  background-color: #f8f9fa; /* Light gray color */
+  color: #333; /* Darker text color for better contrast */
+}

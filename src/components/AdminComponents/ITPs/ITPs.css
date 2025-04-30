@@ -1,0 +1,140 @@
+/* ITP Management Interface Styles */
+.table {
+  --bs-table-hover-bg: #f8f9fa;
+}
+
+.table thead th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  border-top: none;
+  padding: 0.75rem;
+}
+
+.table tbody td {
+  padding: 0.75rem;
+  vertical-align: middle;
+}
+
+.badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.35rem 0.65rem;
+  border-radius: 4px;
+}
+
+.badge.bg-success {
+  background-color: #e6f4ea !important;
+  color: #1e7e34;
+}
+
+.badge.bg-warning {
+  background-color: #fff3cd !important;
+  color: #856404;
+}
+
+.badge.bg-primary {
+  background-color: #e7f1ff !important;
+  color: #0056b3;
+}
+
+.form-control {
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.form-control:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-select {
+  font-size: 0.875rem;
+  border-radius: 4px;
+  padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  border-radius: 4px;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-secondary:hover,
+.btn-outline-danger:hover {
+  color: #fff;
+}
+
+.pagination {
+  margin-bottom: 0;
+}
+
+.page-link {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  color: #007bff;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+}
+
+.page-item.active .page-link {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.page-item.disabled .page-link {
+  color: #6c757d;
+  background-color: #fff;
+  border-color: #dee2e6;
+}
+
+/* Avatar styles */
+.avatar-circle {
+  width: 32px;
+  height: 32px;
+  background-color: #6c757d;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Action buttons */
+.action-buttons .btn {
+  padding: 0.25rem 0.5rem;
+  margin: 0 0.125rem;
+}
+
+.action-buttons .btn i {
+  font-size: 0.875rem;
+}
+
+/* Search and filter section */
+.filters-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.search-box {
+  width: 240px;
+}
+
+.filters-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Results counter */
+.results-counter {
+  color: #6c757d;
+  font-size: 0.875rem;
+}

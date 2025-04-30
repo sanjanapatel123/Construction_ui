@@ -1,0 +1,17 @@
+.chat-box {
+  min-height: 400px;
+}
+
+.bot-icon {
+  font-size: 1.5rem;
+  align-self: flex-start;
+}
+
+.user-msg {
+  max-width: 75%;
+}
+
+.user-avatar img {
+  width: 32px;
+  height: 32px;
+}
