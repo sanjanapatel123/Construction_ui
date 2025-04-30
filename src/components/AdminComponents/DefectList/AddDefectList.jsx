@@ -6,6 +6,7 @@ import axiosInstance from "../../../utils/axiosInstance";
 import { apiUrl } from "../../../utils/config";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProjects } from "../../../redux/slices/projectSlice"; // Adjust the import path as necessary
+import { Modal } from "react-bootstrap";
 
 function AddDefectList() {
   const navigate = useNavigate();
@@ -24,6 +25,14 @@ function AddDefectList() {
 
   const dispatch = useDispatch();
   const { data: projects, loading } = useSelector((state) => state.projects);
+  const [categories, setCategories] = useState([
+    "Plumbing",
+    "Electrical",
+    "HVAC",
+  ]);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+
   // console.log("Projects →", projects);
 
   useEffect(() => {
@@ -141,17 +150,70 @@ function AddDefectList() {
             />
           </div>
           <div className="col-md-6">
-            <label className="form-label">Category</label>
-            <input
-              type="text"
+            <label className="form-label d-flex justify-content-between align-items-center">
+              <span>Category</span>
+              <i
+                className="fa fa-plus"
+                style={{ cursor: "pointer", color: "#0d6efd" }}
+                onClick={() => setShowCategoryModal(true)}
+              ></i>
+            </label>
+
+            <select
               name="category"
-              className="form-control"
-              placeholder="Enter category"
+              className="form-select"
               onChange={handleChange}
               value={formData.category}
-            />
+            >
+              <option value="">Select Category</option>
+              {categories.map((cat, index) => (
+                <option key={index} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
+
+        <Modal
+          show={showCategoryModal}
+          onHide={() => setShowCategoryModal(false)}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Add New Category</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Enter new category"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+            />
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="secondary"
+              onClick={() => setShowCategoryModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                const trimmed = newCategory.trim();
+                if (trimmed && !categories.includes(trimmed)) {
+                  setCategories((prev) => [...prev, trimmed]);
+                  setFormData((prev) => ({ ...prev, category: trimmed }));
+                }
+                setNewCategory("");
+                setShowCategoryModal(false);
+              }}
+            >
+              Save
+            </Button>
+          </Modal.Footer>
+        </Modal>
 
         <div className="row g-3 mt-2">
           <div className="col-md-6">

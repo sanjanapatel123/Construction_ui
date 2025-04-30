@@ -8,7 +8,7 @@ import {
   fetchDefects,
   deleteDefectList,
   fetchDefectDetails,
-} from "../../../redux/slices/defectSlice"; // Adjust the import path as necessary
+} from "../../../redux/slices/defectSlice";
 function DefectList() {
   const [showModal, setShowModal] = useState(false);
 
