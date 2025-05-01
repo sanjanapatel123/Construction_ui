@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Button,
@@ -25,6 +25,11 @@ import {
   faCloudUploadAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import ViewDocument from "./ViewDocument";
+import { useDispatch, useSelector } from "react-redux";
+import { addDrawings, deleteDrawings, fetchDrawings, fetchSingleDrawings } from "../../../redux/slices/drawingsSlice";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
+import { fetchUsers } from "../../../redux/slices/userSlice";
 
 function DrawingRegister() {
   const folders = [
@@ -113,6 +118,14 @@ function DrawingRegister() {
   const [viewMode, setViewMode] = useState("grid");
   const [selectedDoc, setSelectedDoc] = useState(null);
 
+  const { data:users } = useSelector((state) => state.users);
+
+useEffect(() => {
+    dispatch(fetchUsers());
+  }, []);
+
+
+  const dispatch = useDispatch()
   const filteredDocuments = documentsData.filter(
     (doc) =>
       doc.folderId === activeFolder.id &&
@@ -138,10 +151,8 @@ function DrawingRegister() {
   };
 
   const closeViewModal = () => {
-    console.log("Modal closed"); // DEBUG check
     setSelectedDoc(null);
   };
-
 
   const getStatusColorClass = (status) => {
     switch (status) {
@@ -156,6 +167,85 @@ function DrawingRegister() {
     }
   };
 
+  // All Drawing list
+  const { drawings_arr } = useSelector((state) => state.drawings);
+  console.log("Drawings:", drawings_arr.drawingRegisters);
+  useEffect(() => {
+    dispatch(fetchDrawings());
+  }, [dispatch]);
+
+
+
+  // add 
+  const [formData, setFormData] = useState({
+    documentTitle: "",
+    documentType: "",
+    folder: "",
+    assignedTo: "",
+    comments: "",
+    image: null,
+    status: "",
+  });
+
+  const { documentTitle, documentType, folder, assignedTo, comments, imagem, status } = formData;
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleFileChange = (e) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      image: e.target.files[0],
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(formData);
+
+    dispatch(addDrawings(formData)).unwrap().then(() => {
+      toast.success("Document uploaded successfully!");
+      setShowUploadModal(false);
+      dispatch(fetchDrawings());
+    }).catch((error) => {
+      toast.error(error?.response?.data?.message || "Failed to upload document!");
+    })
+  };
+
+  const handleDelete = (id) => {
+    console.log(id);
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(deleteDrawings(id))
+          .then(() => {
+            Swal.fire("Deleted!", "The document has been deleted.", "success");
+            dispatch(fetchDrawings());
+          })
+          .catch(() => {
+            Swal.fire("Error!", "Something went wrong.", "error");
+          });
+      }
+    });
+  };
+
+  const handleViewDocument = (_id) => {
+    dispatch(fetchSingleDrawings(_id))
+  }
+
+
   return (
     <div className="d-flex flex-column flex-md-row h-100">
       <div className="col-12 col-md-3 bg-white p-3">
@@ -163,7 +253,6 @@ function DrawingRegister() {
           <FontAwesomeIcon icon={activeFolder.icon} /> Drawing Register
         </h3>
         <p className="text-muted">Document Management System</p>
-
         <InputGroup className="mb-3">
           <InputGroup.Text>
             <FontAwesomeIcon icon={faSearch} />
@@ -189,7 +278,6 @@ function DrawingRegister() {
             </ListGroup.Item>
           ))}
         </ListGroup>
-
         <Button
           variant="primary"
           className="mt-3 w-100"
@@ -225,91 +313,110 @@ function DrawingRegister() {
 
         {viewMode === "grid" ? (
           <Row xs={1} md={2} lg={3} className="g-3">
-            {filteredDocuments.map((doc) => (
-              <Col key={doc.id}>
-                <div className="card shadow-sm">
-                  <div className="card-body">
-                    <h5 className="card-title">{doc.name}</h5>
-                    <p className="card-text">{doc.type}</p>
-                    <span
-                      className={`badge ${getStatusColorClass(
-                        doc.status
-                      )} mb-2`}
-                    >
-                      {doc.status}
-                    </span>
-                    <div className="d-flex justify-content-between">
-                      <small>{doc.assignedTo}</small>
-                      <small>{doc.lastModified}</small>
+            {drawings_arr?.drawingRegisters?.length > 0 &&
+              drawings_arr.drawingRegisters.map((Drawings) => (
+                <Col key={Drawings._id}>
+                  <div className="card shadow-sm">
+                    <div className="card-body">
+                      {/* Drawing Image */}
+                      <img
+                        src={Drawings.image?.[0]}
+                        alt="Uploaded Image"
+                        className="img-fluid"
+                        style={{ height: "150px" }}
+                      />
+
+                      {/* Document Title */}
+                      <h5 className="card-title">
+                        {Drawings.documentTitle}
+                      </h5>
+
+                      {/* Folder Name */}
+                      <small>
+                        Folder: {Drawings.folder}
+                      </small>
+
+                      {/* Document Type */}
+                      <p className="card-text">
+                        Type: {Drawings.documentType}
+                      </p>
+
+                      {/* Status Badge */}
+                      <span className={`badge ${getStatusColorClass(Drawings.status)}`}>
+                        {Drawings.status}
+                      </span>
+                      
+                      {/* Assigned User Name */}
+                      <div className="d-flex justify-content-between mt-2">
+                        <small>Assigned To: {Drawings.assignedTo?.firstName}</small>
+                        <small>Last Name: {Drawings.lastName}</small>
+                      </div>
+
+                      {/* Comments */}
+                      <p className="card-text mt-2">
+                        Comments: {Drawings.comments}
+                      </p>
                     </div>
-                    <p className="card-text">{doc.comments}</p>
                   </div>
-                </div>
-              </Col>
-            ))}
+                </Col>
+              ))}
           </Row>
         ) : (
           <div className="table-responsive">
-          <table className="table table-hover align-middle mb-0">
-            <thead className="table-light">
-              <tr>
-                <th className="ps-4">Document</th>
-                <th>Status</th>
-                <th>Assigned To</th>
-                <th>Last Modified</th>
-                <th>Comments</th>
-                <th className="pe-4">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredDocuments.map((doc) => (
-                <tr key={doc.id} className="bg-white py-3">
-                  <td className="ps-4 py-3">{doc.name}</td>
-                  <td className="py-3">
-                    <span className={`badge ${getStatusColorClass(doc.status)}`}>
-                      {doc.status}
-                    </span>
-                  </td>
-                  <td className="py-3">{doc.assignedTo}</td>
-                  <td className="py-3">{doc.lastModified}</td>
-                  <td className="py-3">{doc.comments}</td>
-                  <td className="pe-4 py-3">
-                    <button
-                      className="btn btn-link p-0 me-2"
-                      onClick={() => openViewModal(doc)}
-                    >
-                      <FontAwesomeIcon icon={faEye} />
-                    </button>
-                    <button className="btn btn-link p-0 me-2">
-                      <FontAwesomeIcon icon={faEdit} />
-                    </button>
-                    <button className="btn btn-link p-0">
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                  </td>
+            <table className="table table-hover align-middle mb-0">
+              <thead className="table-light">
+                <tr>
+                  <th className="ps-4">Document</th>
+                  <th>Status</th>
+                  <th>Assigned To</th>
+                  <th>Last Modified</th>
+                  <th>Comments</th>
+                  <th className="pe-4">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        
+              </thead>
+              <tbody>
+                {drawings_arr?.drawingRegisters?.length > 0 &&
+                  drawings_arr.drawingRegisters.map((doc) => (
+                    <tr key={doc._id} className="bg-white py-3">
+                      <img src={doc.image?.[0]} alt="Uploaded Image" className="img-fluid" style={{ height: "60px" }} />
+                      <td className="py-3">
+                        <span className={`badge ${getStatusColorClass(doc.status)}`}>
+                          {doc.status}
+                        </span>
+                      </td>
+                      <td className="ps-4 py-3">{doc.assignedTo?.firstName}</td>
+                      {/* <td className="py-3">{doc.assignedTo}</td> */}
+                      {/* <td className="py-3">{new Date(doc.updatedAt).toLocaleString()}</td> */}
+                      <td className="py-3">{new Date(doc.updatedAt).toLocaleDateString()}</td>
+                      <td className="py-3">{doc.comments}</td>
+                      <td className="pe-4 py-3">
+                        <button
+                          className="btn btn-link p-0 me-2"
+                          onClick={() => {
+                            openViewModal(doc);
+                            handleViewDocument(doc._id);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faEye} />
+                        </button>
+                        <button className="btn btn-link p-0 me-2">
+                          <FontAwesomeIcon icon={faEdit} />
+                        </button>
+                        <button className="btn btn-link p-0" onClick={() => handleDelete(doc._id)}>
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
-      <Modal show={!!selectedDoc} onHide={closeViewModal} centered size="lg">
-  <Modal.Header closeButton>
-    <Modal.Title>Document Details</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-    <ViewDocument document={selectedDoc} />
-  </Modal.Body>
-  <Modal.Footer>
-    <Button variant="secondary" onClick={closeViewModal}>
-      Close
-    </Button>
-  </Modal.Footer>
-</Modal>
-
+      <Modal show={!!selectedDoc} onHide={closeViewModal} >
+        <ViewDocument document={selectedDoc} />
+      </Modal>
 
       <Modal
         show={showUploadModal}
@@ -321,59 +428,152 @@ function DrawingRegister() {
           <Modal.Title>Upload New Drawing</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className="text-center mb-4">
-            <FontAwesomeIcon
-              icon={faCloudUploadAlt}
-              size="4x"
-              className="text-muted"
-            />
-            <p className="mt-3">
-              Drag and drop your files here or click to browse
-            </p>
-            <Button variant="primary">Browse Files</Button>
-          </div>
-          <Form>
+          <Form onSubmit={handleSubmit}>
+
+            <div className="text-center mb-4">
+              <FontAwesomeIcon
+                icon={faCloudUploadAlt}
+                size="4x"
+                className="text-muted"
+              />
+              <p className="mt-3">
+                Drag and drop your files here or click to browse
+              </p>
+              <Form.Group controlId="formFile" className="mb-3">
+                <Form.Control type="file" onChange={handleFileChange} />
+              </Form.Group>
+            </div>
+
             <Form.Group className="mb-3">
               <Form.Label>Document Title</Form.Label>
-              <Form.Control type="text" placeholder="Enter document title" />
+              <Form.Control
+                type="text"
+                name="documentTitle"
+                value={documentTitle}
+                onChange={handleInputChange}
+                placeholder="Enter document title"
+              />
             </Form.Group>
+
             <Form.Group className="mb-3">
               <Form.Label>Document Type</Form.Label>
-              <Form.Select>
-                <option>Select document type</option>
-                <option>Blueprint</option>
-                <option>Electrical Plan</option>
-                <option>Mechanical Drawing</option>
+              <Form.Select
+                name="documentType"
+                value={documentType}
+                onChange={handleInputChange}
+              >
+                <option value="">Select document type</option>
+                <option value="Blueprint">Blueprint</option>
+                <option value="Electrical Plan">Electrical Plan</option>
+                <option value="Mechanical Drawing">Mechanical Drawing</option>
               </Form.Select>
             </Form.Group>
+
             <Form.Group className="mb-3">
               <Form.Label>Folder</Form.Label>
-              <Form.Select>
-                <option>Architectural Drawing</option>
-                <option>Structural Drawing</option>
-                <option>Site Plans</option>
+              <Form.Select
+                name="folder"
+                value={folder}
+                onChange={handleInputChange}
+              >
+                <option value="">Select folder</option>
+                <option value="Architectural Drawing">Architectural Drawing</option>
+                <option value="Structural Drawing">Structural Drawing</option>
+                <option value="Site Plans">Hydraulic Drawings</option>
+                <option value="Site Plans">Mechanical Drawings</option>
               </Form.Select>
             </Form.Group>
+
             <Form.Group className="mb-3">
-              <Form.Label>Assigned To</Form.Label>
-              <Form.Control type="text" placeholder="Enter name" />
+              <Form.Label>Status</Form.Label>
+              <Form.Select
+                name="status"
+                value={status}
+                onChange={handleInputChange}
+              >
+                <option value="">Select status</option>
+                <option value="Approved">Approved</option>
+                <option value="Not Approved">completed</option>
+                <option value="Pending">Pending</option>
+              </Form.Select>
             </Form.Group>
+
+            {/* <Form.Group className="mb-3">
+              <Form.Label>Assigned To</Form.Label>
+              <Form.Control
+                type="text"
+                name="assignedTo"
+                value={assignedTo}
+                onChange={handleInputChange}
+                placeholder="Enter name"
+              />
+            </Form.Group> */}
+            {/* <div className="row mb-3">
+          <div className="col-md-6">
+            <label className="form-label">Assignee</label>
+            <select
+              className="form-select"
+              name="assignee"
+              value={formData.assignee}
+              onChange={handleInputChange}
+            >
+                <option value="" disabled>Select assignee</option>
+            {
+              users?.map((user) => (
+                
+                <option key={user._id} value={user._id}> {user.firstName} {user.lastName
+}</option>
+              ))
+            }
+
+              
+            </select>
+</div>
+</div> */}
+<Form.Group className="mb-3">
+  <Form.Label>Assigned To</Form.Label>
+  <Form.Select
+    name="assignedTo"
+    value={assignedTo}
+    onChange={handleInputChange}
+  >
+    <option value="" disabled>Select assignee</option>
+    {users?.map((user) => (
+      <option key={user._id} value={user._id}>
+        {user.firstName} {user.lastName}
+      </option>
+    ))}
+  </Form.Select>
+</Form.Group>
+
             <Form.Group className="mb-3">
               <Form.Label>Comments</Form.Label>
               <Form.Control
                 as="textarea"
+                name="comments"
                 rows={3}
+                value={comments}
+                onChange={handleInputChange}
                 placeholder="Add any additional notes"
               />
             </Form.Group>
+
+
+            <Modal.Footer>
+              <Button variant="secondary" onClick={toggleUploadModal}>
+                Close
+              </Button>
+              <Button variant="primary" type="submit">Submit</Button>
+            </Modal.Footer>
           </Form>
+
         </Modal.Body>
-        <Modal.Footer>
+        {/* <Modal.Footer>
           <Button variant="secondary" onClick={toggleUploadModal}>
             Close
           </Button>
           <Button variant="primary">Upload</Button>
-        </Modal.Footer>
+        </Modal.Footer> */}
       </Modal>
     </div>
   );
