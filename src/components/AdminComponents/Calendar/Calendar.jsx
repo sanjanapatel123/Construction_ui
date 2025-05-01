@@ -1,159 +1,6 @@
-// import React from 'react';
-// import { Button, Row, Col } from 'react-bootstrap';
-// import { Link } from 'react-router-dom';
 
-// function Calendar() {
-//     const calendarData = [
-//         { day: '31', muted: true },
-//         { day: '1', events: [{ text: 'Project Kickoff', color: 'bg-primary bg-opacity-10 text-primary' }] },
-//         { day: '2' },
-//         { day: '3', events: [{ text: 'Site Survey', color: 'bg-success bg-opacity-25 text-success' }] },
-//         { day: '4' },
-//         { day: '5' },
-//         { day: '6' },
-//         { day: '7', events: [{ text: 'Team Meeting', color: 'bg-warning bg-opacity-25 text-warning' }] },
-//         { day: '8' },
-//         { day: '9', events: [{ text: 'Design Review', color: 'bg-purple text-purple bg-opacity-25' }] },
-//         { day: '10' },
-//         { day: '11' },
-//         { day: '12', events: [{ text: 'Safety Inspection', color: 'bg-danger bg-opacity-10 text-danger' }] },
-//         { day: '13', events: [{ text: '& Support', color: 'bg-light border text-dark' }] },
-//         { day: '14' },
-//         { day: '15', events: [{ text: 'Progress Review', color: 'bg-primary bg-opacity-25 text-primary' }] },
-//         { day: '16' },
-//         { day: '17' },
-//         { day: '18', events: [{ text: 'Quality Check', color: 'bg-success bg-opacity-25 text-success' }] },
-//         { day: '19' },
-//         { day: '20' },
-//         { day: '21', events: [{ text: 'Client Meeting', color: 'bg-warning bg-opacity-25 text-warning' }] },
-//         { day: '22' },
-//         { day: '23' },
-//         { day: '24', events: [{ text: 'Milestone Review', color: 'bg-purple text-purple bg-opacity-25' }] },
-//         { day: '25' },
-//         { day: '26' },
-//         { day: '27' },
-//         { day: '28', events: [{ text: 'End of Month Report', color: 'bg-danger bg-opacity-10 text-danger' }] },
-//         { day: '29' },
-//         { day: '30' },
-//         { day: '1' },
-//         { day: '2' },
-//         { day: '3' },
-//         { day: '4', events: [{ text: 'Safety Compliance', color: 'bg-light border text-dark' }] },
-//       ];
 
-//       // Group into weeks
-//       const weeks = [];
-//       for (let i = 0; i < calendarData.length; i += 7) {
-//         weeks.push(calendarData.slice(i, i + 7));
-//       }
-
-//   return (
-//     <div className="container bg-white py-4">
-//     {/* Header */}
-//     <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-//       <h5 className="fw-semibold mb-0">Calendar / Program</h5>
-//       <div className="d-flex gap-2 flex-wrap">
-//         <Button variant="outline-secondary" className="rounded px-3 py-1">Month View</Button>
-//         <Button variant="outline-secondary" className="rounded px-3 py-1">All Projects</Button>
-//         <Button variant="outline-secondary" className="rounded px-3 py-1">All Task Types</Button>
-//         <div className="d-flex align-items-center gap-2">
-//           <Button variant="light" className="px-2 py-1 border rounded-circle"><i className="bi bi-chevron-left" /></Button>
-//           <span className="fw-semibold">September 2023</span>
-//           <Button variant="light" className="px-2 py-1 border rounded-circle"><i className="bi bi-chevron-right" /></Button>
-//         </div>
-//      <Link to={"/Calendar_createnewtask"}>   <Button variant="dark" className="set_btn d-flex align-items-center gap-2 rounded px-3 py-1">
-//           <i className="bi bi-plus-lg"></i> New Task
-//         </Button></Link>
-//       </div>
-//     </div>
-
-//     {/* Calendar */}
-//     <div className="border rounded p-3 bg-white ">
-//       {/* Day Labels */}
-//       <Row className="text-center fw-semibold text-muted mb-1 justify-content-center " style={{ fontSize: '13px' }}>
-//         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
-//           <Col key={idx} style={{ width: '100px', maxWidth: '100px' }}>{day}</Col>
-//         ))}
-//       </Row>
-
-//       {/* Weeks */}
-//       {weeks.map((week, weekIndex) => (
-//         <Row key={weekIndex} className="gx-0 justify-content-center mb-1">
-//           {week.map((d, i) => (
-//             <Col
-//               key={i}
-//               className="border rounded bg-white text-start"
-//               style={{
-//                 height: '130px',
-//                 width: '130px',
-//                 minWidth: '130px',
-//                 maxWidth: '130px',
-//                 minHeight: '130px',
-//                 maxHeight: '130px',
-//                 padding: '6px',
-//                 fontSize: '13px',
-//                 overflow: 'hidden',
-//                 marginLeft:"10px"
-//               }}
-//             >
-//               <div className={`${d.muted ? 'text-muted' : ''}`}>{d.day}</div>
-//               {d.events && d.events.map((e, ei) => (
-//                 <div
-//                   key={ei}
-//                   className={`mt-1 px-2 py-1 rounded text-truncate small ${e.color}`}
-//                   style={{
-//                     fontSize: '12px',
-//                     whiteSpace: 'nowrap',
-//                     overflow: 'hidden',
-//                     textOverflow: 'ellipsis',
-//                   }}
-//                 >
-//                   {e.text}
-//                 </div>
-//               ))}
-//             </Col>
-//           ))}
-//         </Row>
-//       ))}
-//     </div>
-
-//     {/* Milestones + Photos */}
-//     <Row className="bg-white border rounded p-4 mb-5">
-//       <Col md={8}>
-//         <h6 className="fw-semibold mb-3">Upcoming Milestones</h6>
-//         <div className="d-flex justify-content-between border-bottom py-2 align-items-center">
-//           <div>
-//             <div className="fw-medium">Foundation Work Completion</div>
-//             <small className="text-muted">Project A</small>
-//           </div>
-//           <div className="text-danger fw-semibold small">Due in 5 days</div>
-//         </div>
-//         <div className="d-flex justify-content-between border-bottom py-2 align-items-center">
-//           <div>
-//             <div className="fw-medium">Steel Structure Installation</div>
-//             <small className="text-muted">Project B</small>
-//           </div>
-//           <div className="text-danger fw-semibold small">Due in 2 days</div>
-//         </div>
-//       </Col>
-//       {/* <Col md={4}>
-//         <h6 className="fw-semibold mb-3">Photos</h6>
-//         <div className="d-flex flex-column gap-2">
-//           <a href="#" className="text-decoration-none small">Project Planning</a>
-//           <a href="#" className="text-decoration-none small">Documents</a>
-//           <a href="#" className="text-decoration-none">
-//             <i className="bi bi-chevron-down" />
-//           </a>
-//         </div>
-//       </Col> */}
-//     </Row>
-//   </div>
-//   )
-// }
-
-// export default Calendar
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Modal,
@@ -162,38 +9,63 @@ import {
   Row,
   Col,
   Card,
-  Dropdown,
   ButtonGroup,
+  Image,
 } from "react-bootstrap";
 import dayjs from "dayjs";
+import isoWeek from "dayjs/plugin/isoWeek";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProjects } from "../../../redux/slices/projectSlice";
+import { fetchTasks, addTask } from "../../../redux/slices/calendarSlice";
+// import { fetchUsers } from "../../../redux/slices/usersSlice";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { fetchUsers } from "../../../redux/slices/userSlice";
+
+dayjs.extend(isoWeek);
 
 const App = () => {
-  const [currentMonth, setCurrentMonth] = useState(dayjs("2023-09-01"));
-  const [show, setShow] = useState(false);
+  const dispatch = useDispatch();
   const [view, setView] = useState("Month");
-  const [tasks, setTasks] = useState([
-    {
-      date: "2023-09-01",
-      title: "Project Kickoff",
-      color: "primary",
-      project: "Project A",
-      type: "Planning",
-    },
-    {
-      date: "2023-09-03",
-      title: "Site Survey",
-      color: "success",
-      project: "Project B",
-      type: "Inspection",
-    },
-    {
-      date: "2023-09-09",
-      title: "Design Review",
-      color: "warning",
-      project: "Project A",
-      type: "Design",
-    },
-  ]);
+  const [currentMonth, setCurrentMonth] = useState(dayjs().startOf("month"));
+  const [currentWeekStart, setCurrentWeekStart] = useState(dayjs().startOf("isoWeek")); // Monday if ISO Week preferred
+  const [show, setShow] = useState(false);
+  const [showTaskDetails, setShowTaskDetails] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const today = dayjs().format("YYYY-MM-DD");
+
+  // Get projects from Redux store
+  const { data: projects, loading: projectsLoading } = useSelector((state) => state.projects);
+  console.log("projects" ,projects)
+  
+  // Get calendar tasks from Redux store with better error handling
+  const { calendartask, loading: tasksLoading, error: tasksError } = useSelector((state) => state.calendar || {});
+
+  const calendars = calendartask?.calendars || [];
+
+  console.log("calendars" ,calendars)
+
+   const { data: users, loading: usersLoading, error } = useSelector((state) => state.users);
+
+
+  console.log("users" ,users)
+  const userslist = users || [];
+  
+  useEffect(() => {
+    
+    dispatch(fetchTasks())
+  }, [dispatch]);
+
+ 
+  
+  
+  useEffect(() => {
+  {
+     dispatch(fetchProjects());
+      dispatch(fetchUsers());
+    }
+  }, []);
+
   const [filters, setFilters] = useState({ project: "All", type: "All" });
 
   const [milestones] = useState([
@@ -202,49 +74,205 @@ const App = () => {
   ]);
 
   const [newTask, setNewTask] = useState({
-    title: "",
-    date: "",
-    color: "primary",
-    project: "Project A",
-    type: "Planning",
+    taskTitle: "",
+    description: "",
+    startDate: "",
+    endDate: "",
+    assignTeamMembers: [],
+    reminders: today, // Initialize reminder as today's date
+    image: [],
+    color: "#0d6efd", // Changed from "primary" to hex color
+    project: "",
+    taskType: "Task", // Changed from 'type' to match API response
   });
 
   const handleShow = () => setShow(true);
   const handleClose = () => {
     setShow(false);
     setNewTask({
-      title: "",
-      date: "",
-      color: "primary",
-      project: "Project A",
-      type: "Planning",
+      taskTitle: "",
+      description: "",
+      startDate: "",
+      endDate: "",
+      assignTeamMembers: [],
+      reminders: today, 
+      image: [],
+      color: "#0d6efd",
+      project: "",
+      taskType: "Task",
     });
   };
 
-  const handleAddTask = () => {
-    setTasks([...tasks, newTask]);
-    handleClose();
+  const handleShowTaskDetails = (task) => {
+    setSelectedTask(task);
+    setShowTaskDetails(true);
   };
 
-  const getTasksForDate = (date) =>
-    tasks.filter(
-      (task) =>
-        task.date === date.format("YYYY-MM-DD") &&
-        (filters.project === "All" || task.project === filters.project) &&
-        (filters.type === "All" || task.type === filters.type)
-    );
+  const handleCloseTaskDetails = () => {
+    setShowTaskDetails(false);
+    setSelectedTask(null);
+  };
+
+  const handleAddTask = async () => {
+    try {
+      // Create FormData object
+      const formData = new FormData();
+      
+      // Add basic text fields
+      formData.append('taskTitle', newTask.taskTitle);
+      formData.append('description', newTask.description);
+      formData.append('startDate', newTask.startDate);
+      formData.append('endDate', newTask.endDate);
+      formData.append('color', newTask.color);
+      
+      // Convert the project field to a string if it's not already
+      formData.append('project', String(newTask.project));
+      
+      formData.append('taskType', newTask.taskType);
+  
+      // Handle arrays properly by converting to JSON strings
+      // formData.append('assignTeamMembers[]', String(newTask.assignTeamMembers));
+      newTask.assignTeamMembers.forEach(member => {
+        formData.append('assignTeamMembers[]', member);
+      });
+      
+      
+      // Handle reminders as date
+      formData.append('reminders', newTask.reminders);
+  
+      // Handle file uploads
+      if (newTask.image && newTask.image.length > 0) {
+        newTask.image.forEach((file) => {
+          formData.append('image', file);
+        });
+      }
+  
+  
+      console.log("Sending task data:", {
+        taskTitle: newTask.taskTitle,
+        description: newTask.description,
+        startDate: newTask.startDate,
+        endDate: newTask.endDate,
+        project: String(newTask.project),
+        taskType: newTask.taskType,
+        assignTeamMembers: newTask.assignTeamMembers,
+        reminders: newTask.reminders
+      });
+  
+      // Dispatch the action with FormData
+      await dispatch(addTask(formData)).unwrap()
+      .then(() => {
+        toast.success("Task Added Successfully!");
+     
+      })
+      .catch(() => {
+        toast.error( error.message || "Failed to add task!");
+      
+      })
+      
+      // Refresh tasks and close modal on success
+     
+      
+    } catch (error) {
+      console.error('Failed to add task:', error);
+      // Show error message to user
+      dispatch(fetchTasks());
+      handleClose();
+      toast.error( error.message || "Failed to add task!");
+    }
+  };
+
+  const getTasksForDate = (date) => {
+    if (!Array.isArray(calendars)) {
+      console.error("calendars is not an array:", calendars);
+      return [];
+    }
+    
+    // Format the current date in YYYY-MM-DD
+    const formattedDate = date.format("YYYY-MM-DD");
+    
+    return calendars.filter((task) => {
+      // Extract the date part from startDate (which is in ISO format)
+      const taskDate = task.startDate ? task.startDate.split('T')[0] : null;
+      
+      const projectMatch = filters.project === "All" || filters.project === task.project;
+      const typeMatch = filters.type === "All" || filters.type === task.taskType;
+      
+      return taskDate === formattedDate && projectMatch && typeMatch;
+    });
+  };
 
   const generateCalendar = () => {
-    const startDate = currentMonth.startOf("month");
-    const daysInMonth = view === "Month" ? currentMonth.daysInMonth() : 7;
     const calendar = [];
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      calendar.push(startDate.date(day));
+    if (view === "Month") {
+      const daysInMonth = currentMonth.daysInMonth();
+      const startOfMonth = currentMonth.startOf("month");
+
+      for (let day = 0; day < daysInMonth; day++) {
+        calendar.push(startOfMonth.add(day, "day"));
+      }
+    } else if (view === "Week") {
+      for (let i = 0; i < 7; i++) {
+        calendar.push(currentWeekStart.add(i, "day"));
+      }
     }
 
     return calendar;
   };
+
+  const goToPrevious = () => {
+    if (view === "Month") {
+      setCurrentMonth(currentMonth.subtract(1, "month"));
+    } else {
+      setCurrentWeekStart(currentWeekStart.subtract(1, "week"));
+    }
+  };
+
+  const goToNext = () => {
+    if (view === "Month") {
+      setCurrentMonth(currentMonth.add(1, "month"));
+    } else {
+      setCurrentWeekStart(currentWeekStart.add(1, "week"));
+    }
+  };
+
+  // Get color class based on hex color
+  const getColorClass = (hexColor) => {
+    if (!hexColor) return "primary";
+    
+    // Map common hex colors to Bootstrap classes
+    const colorMap = {
+      "#0d6efd": "primary",
+      "#198754": "success", 
+      "#ffc107": "warning",
+      "#dc3545": "danger",
+      "#ff5733": "danger"
+    };
+    
+    return colorMap[hexColor.toLowerCase()] || "primary";
+  };
+
+  // Show loading state
+  if (tasksLoading) {
+    return <div className="text-center p-5">Loading calendar data...</div>;
+  }
+
+  // Show error state
+  if (tasksError) {
+    return (
+      <div className="text-center p-5 text-danger">
+        Error loading calendar data: {tasksError}
+      </div>
+    );
+  }
+
+
+  if (!Array.isArray(calendars)) {
+    return <div className="text-danger p-5">Something went wrong loading calendar tasks.</div>;
+  }
+  else {
+  
 
   return (
     <Container className="mt-4">
@@ -273,10 +301,14 @@ const App = () => {
 
         <Col className="text-end">
           <Button style={{ backgroundColor: "#0052CC" }} onClick={handleShow}>
-          <i class="fa-solid fa-plus me-2"></i> New Task
+            <i className="fa-solid fa-plus me-2"></i> New Task
           </Button>
         </Col>
       </Row>
+
+
+
+      
 
       {/* Filter + View Controls */}
       <Row className="mb-3">
@@ -287,17 +319,23 @@ const App = () => {
               setFilters({ ...filters, project: e.target.value })
             }
           >
-            <option>All Projects</option>
-            <option>Project A</option>
-            <option>Project B</option>
+            <option value="All">All Projects</option>
+            {projects && projects.length > 0 && 
+              projects.map(project => (
+                <option key={project._id} value={project.name}>{project.name}</option>
+              ))
+            }
           </Form.Select>
         </Col>
         <Col md={4}>
           <Form.Select
             value={filters.type}
-            onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+            onChange={(e) =>
+              setFilters({ ...filters, type: e.target.value })
+            }
           >
-            <option>All Task Types</option>
+            <option value="All">All Task Types</option>
+            <option>Task</option>
             <option>Planning</option>
             <option>Inspection</option>
             <option>Design</option>
@@ -321,6 +359,13 @@ const App = () => {
         </Col>
       </Row>
 
+      {/* Debug info */}
+      {tasksError && (
+        <div className="alert alert-danger">
+          Error: {tasksError}
+        </div>
+      )}
+      
       {/* Calendar Grid */}
       <Row className="g-3">
         {generateCalendar().map((dateObj) => (
@@ -330,14 +375,16 @@ const App = () => {
                 <Card.Title className="fs-6 text-muted">
                   {dateObj.format("D MMM")}
                 </Card.Title>
-                {getTasksForDate(dateObj).map((task, idx) => (
+                {getTasksForDate(dateObj).map((task) => (
                   <Card
-                    key={idx}
-                    bg={task.color}
+                    key={task._id}
+                    bg={getColorClass(task.color)}
                     text="white"
                     className="mb-1 px-1 py-1"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => handleShowTaskDetails(task)}
                   >
-                    <small>{task.title}</small>
+                    <small>{task.taskTitle}</small>
                   </Card>
                 ))}
               </Card.Body>
@@ -362,8 +409,8 @@ const App = () => {
         ))}
       </Row>
 
-      {/* Modal */}
-      <Modal show={show} onHide={handleClose}>
+      {/* Add Task Modal */}
+      <Modal show={show} onHide={handleClose} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>Add New Task</Modal.Title>
         </Modal.Header>
@@ -373,9 +420,9 @@ const App = () => {
               <Form.Label>Task Title</Form.Label>
               <Form.Control
                 type="text"
-                value={newTask.title}
+                value={newTask.taskTitle}
                 onChange={(e) =>
-                  setNewTask({ ...newTask, title: e.target.value })
+                  setNewTask({ ...newTask, taskTitle: e.target.value })
                 }
               />
             </Form.Group>
@@ -386,19 +433,13 @@ const App = () => {
                 as="textarea"
                 rows={3}
                 placeholder="Enter task description"
+                value={newTask.description}
+                onChange={(e) =>
+                  setNewTask({ ...newTask, description: e.target.value })
+                }
               />
             </Form.Group>
 
-            {/* <Form.Group className="mt-2">
-              <Form.Label>Date</Form.Label>
-              <Form.Control
-                type="date"
-                value={newTask.date}
-                onChange={(e) =>
-                  setNewTask({ ...newTask, date: e.target.value })
-                }
-              />
-            </Form.Group> */}
             <Row className="mb-3">
               <Col>
                 <Form.Label>Project</Form.Label>
@@ -408,18 +449,31 @@ const App = () => {
                     setNewTask({ ...newTask, project: e.target.value })
                   }
                 >
-                  <option>Project A</option>
-                  <option>Project B</option>
+                  <option value="">Select Project</option>
+                  {projectsLoading ? (
+                    <option>Loading projects...</option>
+                  ) : (
+                    projects && projects.length > 0 ? (
+                      projects.map((project) => (
+                        <option key={project._id} value={project._id}>{project.name}</option>
+                      ))
+                    ) : (
+                      <>
+                       
+                      </>
+                    )
+                  )}
                 </Form.Select>
               </Col>
               <Col>
                 <Form.Label>Task Type</Form.Label>
                 <Form.Select
-                  value={newTask.type}
+                  value={newTask.taskType}
                   onChange={(e) =>
-                    setNewTask({ ...newTask, type: e.target.value })
+                    setNewTask({ ...newTask, taskType: e.target.value })
                   }
                 >
+                  <option>Task</option>
                   <option>Planning</option>
                   <option>Inspection</option>
                   <option>Design</option>
@@ -430,40 +484,73 @@ const App = () => {
             <Row className="mb-3">
               <Col>
                 <Form.Label>Start Date</Form.Label>
-                <Form.Control type="date" />
+                <Form.Control 
+                  type="date" 
+                  value={newTask.startDate} 
+                  onChange={(e) => setNewTask({ ...newTask, startDate: e.target.value })} 
+                />
               </Col>
               <Col>
                 <Form.Label>End Date</Form.Label>
-                <Form.Control type="date" />
+                <Form.Control 
+                  type="date" 
+                  value={newTask.endDate} 
+                  onChange={(e) => setNewTask({ ...newTask, endDate: e.target.value })}
+                />
               </Col>
             </Row>
 
             <Form.Group className="mb-3">
               <Form.Label>Assign Team Members</Form.Label>
-              <Form.Control as="select" multiple>
-                <option>John Smith</option>
-                <option>Sarah Johnson</option>
-                <option>Mike Williams</option>
-                <option>Emily Brown</option>
-              </Form.Control>
+              <Form.Select 
+                multiple
+                onChange={(e) => {
+                  const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+                  setNewTask({ ...newTask, assignTeamMembers: selectedOptions });
+                }}
+              >
+                {usersLoading ? (
+                  <option>Loading users...</option>
+                ) : (
+                  userslist && userslist.length > 0 ? (
+                    userslist.map((user) => (
+                      <option key={user._id} value={user._id}>{user.firstName} {user.lastName}</option>
+                    ))
+                  ) : (
+                    <option value="">No users available</option>
+                  )
+                )}
+              </Form.Select>
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Attachments</Form.Label>
-              <div
+              <Form.Control
+                type="file"
+                multiple
+                onChange={(e) =>
+                  setNewTask({ ...newTask, image: Array.from(e.target.files) })
+                }
+              />
+              {/* <div
                 className="border p-4 text-center"
                 style={{ borderStyle: "dashed" }}
               >
                 <p className="mb-1">📎 Upload files or drag and drop</p>
                 <small className="text-muted">PNG, JPG, PDF up to 10MB</small>
-              </div>
+              </div> */}
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Reminders</Form.Label>
-              <br />
-              <Form.Check inline label="Email" type="checkbox" />
-              <Form.Check inline label="Push Notification" type="checkbox" />
+              <Form.Label>Reminder Date</Form.Label>
+              <Form.Control
+                type="date"
+                value={newTask.reminders}
+                onChange={(e) => setNewTask({ ...newTask, reminders: e.target.value })}
+              />
+              <Form.Text className="text-muted">
+                Select a date for when you want to be reminded about this task.
+              </Form.Text>
             </Form.Group>
 
             <Form.Group className="mt-2">
@@ -474,10 +561,10 @@ const App = () => {
                   setNewTask({ ...newTask, color: e.target.value })
                 }
               >
-                <option value="primary">Blue</option>
-                <option value="success">Green</option>
-                <option value="warning">Yellow</option>
-                <option value="danger">Red</option>
+                <option value="#0d6efd">Blue</option>
+                <option value="#198754">Green</option>
+                <option value="#ffc107">Yellow</option>
+                <option value="#ff5733">Red</option>
               </Form.Select>
             </Form.Group>
           </Form>
@@ -486,13 +573,80 @@ const App = () => {
           <Button variant="secondary" onClick={handleClose}>
             Cancel
           </Button>
-          <Button className="btn" style={{backgroundColor:"#0d6efd",color:"white"}} onClick={handleAddTask}>
+          <Button
+            className="btn"
+            style={{ backgroundColor: "#0052CC", color: "white" }}
+            onClick={handleAddTask}
+          >
             Add Task
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Task Details Modal */}
+      <Modal show={showTaskDetails} onHide={handleCloseTaskDetails}>
+        <Modal.Header closeButton>
+          <Modal.Title>{selectedTask?.taskTitle}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedTask && (
+            <>
+              <p><strong>Description:</strong> {selectedTask.description}</p>
+              
+              <p>
+                <strong>Date:</strong> {dayjs(selectedTask.startDate).format("MMM D, YYYY")}
+                {selectedTask.endDate && selectedTask.endDate !== selectedTask.startDate && 
+                  ` - ${dayjs(selectedTask.endDate).format("MMM D, YYYY")}`}
+              </p>
+              
+              <p><strong>Task Type:</strong> {selectedTask.taskType}</p>
+
+              {selectedTask.reminders && (
+                <p><strong>Reminder Date:</strong> {dayjs(selectedTask.reminders).format("MMM D, YYYY")}</p>
+              )}
+              
+              {selectedTask.assignTeamMembers && selectedTask.assignTeamMembers.length > 0 && (
+                <div>
+                  <strong>Assigned To:</strong>
+                  <ul>
+                    {selectedTask.assignTeamMembers.map(member => (
+                      <li key={member._id || member}>
+                        {member.firstName ? `${member.firstName} ${member.lastName}` : member}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {selectedTask.image && selectedTask.image.length > 0 && (
+                <div className="mt-3">
+                  <strong>Attachments:</strong>
+                  <div className="d-flex mt-2 flex-wrap">
+                    {selectedTask.image.map((img, idx) => (
+                      <div key={idx} className="me-2 mb-2">
+                        <Image 
+                          src={img} 
+                          alt={`Attachment ${idx + 1}`} 
+                          thumbnail 
+                          style={{ maxHeight: "100px" }} 
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseTaskDetails}>
+            Close
           </Button>
         </Modal.Footer>
       </Modal>
     </Container>
   );
-};
+}
+}
 
 export default App;

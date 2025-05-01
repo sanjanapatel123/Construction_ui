@@ -57,6 +57,19 @@ export const deleteswms = createAsyncThunk("swms/deletswms",
     }
 )
 
+export const updateswms = createAsyncThunk("swms/updateswms",
+    async ({ id, updatedForm }, thunkAPI) => {
+        try {
+            const response = await axiosInstance.patch(`${apiUrl}/swms/${id}`, updatedForm, {
+                headers: { "Content-Type": "application/json" },
+            });
+            return response.data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response?.data || error.message || "Error updating swms")
+        }
+    }
+)
+
 const initialState = { swms: [],
     singleSwms: null,
      loading: false,

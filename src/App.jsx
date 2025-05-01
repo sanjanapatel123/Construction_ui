@@ -82,6 +82,7 @@ import "react-toastify/dist/ReactToastify.css";
 import SafetyEquipmentList from "./components/AdminComponents/SafetyEquipment/SafetyEquipmentList";
 import SafetyEquipmentDetails from "./components/AdminComponents/SafetyEquipment/SafetyEquipmentDetails";
 import EditToolboxTalk from "./components/AdminComponents/ToolboxTalks/EditToolboxTalk";
+import AuditReports from "./components/AdminComponents/AuditEquipment/AuditReports";
 import RFIs from "./components/AdminComponents/RFIs/RFIs";
 import EditUser from "./components/AdminComponents/UserManagement/EditUser";
 import ViewUser from "./components/AdminComponents/UserManagement/ViewUser";
@@ -131,6 +132,8 @@ function App() {
               element={<AddNewWorker></AddNewWorker>}
             ></Route>
             <Route path="/AddnewSms" element={<AddnewSms />} />
+            <Route path="/editnewSwms/:id" element={<AddnewSms />} />
+
             <Route path="/template" element={<Template />} />
             <Route path="/equipment" element={<Equipment />} />
             <Route path="/n" element={<NEW />} />
@@ -215,6 +218,8 @@ function App() {
             <Route path="/AddnewInduction" element={<AddnewInduction />} />
             <Route path="/swms" element={<SWMS />} />
             <Route path="/audit-equipment" element={<AuditEquipment />} />
+            <Route path="/edit-audit-equipment/:id" element={<AuditEquipment />} />
+            <Route path="/auditreport" element={<AuditReports  />} />
             <Route path="/safety-equipment" element={<SafetyEquipment />} />
             <Route path="/submit-report" element={<SubmitReport />} />
             <Route path="/AddnewSms" element={<AddnewSms />} />

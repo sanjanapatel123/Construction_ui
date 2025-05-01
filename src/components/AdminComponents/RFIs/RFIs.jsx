@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Dialog } from "@headlessui/react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
   LineChart,
@@ -53,6 +52,7 @@ function RFIs() {
   const { rfi } = useSelector((state) => state.rfi);
 
   useEffect(() => {
+  
     dispatch(fetchRFI());
   }, [dispatch]);
 

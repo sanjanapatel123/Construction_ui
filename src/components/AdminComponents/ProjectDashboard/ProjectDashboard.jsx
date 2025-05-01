@@ -156,14 +156,15 @@ const ProjectDashboard = () => {
             {paginatedData.map((project, index) => (
               <tr key={index} className="bg-white py-3">
                 <td className="ps-4 py-3">{project.name}</td>
-                <td className="py-3">{project?.assignedTo?.firstName}</td>
+                <td className="py-3">
+                  {project.assignedTo?.firstName} {project.assignedTo?.lastName}
+                </td>
                 <td className="py-3">
                   {new Date(project.startDate).toLocaleDateString()}
                 </td>
                 <td className="py-3">
                   {new Date(project.endDate).toLocaleDateString()}
                 </td>
-
                 <td className="py-3">
                   <span
                     className={`badge ${

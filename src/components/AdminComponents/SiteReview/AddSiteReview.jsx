@@ -12,6 +12,8 @@ import {
 import { fetchSiteEntries } from '../../../redux/slices/siteEntrySlice';
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { fetchUsers } from '../../../redux/slices/userSlice';
+
 
 function AddSiteReview() {
   const dispatch = useDispatch();
@@ -20,7 +22,11 @@ function AddSiteReview() {
   const reviewId = id;
 
   const { entries } = useSelector((state) => state.entries);
+
+   const { data: users} = useSelector((state) => state.users);
+  console.log(users)
   const { loading, error } = useSelector((state) => state.sitereview);
+  
 
   const [formData, setFormData] = useState({
     siteName: '',
@@ -39,6 +45,7 @@ function AddSiteReview() {
   });
 
   useEffect(() => {
+    dispatch(fetchUsers());
     dispatch(fetchSiteEntries());
 
     if (reviewId) {
@@ -121,14 +128,13 @@ function AddSiteReview() {
         });
       } else {
         await dispatch(createsitereview(form)).unwrap()
-        .then(() => {
-          toast.success("Site Review added Successfully!");
-          navigate('/siteReview');
-        })
-        .catch(() => {
-          toast.error("Failed to add site entry!");
-          navigate('/siteReview');
-        })
+         .then(() => {
+                  toast.success("Site Entry Added Successfully!");
+                  navigate('/siteReview');
+                })
+                .catch(() => {
+                  toast.error("Failed to add site entry!");
+                });
           
         
       }
@@ -228,8 +234,12 @@ function AddSiteReview() {
             <label className="form-label">Assigned To</label>
             <select className="form-select" name="assignedTo" value={formData.assignedTo} onChange={handleInputChange}>
               <option value="">Select Staff</option>
-              <option value="60b74f3c8c9c510018f9f03d">Staff 1</option>
-              <option value="60b74f3c8c9c510018f9f03d">Staff 2</option>
+              {
+                users.map((user) => (
+                  <option key={user._id} value={user._id}>{user?.firstName} {user?.lastName}</option>
+                ))
+              }
+              
             </select>
           </div>
           <div className="col-md-6">

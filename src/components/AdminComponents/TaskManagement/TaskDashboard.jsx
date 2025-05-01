@@ -11,6 +11,8 @@ const AllTasks = () => {
 
   const { tasks, loading, error } = useSelector((state) => state.task);
 
+  
+
   console.log("Tasks:", tasks);
 
   const HandleDelete = (id) => {
@@ -123,7 +125,7 @@ const AllTasks = () => {
                   <span
                     className={`badge text-white ${
                       task.status === "Completed"
-                        ? "bg-success"
+                        ? "bg-[#117a1f]"
                         : task.status === "In Progress"
                         ? "bg-primary"
                         : "bg-danger"

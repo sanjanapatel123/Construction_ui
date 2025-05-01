@@ -202,14 +202,26 @@ function SWMS() {
       </Row>
 
       <Card className="mb-5 border-0 shadow-sm">
-        <Card.Header className="bg-white py-3 border-0">
-          <div className="row align-items-center g-3">
-            {/* Title */}
-            <div className="col-12 col-md-6">
-              <h5 className="mb-0 fw-semibold text-center text-md-start">
-                SWMS Overview
-              </h5>
-            </div>
+      <Card.Header className="bg-white py-3 border-0">
+  <div className="row align-items-center g-3">
+    {/* Title */}
+    <div className="col-12 col-md-6">
+      <h5 className="mb-0 fw-semibold text-center text-md-start">SWMS Overview</h5>
+    </div>
+
+    {/* Search Input */}
+    {/* <div className="col-12 col-md-6">
+      <div className="d-flex justify-content-center justify-content-md-end">
+        <Form.Control
+          type="text"
+          placeholder="Search SWMS..."
+          className="form-control-sm ps-4"
+          style={{ width: "100%", maxWidth: "240px", backgroundColor: "#f4f5f7" }}
+        />
+      </div>
+    </div> */}
+  </div>
+</Card.Header>
 
             {/* Search Input */}
             <div className="col-12 col-md-6">
@@ -301,20 +313,22 @@ function SWMS() {
               </tbody>
             </table>
           </div>
-
-          {/* Pagination */}
-          <div className="d-flex justify-content-end my-3">
-            <Button size="sm" variant="outline-secondary" className="me-2">
-              Previous
-            </Button>
-            <Button size="sm" variant="primary" className="ms-2">
-              1
-            </Button>
-            <Button size="sm" variant="outline-secondary" className="ms-2">
-              2
-            </Button>
-            <Button size="sm" variant="outline-secondary" className="ms-2">
-              Next
+        </td>
+        <td>{( item?.project?.name || item.project)}</td>
+        <td>{item?.workArea}</td>
+        <td>{new Date(item?.createdAt).toLocaleString()}</td>
+        <td className="pe-4">
+          <div className="d-flex gap-3">
+            <Link to={`/view-swms/${item?._id}`}>
+              <Button variant="link" className="text-primary p-0">
+                <i className="fa-solid fa-eye"></i>
+              </Button>
+            </Link>
+            <Button variant="link" className="text-primary p-0" onClick={() => navigate(`/editnewSwms/${item?._id}`) || handleEdit(item?._id)}>
+                <i className="fa-solid fa-pencil"></i>
+              </Button>
+            <Button variant="link" className="text-primary p-0">
+              <i className="fa-solid fa-download"></i>
             </Button>
           </div>
         </Card.Body>

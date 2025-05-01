@@ -67,7 +67,36 @@ function SiteReview() {
   }, [dispatch])
 
   
-
+// const HandleDelete = (id) => {
+//     Swal.fire({
+//       title: 'Are you sure?',
+//       text: "You won't be able to revert this!",
+//       icon: 'warning',
+//       showCancelButton: true,
+//       confirmButtonColor: '#3085d6',
+//       cancelButtonColor: '#d33',
+//       confirmButtonText: 'Yes, delete it!'
+//     }).then((result) => {
+//       if (result.isConfirmed) {
+//         dispatch(deleteSiteEntry  (id))
+//           .then(() => {
+//             Swal.fire(
+//               'Deleted!',
+//               'The site entry has been deleted.',
+//               'success'
+//             );
+//             dispatch(fetchSiteEntries());  // Refresh the table after delete
+//           })
+//           .catch((error) => {
+//             Swal.fire(
+//               'Error!',
+//               'Something went wrong.',
+//               'error'
+//             );
+//           });
+//       }
+//     });
+//   };
   const HandleDelete = (id) => {
       Swal.fire({
         title: 'Are you sure?',

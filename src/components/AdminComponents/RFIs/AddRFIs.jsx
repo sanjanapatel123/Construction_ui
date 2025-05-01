@@ -1,10 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { createRFI } from "../../../redux/slices/rfiSlice";
+import { fetchUsers } from "../../../redux/slices/userSlice";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+
 
 function AddRFIs() {
+
+  const { data:users } = useSelector((state) => state.users);
+  console.log(users)
   const dispatch = useDispatch();
+
+  
   const [formData, setFormData] = useState({
     subject: "",
     priority: "",
@@ -23,6 +33,9 @@ function AddRFIs() {
     }));
   };
 
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, []);
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
     setFormData((prev) => ({
@@ -33,7 +46,7 @@ function AddRFIs() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+   
     const submitData = new FormData();
     submitData.append("subject", formData.subject);
     submitData.append("priority", formData.priority);
@@ -46,8 +59,13 @@ function AddRFIs() {
       submitData.append("image", file);
     });
     // Dispatch the thunk with your formData object
-    dispatch(createRFI(formData));
+    dispatch(createRFI( submitData )).unwrap().then(() => {
+      toast.success("RFI created successfully!");
+    }).catch(() => {
+      toast.error("Failed to create RFI");
+    });
   };
+
 
   const handleAutofill = async () => {
     try {
@@ -131,9 +149,10 @@ function AddRFIs() {
               value={formData.priority}
               onChange={handleInputChange}
             >
-              <option>High</option>
-              <option>Medium</option>
-              <option>Low</option>
+               <option value="" disabled>Select priority</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
             </select>
           </div>
           <div className="col-md-6">
@@ -158,9 +177,16 @@ function AddRFIs() {
               value={formData.assignee}
               onChange={handleInputChange}
             >
-              <option>Sarah Johnson</option>
-              <option>John Doe</option>
-              <option>Jane Smith</option>
+                <option value="" disabled>Select assignee</option>
+            {
+              users?.map((user) => (
+                
+                <option key={user._id} value={user._id}> {user.firstName} {user.lastName
+}</option>
+              ))
+            }
+
+              
             </select>
           </div>
           <div className="col-md-6">
@@ -171,9 +197,9 @@ function AddRFIs() {
               value={formData.department}
               onChange={handleInputChange}
             >
-              <option>Engineering</option>
-              <option>Construction</option>
-              <option>Design</option>
+              <option value="engineering">Engineering</option>
+              <option value="construction">Construction</option>
+              <option value="design">Design</option>
             </select>
           </div>
         </div>

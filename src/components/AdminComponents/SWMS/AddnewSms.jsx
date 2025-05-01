@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, use } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { Link }  from "react-router-dom";
+import { useNavigate, useParams } from 'react-router-dom'
+
 
 import { fetchProjects } from "../../../redux/slices/projectSlice";
-import { createSwms } from "../../../redux/slices/swmsSlice";
+import { createSwms, getswmsbyId } from "../../../redux/slices/swmsSlice";
 import { toast } from "react-toastify";
 
 function AddnewSms() {
+
+  const { id } = useParams();
   const navigate = useNavigate();
   const dispatchEvent = useDispatch();
   const projects = useSelector((state) => state.projects.data);
@@ -113,20 +117,56 @@ function AddnewSms() {
     }));
   };
 
+
+  if( id ) {
+    dispatchEvent(getswmsbyId(id)).unwrap().then((data) => {
+      setFormData(data);
+    }).catch((err) => {
+      console.log("error in get swms by id",err)
+      showErrorToast(err || 'add failed!');
+    
+    })}
+
   const handleSubmit = (e, isDraft = false) => {
     e.preventDefault();
-    // console.log("Form submitted:", formData);
-    dispatchEvent(createSwms(formData))
-      .unwrap()
-      .then((data) => {
-        toast.success("SWMS added successfully!");
+    console.log('Form submitted:', formData)
+
+
+    if(id) {
+      dispatchEvent(updateswms({ id: id, updatedForm: formData })).unwrap()
+      .then(() => {
+       toast.success("SWMS updated successfully!");
         navigate("/swms");
       })
-      .catch((err) => {
-        console.log("error in create swms", err);
-        toast.error(err || "add failed!");
-      });
-  };
+    }
+    // dispatchEvent(createSwms(formData)).unwrap()
+    // .then((data) =>{
+    //   alert("SWMS added successfully!");
+    //   // showSuccessToast(data?.title  || 'add swms successful!');
+    //    navigate("/swms");
+    // }) .catch((err) => {
+    //   console.log("error in create swms",err)
+    //   showErrorToast(err || 'add failed!');
+    //   showErrorAlert(err || 'add failed!');
+    // });
+
+    dispatchEvent(createSwms(formData))
+    .unwrap()
+    .then((data) => {
+      toast.success("SWMS added successfully!");
+      navigate("/swms");
+    })
+    .catch((err) => {
+      console.log("error in create swms", err);
+      toast.error(err || "add failed!");
+    });
+    
+    // TODO: Implement form submission logic
+
+  }
+    // console.log("Form submitted:", formData);
+   
+  
 
   useEffect(() => {
     dispatchEvent(fetchProjects());
@@ -135,7 +175,8 @@ function AddnewSms() {
   return (
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h3>Create New SWMS</h3>
+        { id ? <h3>Update SWMS</h3> : <h3>Create New SWMS</h3>}
+        
 
         <div className="gap-2 d-flex align-items-center">
           {" "}

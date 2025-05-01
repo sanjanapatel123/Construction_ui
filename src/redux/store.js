@@ -25,6 +25,9 @@ import safetyEquipmentSlice from "./slices/safetyEquipmentSlice";
 import documentSlice from "./slices/documentSlice"
 import toolboxTalkReducer from "./slices/toolboxTalkSlice";
 import taskManagementSlice from "./slices/taskManagement"
+import calendarReducer from "./slices/calendarSlice";
+
+import auditReducer from "./slices/auditSlice";
 import userReducer from "./slices/userSlice";
 
 
@@ -52,6 +55,8 @@ export const store = configureStore({
       document: documentSlice,
         toolboxTalks: toolboxTalkReducer,
       task : taskManagementSlice,
+      calendar : calendarReducer,
+      audit : auditReducer,
         users: userReducer,
   }
 });

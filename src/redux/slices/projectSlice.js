@@ -6,6 +6,7 @@ import axiosInstance from '../../utils/axiosInstance.jsx'
 
 
 export const fetchProjects = createAsyncThunk('projects/fetchProjects', async () => {
+  console.log("api called prjects")
   const response = await axiosInstance.get(`${apiUrl}/projects/`);
   return response.data;
 });
