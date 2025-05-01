@@ -329,10 +329,10 @@ function AuditReports() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    dispatch(fetchAudit());
+useEffect(() => {
     dispatch(fetchProjects());
-  }, [dispatch]);
+    dispatch(fetchAudit());
+  }, [dispatch]); 
 
   const { audit, loading, error } = useSelector((state) => state.audit);
   console.log("audit", audit.data)
@@ -345,9 +345,10 @@ function AuditReports() {
   console.log( auditData)
   console.log(auditData.length)
   
-  const filteredAuditReports =  audit.data .length > 1 && audit?.data.filter((report) =>
+  const filteredReports = !loading && auditData.filter((report) =>
     report.auditedBy.toLowerCase().includes(search.toLowerCase())
   );
+  
 
   const handleDelete = (id) => {
     Swal.fire({
@@ -539,7 +540,7 @@ function AuditReports() {
                       <td>{formatDate(item?.auditDate)}</td>
                       <td className="pe-4">
                         <div className="d-flex gap-3">
-                          <Link to={`/view-audit/${item?._id}`}>
+                          <Link to={`/audit-equipmentview/${item?._id}`}>
                             <Button variant="link" className="text-primary p-0">
                               <i className="fa-solid fa-eye"></i>
                             </Button>

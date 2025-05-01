@@ -51,7 +51,7 @@ import axiosInstance from "../../utils/axiosInstance";
     "audit/updateAudit",
     async ({ id, updatedForm }, thunkAPI) => {
       try {
-        const response = await axiosInstance.put(
+        const response = await axiosInstance.patch(
           `${apiUrl}/audit/${id}`,
           updatedForm,
           {
@@ -87,6 +87,7 @@ import axiosInstance from "../../utils/axiosInstance";
     name: "audit",
     initialState: {
       audit: [],
+      selectedAudit: null,
       loading: false,
       error: null,
     },
@@ -149,7 +150,7 @@ import axiosInstance from "../../utils/axiosInstance";
         })
         .addCase(fetchAuditById.fulfilled, (state, action) => {
           state.loading = false;
-          state.audit = action.payload;
+          state.selectedAudit = action.payload;
         })
         .addCase(fetchAuditById.rejected, (state, action) => {
           state.loading = false;

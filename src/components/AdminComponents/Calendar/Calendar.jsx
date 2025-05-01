@@ -455,7 +455,7 @@ const App = () => {
                   ) : (
                     projects && projects.length > 0 ? (
                       projects.map((project) => (
-                        <option key={project._id} value={project._id}>{project.name}</option>
+                        <option key={project._id} value={project.name}>{project.name}</option>
                       ))
                     ) : (
                       <>

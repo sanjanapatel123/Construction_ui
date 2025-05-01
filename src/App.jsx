@@ -86,6 +86,7 @@ import AuditReports from "./components/AdminComponents/AuditEquipment/AuditRepor
 import RFIs from "./components/AdminComponents/RFIs/RFIs";
 import EditUser from "./components/AdminComponents/UserManagement/EditUser";
 import ViewUser from "./components/AdminComponents/UserManagement/ViewUser";
+import AuditEquipmentView from "./components/AdminComponents/AuditEquipment/AuditEquipmentView";
 
 
 function App() {
@@ -216,6 +217,7 @@ function App() {
             <Route path="/swms" element={<SWMS />} />
             <Route path="/audit-equipment" element={<AuditEquipment />} />
             <Route path="/edit-audit-equipment/:id" element={<AuditEquipment />} />
+            <Route path="/audit-equipmentview/:id" element={<AuditEquipmentView />} />
             <Route path="/auditreport" element={<AuditReports  />} />
             <Route path="/safety-equipment" element={<SafetyEquipment />} />
             <Route path="/submit-report" element={<SubmitReport />} />

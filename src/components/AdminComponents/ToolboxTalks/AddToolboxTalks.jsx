@@ -24,7 +24,7 @@ function AddToolboxTalks() {
     const fetchUsers = async () => {
       try {
         const response = await axiosInstance.get(
-          "https://hrb5wx2v-8000.inc1.devtunnels.ms/api/users"
+        `${apiUrl}/users` 
         );
         setWorkersList(response.data.data.users);
       } catch (error) {
@@ -185,7 +185,7 @@ function AddToolboxTalks() {
                   {workersList.map((worker) => (
                     <option
                       key={worker._id}
-                      value={`${worker.firstName} ${worker.lastName}`}
+                      value={worker._id}
                     >
                       {worker.firstName} {worker.lastName}
                     </option>
@@ -205,7 +205,7 @@ function AddToolboxTalks() {
                   {workersList.map((worker) => (
                     <option
                       key={worker._id}
-                      value={`${worker.firstName} ${worker.lastName}`}
+                     value={worker._id}
                     >
                       {worker.firstName} {worker.lastName}
                     </option>

@@ -271,7 +271,7 @@ function ToolboxTalks() {
                       </td>
                       <td>{new Date(talk.date).toLocaleString()}</td>
                       <td>
-                        {talk.presenter.firstName} {talk.presenter.lastName}
+                        {talk?.presenter?.firstName} {talk?.presenter?.lastName}
                         <br />
                         <small>{talk.participants.length} participants</small>
                       </td>
