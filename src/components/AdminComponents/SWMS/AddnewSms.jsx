@@ -123,7 +123,7 @@ function AddnewSms() {
       setFormData(data);
     }).catch((err) => {
       console.log("error in get swms by id",err)
-      showErrorToast(err || 'add failed!');
+      toast.error(err || 'add failed!');
     
     })}
 

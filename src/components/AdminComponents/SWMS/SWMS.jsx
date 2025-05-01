@@ -9,28 +9,37 @@ import {
   Table,
   Badge,
 } from "react-bootstrap";
+import { FaEdit, FaEye, FaTrash, FaDownload, FaShare } from "react-icons/fa";
 import { getallSwms, deleteswms } from "../../../redux/slices/swmsSlice";
-import { fetchProjects } from "../../../redux/slices/projectSlice";
+import {
+  getSingleProject,
+  fetchProjects,
+} from "../../../redux/slices/projectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function SWMS() {
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const dispatch = useDispatch();
 
   const { swms, loading, error } = useSelector((state) => state.swms);
+  // console.log("swms", swms);
 
   const projects = useSelector((state) => state.projects.data);
+  // console.log(projects);
 
+  // console.log("sWMS" ,swms)
   const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(getallSwms());
-
     dispatch(fetchProjects());
   }, [dispatch]);
 
@@ -40,6 +49,13 @@ function SWMS() {
 
   const filteredSwms = SwmsList.filter((swms) =>
     swms.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredSwms.length / itemsPerPage);
+
+  const paginatedSwms = filteredSwms.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   const templates = [
@@ -99,13 +115,6 @@ function SWMS() {
     },
   ];
 
-  // const handleDelete = (id) => {
-  //   dispatch(deleteswms(id))
-  //     .unwrap()
-  //     .then(() => toast.success("SWMS deleted successfully!"))
-  //     .catch(() => toast.error("Failed to delete SWMS."));
-  // };
-
   const handleDelete = (id) => {
     Swal.fire({
       title: "Are you sure?",
@@ -129,7 +138,7 @@ function SWMS() {
             }
           })
           .catch(() => {
-            showErrorToast("Something went wrong!");
+            toast.error("Something went wrong!");
           });
       }
     });
@@ -161,7 +170,7 @@ function SWMS() {
       </div>
       <Row className="mb-4 align-items-center g-3">
         {/* <h3>SMS Induction </h3> */}
-        <Col sm={12} md={3}>
+        <Col sm={12} md={6}>
           <Form.Control
             type="search"
             value={search}
@@ -172,14 +181,14 @@ function SWMS() {
         </Col>
 
         <Col sm={12} md={2}>
-          <Form.Select
+          {/* <Form.Select
             style={{ borderRadius: "4px", border: "1px solid #dee2e6" }}
           >
             <option>All Status</option>
             <option>Draft</option>
             <option>Pending Approval</option>
             <option>Approved</option>
-          </Form.Select>
+          </Form.Select> */}
         </Col>
         <Col sm={12} md="auto" className="ms-md-auto">
           <Link to={"/AddnewSms"}>
@@ -202,41 +211,13 @@ function SWMS() {
       </Row>
 
       <Card className="mb-5 border-0 shadow-sm">
-      <Card.Header className="bg-white py-3 border-0">
-  <div className="row align-items-center g-3">
-    {/* Title */}
-    <div className="col-12 col-md-6">
-      <h5 className="mb-0 fw-semibold text-center text-md-start">SWMS Overview</h5>
-    </div>
-
-    {/* Search Input */}
-    {/* <div className="col-12 col-md-6">
-      <div className="d-flex justify-content-center justify-content-md-end">
-        <Form.Control
-          type="text"
-          placeholder="Search SWMS..."
-          className="form-control-sm ps-4"
-          style={{ width: "100%", maxWidth: "240px", backgroundColor: "#f4f5f7" }}
-        />
-      </div>
-    </div> */}
-  </div>
-</Card.Header>
-
-            {/* Search Input */}
+        <Card.Header className="bg-white py-3 border-0">
+          <div className="row align-items-center g-3">
+            {/* Title */}
             <div className="col-12 col-md-6">
-              <div className="d-flex justify-content-center justify-content-md-end">
-                <Form.Control
-                  type="text"
-                  placeholder="Search SWMS..."
-                  className="form-control-sm ps-4"
-                  style={{
-                    width: "100%",
-                    maxWidth: "240px",
-                    backgroundColor: "#f4f5f7",
-                  }}
-                />
-              </div>
+              <h5 className="mb-0 fw-semibold text-center text-md-start">
+                SWMS Overview
+              </h5>
             </div>
           </div>
         </Card.Header>
@@ -245,16 +226,6 @@ function SWMS() {
           <div className="table-responsive">
             <table className="table table-hover align-middle mb-0">
               <thead className="bg-light">
-                {/* Earliear recievde in ui  , Changed according to form. */}
-
-                {/* <tr>
-          <th className="ps-4">SWMS Name</th>
-          <th>Company Name</th>
-          <th>Principal Contractor</th>
-          <th>Date Created</th>
-          <th className="pe-4">Actions</th>
-        </tr> */}
-
                 <tr>
                   <th className="ps-4">SWMS Name</th>
                   <th>Project</th>
@@ -271,7 +242,7 @@ function SWMS() {
                     </td>
                   </tr>
                 ) : filteredSwms.length > 0 ? (
-                  filteredSwms.map((item, index) => (
+                  paginatedSwms.map((item, index) => (
                     <tr key={index}>
                       <td className="ps-4">
                         <div className="d-flex align-items-center gap-3">
@@ -290,9 +261,17 @@ function SWMS() {
                               <i className="fa-solid fa-eye"></i>
                             </Button>
                           </Link>
-                          <Button variant="link" className="text-primary p-0">
-                            <i className="fa-solid fa-download"></i>
+                          <Button
+                            variant="link"
+                            className="text-primary p-0"
+                            onClick={() =>
+                              navigate(`/editnewSwms/${item?._id}`) ||
+                              handleEdit(item?._id)
+                            }
+                          >
+                            <i className="fa-solid fa-pencil"></i>
                           </Button>
+
                           <button
                             className="text-danger btn p-0"
                             onClick={() => handleDelete(item?._id)}
@@ -313,22 +292,40 @@ function SWMS() {
               </tbody>
             </table>
           </div>
-        </td>
-        <td>{( item?.project?.name || item.project)}</td>
-        <td>{item?.workArea}</td>
-        <td>{new Date(item?.createdAt).toLocaleString()}</td>
-        <td className="pe-4">
-          <div className="d-flex gap-3">
-            <Link to={`/view-swms/${item?._id}`}>
-              <Button variant="link" className="text-primary p-0">
-                <i className="fa-solid fa-eye"></i>
+
+          {/* Pagination */}
+          <div className="d-flex justify-content-end my-3 align-items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline-secondary"
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+
+            {[...Array(totalPages)].map((_, idx) => (
+              <Button
+                key={idx}
+                size="sm"
+                variant={
+                  currentPage === idx + 1 ? "primary" : "outline-secondary"
+                }
+                onClick={() => setCurrentPage(idx + 1)}
+              >
+                {idx + 1}
               </Button>
-            </Link>
-            <Button variant="link" className="text-primary p-0" onClick={() => navigate(`/editnewSwms/${item?._id}`) || handleEdit(item?._id)}>
-                <i className="fa-solid fa-pencil"></i>
-              </Button>
-            <Button variant="link" className="text-primary p-0">
-              <i className="fa-solid fa-download"></i>
+            ))}
+
+            <Button
+              size="sm"
+              variant="outline-secondary"
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+            >
+              Next
             </Button>
           </div>
         </Card.Body>
