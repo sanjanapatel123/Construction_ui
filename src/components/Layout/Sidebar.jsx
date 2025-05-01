@@ -185,7 +185,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   };
 
   const filteredMenuItems = menuItems.filter((item) => {
-    if (roledata === "admin" || roledata === "supervisor") {
+    if (roledata === "admin" ) {
       const hiddenAdminPaths = [
         "/super-admin-dashboard",
         "/Plan-Package",
@@ -210,7 +210,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       }
       return false;
     } else if (roledata === "supervisor") {
-      if (item.title === "User Management" || item.title === "Settings" || item.path === "/super-admin-dashboard") {
+      if (item.title === "User Management" || item.title === "Settings" || item.path === "/super-admin-dashboard" || item.path === "/Plan-Package" || item.path === "/Plan-request" || item.path === "/user-info" || item.path === "/super-admin-setting") {
         return false;
       }
       if (item.submenu) {

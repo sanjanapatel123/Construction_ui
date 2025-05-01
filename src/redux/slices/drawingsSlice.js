@@ -55,9 +55,10 @@ export const fetchSingleDrawings = createAsyncThunk(
 // Update an existing drawings
 export const updatedrawings = createAsyncThunk(
   "drawingss/updatedrawings",
-  async ({ _id, updatedData }, thunkAPI) => {
+  async ( updatedData , thunkAPI) => {
+    console.log(updatedData, "updatedData");
     try {
-      const response = await axiosInstance.patch(`${apiUrl}/drawings/${_id}`, updatedData,
+      const response = await axiosInstance.patch(`${apiUrl}/drawings/${id}`, updatedData,
         {
           headers: { "Content-Type": "multipart/form-data" }
         }
