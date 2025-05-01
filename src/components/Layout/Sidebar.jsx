@@ -45,7 +45,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         { title: "Incident Reports", path: "/incidentReports" },
         { title: "Site Entry", path: "/siteEntryTable" },
         { title: "Site Review", path: "/siteReview" },
-        { title: "Audit Equipment", path: "/audit-equipment" },
+        { title: "Audit Equipment", path: "/auditreport" },
         { title: "Safety Equipment", path: "/safety-equipment" },
       ],
     },

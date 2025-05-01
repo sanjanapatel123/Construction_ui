@@ -495,14 +495,14 @@ function AuditReports() {
             </div>
 
             <div className="col-12 col-md-6">
-              <div className="d-flex justify-content-center justify-content-md-end">
+              {/* <div className="d-flex justify-content-center justify-content-md-end">
                 <Form.Control
                   type="text"
                   placeholder="Quick search..."
                   className="form-control-sm ps-4"
                   style={{ width: "100%", maxWidth: "240px", backgroundColor: "#f4f5f7" }}
                 />
-              </div>
+              </div> */}
             </div>
           </div>
         </Card.Header>
@@ -542,16 +542,16 @@ function AuditReports() {
                               <i className="fa-solid fa-eye"></i>
                             </Button>
                           </Link>
-                          <Button 
+                          {/* <Button 
                             variant="link" 
                             className="text-primary p-0" 
                             onClick={() => navigate(`/edit-audit/${item?._id}`)}
                           >
                             <i className="fa-solid fa-pencil"></i>
-                          </Button>
-                          <Button variant="link" className="text-primary p-0">
+                          </Button> */}
+                          {/* <Button variant="link" className="text-primary p-0">
                             <i className="fa-solid fa-download"></i>
-                          </Button>
+                          </Button> */}
                           <button 
                             className="text-danger btn p-0" 
                             onClick={() => handleDelete(item?._id)}

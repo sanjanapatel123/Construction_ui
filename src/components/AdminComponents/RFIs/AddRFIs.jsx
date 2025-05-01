@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { createRFI } from "../../../redux/slices/rfiSlice";
 import { fetchUsers } from "../../../redux/slices/userSlice";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 
 function AddRFIs() {
@@ -43,7 +46,7 @@ function AddRFIs() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+   
     const submitData = new FormData();
     submitData.append("subject", formData.subject);
     submitData.append("priority", formData.priority);
@@ -56,7 +59,11 @@ function AddRFIs() {
       submitData.append("image", file);
     });
     // Dispatch the thunk with your formData object
-    dispatch(createRFI( submitData ));
+    dispatch(createRFI( submitData )).unwrap().then(() => {
+      toast.success("RFI created successfully!");
+    }).catch(() => {
+      toast.error("Failed to create RFI");
+    });
   };
 
 
@@ -142,6 +149,7 @@ function AddRFIs() {
               value={formData.priority}
               onChange={handleInputChange}
             >
+               <option value="" disabled>Select priority</option>
               <option value="High">High</option>
               <option value="Medium">Medium</option>
               <option value="Low">Low</option>
@@ -169,6 +177,7 @@ function AddRFIs() {
               value={formData.assignee}
               onChange={handleInputChange}
             >
+                <option value="" disabled>Select assignee</option>
             {
               users?.map((user) => (
                 

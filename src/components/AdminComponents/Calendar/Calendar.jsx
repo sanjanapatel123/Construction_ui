@@ -56,15 +56,12 @@ const App = () => {
     dispatch(fetchTasks())
   }, [dispatch]);
 
-  useEffect(() => {
-   
-    dispatch(fetchUsers());
-  }, []);
+ 
   
-
+  
   useEffect(() => {
-    if (show) {
-     
+  {
+     dispatch(fetchProjects());
       dispatch(fetchUsers());
     }
   }, []);
@@ -460,8 +457,7 @@ const App = () => {
                       ))
                     ) : (
                       <>
-                        <option value="Project A">Project A</option>
-                        <option value="Project B">Project B</option>
+                       
                       </>
                     )
                   )}
