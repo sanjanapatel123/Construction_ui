@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Form, Col, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-
- // Adjust the import path as necessary
+// Adjust the import path as necessary
 import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
-import { fetchProjects } from "../../../redux/slices/projectSlice"; // Adjust the import path as necessary
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProjects } from "../../../redux/slices/projectSlice";
+import {  fetchUsers  } from "../../../redux/slices/userSlice"; // Adjust the import path as necessary
 import axiosInstance from "../../../utils/axiosInstance";
 import { apiUrl } from "../../../utils/config";
 
@@ -14,19 +14,23 @@ const AddProject = () => {
   // State to handle form inputs
   const [formData, setFormData] = useState({
     name: "",
-    assignedTo: 1,
+    assignedTo: "",
     startDate: "",
     endDate: "",
     status: "",
     priority: "",
     description: "",
-    Progress: "40",
-    // projectName: "",
+    Progress: "",
   });
 
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
+  const users = useSelector((state) => state.users.data);
+
+  useEffect(() => {
+    dispatch( fetchUsers ());
+  }, [dispatch]);
 
   // Handle input changes
   const handleChange = (e) => {
@@ -41,7 +45,7 @@ const AddProject = () => {
   const handleProgressChange = (e) => {
     setFormData((prevState) => ({
       ...prevState,
-      progress: e.target.value,
+      Progress: e.target.value,
     }));
   };
 
@@ -80,29 +84,20 @@ const AddProject = () => {
         </Form.Group>
 
         <Form.Group className="mb-3">
-          <Form.Label>Project Name</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter project name"
-            name="assignedTo"
-            value={formData.assignedTo}
-            onChange={handleChange}
-          />
-        </Form.Group>
-        {/* <Form.Group className="mb-3">
           <Form.Label>Assigned To</Form.Label>
           <Form.Select
             name="assignedTo"
             value={formData.assignedTo}
             onChange={handleChange}
           >
-            <option value="">Select assignee</option>
-            <option value="John Doe">John Doe</option>
-            <option value="Jane Smith">Jane Smith</option>
-            <option value="Alex Johnson">Alex Johnson</option>
-   
+            <option value="">Select a user</option>
+            {users.map((user) => (
+              <option key={user._id} value={user._id}>
+                {user.firstName} {user.lastName}
+              </option>
+            ))}
           </Form.Select>
-        </Form.Group> */}
+        </Form.Group>
 
         <Row className="mb-3">
           <Col md={6}>
@@ -156,7 +151,7 @@ const AddProject = () => {
         </Row>
 
         <Form.Group className="mb-3">
-          <Form.Label>Progress (0%)</Form.Label>
+          <Form.Label>Progress</Form.Label>
           <Form.Control
             type="range"
             min="0"

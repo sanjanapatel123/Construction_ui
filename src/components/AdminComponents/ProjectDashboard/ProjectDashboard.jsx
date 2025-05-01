@@ -11,6 +11,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import ViewProjectModal from "./ViewProjectModal";
+
 import {
   fetchProjects,
   deleteProject,
@@ -22,6 +23,12 @@ import { toast } from "react-toastify";
 import axiosInstance from "../../../utils/axiosInstance";
 
 const ProjectDashboard = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
@@ -41,8 +48,10 @@ const ProjectDashboard = () => {
       alert("Failed to load project details");
     }
   };
+
   useEffect(() => {
     dispatch(fetchProjects());
+    // dispatch(fetchUsers());
   }, [dispatch]);
 
   const handleCloseModal = () => {
@@ -53,6 +62,23 @@ const ProjectDashboard = () => {
   const handleDelete = (projectId) => {
     dispatch(deleteProject(projectId));
   };
+
+  const filteredData = data.filter((project) => {
+    const matchesSearch = project.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter ? project.status === statusFilter : true;
+    const matchesPriority = priorityFilter
+      ? project.priority === priorityFilter
+      : true;
+    return matchesSearch && matchesStatus && matchesPriority;
+  });
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <Container className="mt-4 ">
@@ -75,30 +101,40 @@ const ProjectDashboard = () => {
         {/* Filters Row */}
         <Row className="mb-3">
           <Col md={4}>
-            <Form.Control type="text" placeholder="Search projects..." />
+            <Form.Control
+              type="text"
+              placeholder="Search projects..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </Col>
           <Col md={2}>
-            <Form.Control as="select">
-              <option>All Statuses</option>
+            <Form.Control
+              as="select"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="">All Statuses</option>
               <option>Ongoing</option>
               <option>Completed</option>
-              <option>Pending</option>
+              <option>In Progress</option>
               <option>Delayed</option>
             </Form.Control>
           </Col>
           <Col md={2}>
-            <Form.Control as="select">
-              <option>All Priorities</option>
+            <Form.Control
+              as="select"
+              value={priorityFilter}
+              onChange={(e) => {
+                setPriorityFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="">All Priorities</option>
               <option>High</option>
               <option>Medium</option>
               <option>Low</option>
             </Form.Control>
-          </Col>
-          <Col md={2}>
-            <Form.Control type="date" />
-          </Col>
-          <Col md={2}>
-            <Form.Control type="date" />
           </Col>
         </Row>
 
@@ -117,12 +153,18 @@ const ProjectDashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {data.map((project, index) => (
+            {paginatedData.map((project, index) => (
               <tr key={index} className="bg-white py-3">
                 <td className="ps-4 py-3">{project.name}</td>
-                <td className="py-3">{project.assignedTo?.firstName} {project.assignedTo?.lastName}</td>
-                <td className="py-3">{new Date(project.startDate).toLocaleDateString()}</td>
-                <td className="py-3">{new Date(project.endDate).toLocaleDateString()}</td>
+                <td className="py-3">
+                  {project.assignedTo?.firstName} {project.assignedTo?.lastName}
+                </td>
+                <td className="py-3">
+                  {new Date(project.startDate).toLocaleDateString()}
+                </td>
+                <td className="py-3">
+                  {new Date(project.endDate).toLocaleDateString()}
+                </td>
                 <td className="py-3">
                   <span
                     className={`badge ${
@@ -205,23 +247,42 @@ const ProjectDashboard = () => {
           show={showEditModal}
           handleClose={() => setShowEditModal(false)}
           project={selectedProject}
+          // users={users}
           // refreshData={fetchProjectsAgain} // optional
         />
 
-        <div className="d-flex justify-content-end">
-          <Button size="sm" variant="outline-secondary" className="me-2">
+        <div className="d-flex justify-content-end mt-3">
+          <Button
+            size="sm"
+            variant="outline-secondary"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((prev) => prev - 1)}
+          >
             Previous
           </Button>
-          <Button size="sm" variant="primary" className="ms-2">
-            1
-          </Button>
-          <Button size="sm" variant="outline-secondary" className="ms-2">
-            2
-          </Button>
-          <Button size="sm" variant="outline-secondary" className="ms-2">
+          {[...Array(totalPages)].map((_, idx) => (
+            <Button
+              key={idx}
+              size="sm"
+              variant={
+                currentPage === idx + 1 ? "primary" : "outline-secondary"
+              }
+              className="mx-1"
+              onClick={() => setCurrentPage(idx + 1)}
+            >
+              {idx + 1}
+            </Button>
+          ))}
+          <Button
+            size="sm"
+            variant="outline-secondary"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+          >
             Next
           </Button>
         </div>
+
         {/* Pagination */}
       </div>
     </Container>

@@ -17,7 +17,7 @@ function SiteEntry() {
       dispatch(fetchSiteEntries());
     }
   }, [id, dispatch]);
-  
+
   useEffect(() => {
     if (id && entries.length > 0) {
       const existingEntry = entries.find((entry) => entry._id === id);
@@ -36,7 +36,6 @@ function SiteEntry() {
       }
     }
   }, [id, entries]);
-  
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -55,8 +54,6 @@ function SiteEntry() {
     inductionDate: "",
     siteLocation: "",
   });
-  
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -79,7 +76,7 @@ function SiteEntry() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-  
+
     if (id) {
       dispatch(updateSiteEntry({ id, updatedEntry: formData }))
         .unwrap()
@@ -102,7 +99,7 @@ function SiteEntry() {
         });
     }
   };
-  
+
   const isSafetyEquipmentSelected = Object.values(
     formData.safetyEquipment
   ).every((item) => item);
@@ -290,7 +287,7 @@ function SiteEntry() {
               </div>
             </div>
           </div>
-        
+
           {/* Site Information */}
 <div className="bg-white shadow-sm rounded p-3 mt-3">
           <div className="row ">
@@ -369,3 +366,4 @@ function SiteEntry() {
 }
 
 export default SiteEntry;
+

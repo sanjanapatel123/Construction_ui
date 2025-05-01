@@ -3,9 +3,9 @@ import { Modal, Button, Tab, Row, Col, Nav, Card } from "react-bootstrap";
 import { FaEdit } from "react-icons/fa";
 
 const ViewProjectModal = ({ show, handleClose, project }) => {
-  const [key, setKey] = useState("overview"); // Tab state
+  const [key, setKey] = useState("overview");
 
-  console.log(project);
+  // console.log(project);
   return (
     <Modal show={show} onHide={handleClose} size="lg" centered>
       <Modal.Header closeButton>
@@ -43,7 +43,8 @@ const ViewProjectModal = ({ show, handleClose, project }) => {
                     <Card.Body>
                       <Card.Title>Project Details</Card.Title>
                       <p>
-                        <strong>Project Manager:</strong> {project.manager}
+                        <strong>Project Manager:</strong>
+                        {project?.assignedTo?.firstName}
                       </p>
                       <p>
                         <strong>Timeline:</strong> {project.startDate} to{" "}

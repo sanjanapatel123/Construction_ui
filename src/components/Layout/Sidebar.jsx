@@ -45,10 +45,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         { title: "Incident Reports", path: "/incidentReports" },
         { title: "Site Entry", path: "/siteEntryTable" },
         { title: "Site Review", path: "/siteReview" },
-        { title: "Audit Equipment", path: "/auditreport" },
+        { title: "ComplianceReport", path: "/ComplianceReport" },
+        { title: "Audit Equipment", path: "/audit-equipment" },
         { title: "Safety Equipment", path: "/safety-equipment" },
       ],
     },
+
     {
       title: "Quality Compliance",
       icon: <MdOutlineHighQuality className="menu-icon" />,
@@ -183,7 +185,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   };
 
   const filteredMenuItems = menuItems.filter((item) => {
-    if (roledata === "admin") {
+    if (roledata === "admin" || roledata === "supervisor") {
       const hiddenAdminPaths = [
         "/super-admin-dashboard",
         "/Plan-Package",
@@ -208,7 +210,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       }
       return false;
     } else if (roledata === "supervisor") {
-      if (item.title === "User Management" || item.title === "Settings") {
+      if (item.title === "User Management" || item.title === "Settings" || item.path === "/super-admin-dashboard") {
         return false;
       }
       if (item.submenu) {
@@ -218,6 +220,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       }
       return true;
     } else if (roledata === "worker") {
+      if (item.title === "User Management" || item.title === "Settings" || item.path === "/super-admin-dashboard") {
+        return false;
+      }
       // Worker can only see a specific set of items
       const workerMenuItems = [
         "Dashboard",

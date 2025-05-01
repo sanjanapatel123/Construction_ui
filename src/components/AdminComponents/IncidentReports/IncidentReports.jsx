@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, Form, InputGroup, Badge } from "react-bootstrap";
-import { FaSearch, FaFilter, FaPaperclip, FaUserPlus, FaFileExport,} from "react-icons/fa";
+import {
+  FaSearch,
+  FaFilter,
+  FaPaperclip,
+  FaUserPlus,
+  FaFileExport,
+} from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { deleteIncidentReport, getIncidentReports } from "../../../redux/slices/incidentReportSlice";
+import {
+  deleteIncidentReport,
+  getIncidentReports,
+} from "../../../redux/slices/incidentReportSlice";
 import { useDispatch, useSelector } from "react-redux";
-import Swal from 'sweetalert2';
-
+import Swal from "sweetalert2";
 
 const safetyProtocols = [
   { id: 1, text: "Initial containment measures implemented", completed: true },
@@ -35,53 +43,79 @@ const timelineEvents = [
 ];
 
 function IncidentReports() {
-  const {reports}= useSelector((state)=>state.reports)
+  const { reports } = useSelector((state) => state.reports);
   // console.log(reports)
-  const dispatch= useDispatch()
+  const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedType, setSelectedType] = useState("All Types");
-  useEffect(()=>{
-  dispatch(getIncidentReports())
-  },[])
+  const [selectedType, setSelectedType] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
+  useEffect(() => {
+    dispatch(getIncidentReports());
+  }, [dispatch]);
 
   const getSeverityBadge = (severity) => {
     switch (severity) {
-      case 'low':
+      case "low":
         return <span className="badge bg-success">Low</span>;
-      case 'medium':
+      case "medium":
         return <span className="badge bg-warning text-dark">Medium</span>;
-      case 'high':
+      case "high":
         return <span className="badge bg-danger">High</span>;
-      case 'critical':
+      case "critical":
         return <span className="badge bg-dark">Critical</span>;
       default:
         return <span className="badge bg-secondary">Unknown</span>;
     }
   };
-  
+
   const handleDelete = (id) => {
     Swal.fire({
-      title: 'Are you sure?',
-      text: 'You won’t be able to revert this!',
-      icon: 'warning',
+      title: "Are you sure?",
+      text: "You won’t be able to revert this!",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, delete it!'
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
         dispatch(deleteIncidentReport(id))
           .unwrap()
           .then(() => {
-            Swal.fire('Deleted!', 'Incident has been deleted.', 'success');
+            Swal.fire("Deleted!", "Incident has been deleted.", "success");
           })
           .catch((err) => {
-            Swal.fire('Error!', err, 'error');
+            Swal.fire("Error!", err, "error");
           });
       }
     });
   };
+
+  const filteredReports = reports.filter((report) => {
+    const incidentType = report?.incidentType?.toLowerCase().trim() || "";
+    const location = report?.location?.toLowerCase().trim() || "";
+    const search = searchQuery.toLowerCase().trim();
+    const selected = selectedType.toLowerCase().trim();
+
+    const matchesSearch =
+      incidentType.includes(search) || location.includes(search);
+    const matchesType = selected === "all" || incidentType === selected;
+
+    return matchesSearch && matchesType;
+  });
+
+  const incidentTypes = [
+    ...new Set(reports.map((r) => r.incidentType?.trim())),
+  ].filter(Boolean);
+
+  const totalPages = Math.ceil(filteredReports.length / itemsPerPage);
+
+  const paginatedReports = filteredReports.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="container py-4">
@@ -107,14 +141,21 @@ function IncidentReports() {
 
           <Form.Select
             value={selectedType}
-            onChange={(e) => setSelectedType(e.target.value)}
+            onChange={(e) => {
+              setSelectedType(e.target.value);
+              setCurrentPage(1);
+            }}
             style={{ width: "150px" }}
-            className="border-0 shadow-sm rounded">
-            <option>All Types</option>
-            <option>Injury</option>
-            <option>Equipment Damage</option>
-            <option>Near Miss</option>
+            className="border-0 shadow-sm rounded"
+          >
+            <option value="All">All Types</option>
+            {incidentTypes.map((type, idx) => (
+              <option key={idx} value={type?.trim()}>
+                {type}
+              </option>
+            ))}
           </Form.Select>
+          
         </div>
 
         <Link to="/AddIncidentReports">
@@ -125,7 +166,7 @@ function IncidentReports() {
       </div>
 
       {/* Top Action Buttons */}
-      <div className="d-flex flex-wrap gap-2 mb-4 px-2">
+      {/* <div className="d-flex flex-wrap gap-2 mb-4 px-2">
         <Button
           variant="outline-secondary"
           size="sm"
@@ -147,61 +188,89 @@ function IncidentReports() {
         >
           <FaFileExport className="me-1" /> Export Report
         </Button>
-      </div>
+      </div> */}
 
       {/* Incident Table */}
       <div className="bg-white rounded-3 shadow-sm mb-3 p-2">
         <div className="table-responsive">
-      <Table hover className="shadow-sm bg-white mb-0 rounded mt-2">
-  <thead className="table-light p-2">
-    <tr>
-      <th>#</th>
-      <th>Type</th>
-      <th>Location</th>
-      <th>Status</th>
-      <th>Date</th>
-      <th>Action</th>
+          <Table hover className="shadow-sm bg-white mb-0 rounded mt-2">
+            <thead className="table-light p-2">
+              <tr>
+                <th>#</th>
+                <th>Type</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody className="p-2">
+              {paginatedReports.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="text-center">
+                    No Reports Found
+                  </td>
+                </tr>
+              ) : (
+                paginatedReports?.map((incident, index) => (
+                  <tr key={incident._id}>
+                    <td>{index + 1}</td>
+                    <td>{incident?.incidentType}</td>
+                    <td>{incident?.location}</td>
+                    <td>{getSeverityBadge(incident.severityLevel)}</td>
+                    <td>{new Date(incident.dateTime).toLocaleString()}</td>
+                    <td>
+                      {" "}
+                      <Button
+                        variant="link"
+                        className="text-primary p-0"
+                        onClick={() => handleDelete(incident._id)}
+                      >
+                        <i className="fas fa-trash  text-danger"></i>
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </Table>
+        </div>
+        <div className="d-flex justify-content-end mb-2 mt-3">
+          <Button
+            size="sm"
+            variant="outline-secondary"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
 
-    </tr>
-  </thead>
-  <tbody className="p-2">
-  {reports.length === 0 ? (
-    <tr>
-      <td colSpan="7" className="text-center">No Reports Found</td>
-    </tr>
-  ) : (
-    reports?.map((incident,index) => (
-      <tr key={incident._id}>
-        <td>{index+1}</td>
-        <td>{incident?.incidentType}</td>
-        <td>{incident?.location}</td>
-        <td>{getSeverityBadge(incident.severityLevel)}</td>
-        <td>{new Date(incident.dateTime).toLocaleString()}</td>
-          <td> <Button variant="link" className="text-primary p-0" onClick={()=>handleDelete(incident._id)}>
-         <i className="fas fa-trash  text-danger"></i> 
-         </Button></td>
-      </tr>
-    ))
-  )}
-</tbody>
+          {[...Array(totalPages)].map((_, idx) => (
+            <Button
+              key={idx}
+              size="sm"
+              variant={
+                currentPage === idx + 1 ? "primary" : "outline-secondary"
+              }
+              onClick={() => setCurrentPage(idx + 1)}
+              className="mx-1"
+            >
+              {idx + 1}
+            </Button>
+          ))}
 
-</Table>
-</div>
-<div className="d-flex justify-content-end mb-2 mt-3">
-  <Button size="sm" variant="outline-secondary" className="me-2">
-    Previous
-  </Button>
-  <Button size="sm" variant="primary" className="ms-2">
-    1
-  </Button>
-  <Button size="sm" variant="outline-secondary" className="ms-2">
-    2
-  </Button>
-  <Button size="sm" variant="outline-secondary" className="ms-2">
-    Next
-  </Button>
-</div>
-</div>
+          <Button
+            size="sm"
+            variant="outline-secondary"
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
       {/* Overview & Checklist */}
       <div className="row g-4 mb-4">
         <div className="col-md-6">
