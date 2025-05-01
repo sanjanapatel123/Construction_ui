@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { Button, Form, Col, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-
- // Adjust the import path as necessary
+// Adjust the import path as necessary
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { fetchProjects } from "../../../redux/slices/projectSlice"; // Adjust the import path as necessary
@@ -14,14 +13,13 @@ const AddProject = () => {
   // State to handle form inputs
   const [formData, setFormData] = useState({
     name: "",
-    assignedTo: 1,
+    assignedTo: "680b732841a4ddabafda39b3",
     startDate: "",
     endDate: "",
     status: "",
     priority: "",
     description: "",
     Progress: "40",
-    // projectName: "",
   });
 
   const navigate = useNavigate();
@@ -89,7 +87,7 @@ const AddProject = () => {
             onChange={handleChange}
           />
         </Form.Group>
-        {/* <Form.Group className="mb-3">
+        <Form.Group className="mb-3">
           <Form.Label>Assigned To</Form.Label>
           <Form.Select
             name="assignedTo"
@@ -102,7 +100,7 @@ const AddProject = () => {
             <option value="Alex Johnson">Alex Johnson</option>
    
           </Form.Select>
-        </Form.Group> */}
+        </Form.Group>
 
         <Row className="mb-3">
           <Col md={6}>

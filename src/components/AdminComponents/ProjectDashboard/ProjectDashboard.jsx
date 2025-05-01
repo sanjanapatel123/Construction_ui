@@ -27,7 +27,7 @@ const ProjectDashboard = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const dispatch = useDispatch();
   const { data, loading, error } = useSelector((state) => state.projects);
-  console.log(data);
+  // console.log(data);
 
   const handleShowModal = async (projectId) => {
     try {
