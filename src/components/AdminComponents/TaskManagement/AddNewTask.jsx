@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { Form, Button, Row, Col ,Modal} from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchTasks, updateTask, addTask } from "../../../redux/slices/taskManagement";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { fetchUsers } from "../../../redux/slices/userSlice";
 
 const AddNewTask = () => {
   const dispatch = useDispatch();
   const { tasks, loading ,error} = useSelector((state) => state.task);
+
+   const { data: users } = useSelector((state) => state.users);
+   console.log(users)
 
   const { id } = useParams();
   console.log(id)
@@ -44,7 +48,9 @@ const AddNewTask = () => {
 
   const navigate = useNavigate();
 
-
+useEffect(() => {
+  dispatch(fetchUsers());
+},[])
 
   useEffect(() => {
       if (id) {
@@ -59,13 +65,13 @@ const AddNewTask = () => {
         console.log("assgn", existingEntry.assignTo)
         if (existingEntry) {
           setTaskDetails({
-            taskTitle: existingEntry.taskTitle,
+            taskTitle: existingEntry?.taskTitle,
             description: existingEntry?.description,
-            assignTo: existingEntry.assignTo._id,
-            dueDate: existingEntry.dueDate,
-            priority: existingEntry.priority,
-            category: existingEntry.category,
-            status: existingEntry.status,
+            assignTo: existingEntry?.assignTo?._id,
+            dueDate: existingEntry?.dueDate,
+            priority: existingEntry?.priority,
+            category: existingEntry?.category,
+            status: existingEntry?.status,
           });
         }
       }
@@ -147,9 +153,11 @@ const AddNewTask = () => {
           <Form.Label>Assigned To</Form.Label>
           <Form.Select name="assignTo" value={taskDetails.assignTo} onChange={handleInputChange}>
             <option value="">Select assignee</option>
-            <option value="68078c13c78a4e929267accc">John Doe</option>
-            <option value="68078c13c78a4e929267accc">Jane Smith</option>
-            <option value="Alex Johnson">Alex Johnson</option>
+            {users.map((user) => (
+              <option key={user._id} value={user._id}>
+                {user.firstName} {user.lastName}
+              </option>
+            ))}
             {/* Add more options as needed */}
           </Form.Select>
         </Form.Group>

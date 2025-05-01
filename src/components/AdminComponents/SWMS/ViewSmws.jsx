@@ -131,12 +131,15 @@ const ViewSwms = () => {
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h3 className="mb-0">SWMS Details</h3>
-        
+        <div >
+          <button className="btn me-2" style={{ backgroundColor: "#0d6efd", color: "white" }}><i className="fa-solid fa-file-pdf "></i> Download PDF</button>
+       
         <Link to="/swms">
           <button className="btn" style={{ backgroundColor: "#0d6efd", color: "white" }}>
-            <i className="fa-solid fa-arrow-left me-2"></i> Back to Overview
+            <i className="fa-solid fa-arrow-left  me-2"></i> Back to Overview
           </button>
         </Link>
+        </div>
       </div>
 
       {loading ? (
