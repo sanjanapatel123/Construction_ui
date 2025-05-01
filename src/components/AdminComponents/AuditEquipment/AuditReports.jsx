@@ -321,7 +321,8 @@ import Swal from "sweetalert2";
 import { Link } from "react-router-dom";
 
 import { fetchProjects } from "../../../redux/slices/projectSlice";
-import { fetchAudit } from "../../../redux/slices/auditSlice";
+import { deleteAudit, fetchAudit } from "../../../redux/slices/auditSlice";
+import { toast } from "react-toastify";
 
 function AuditReports() {
   const [search, setSearch] = useState("");
@@ -334,7 +335,7 @@ function AuditReports() {
   }, [dispatch]);
 
   const { audit, loading, error } = useSelector((state) => state.audit);
-  console.log("audit", audit)
+  console.log("audit", audit.data)
   const projects = useSelector((state) => state.projects.data);
 
   const handleSearchChange = (e) => setSearch(e.target.value);
@@ -344,7 +345,7 @@ function AuditReports() {
   console.log( auditData)
   console.log(auditData.length)
   
-  const filteredAuditReports = auditData.filter((report) =>
+  const filteredAuditReports =  audit.data .length > 1 && audit?.data.filter((report) =>
     report.auditedBy.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -359,11 +360,11 @@ function AuditReports() {
       confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        dispatch(deleteAuditReport(id))
+        dispatch(deleteAudit(id))
           .then((response) => {
-            if (response.meta.requestStatus === "fulfilled") {
-              dispatch(fetchAudit());
-              navigate("/audit-reports");
+            console.log(response);
+            if (response.success) {
+             toast.success("Audit report deleted successfully!");
             }
           })
          .catch((error) => {
@@ -374,6 +375,7 @@ function AuditReports() {
                        );
                      });
       }
+      dispatch(fetchAudit());
     });
   };
 
@@ -542,13 +544,13 @@ function AuditReports() {
                               <i className="fa-solid fa-eye"></i>
                             </Button>
                           </Link>
-                          {/* <Button 
+                          <Button 
                             variant="link" 
                             className="text-primary p-0" 
-                            onClick={() => navigate(`/edit-audit/${item?._id}`)}
+                            onClick={() => navigate(`/edit-audit-equipment/${item?._id}`)}
                           >
                             <i className="fa-solid fa-pencil"></i>
-                          </Button> */}
+                          </Button>
                           {/* <Button variant="link" className="text-primary p-0">
                             <i className="fa-solid fa-download"></i>
                           </Button> */}

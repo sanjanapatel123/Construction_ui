@@ -282,17 +282,19 @@ const App = () => {
           <h4>Calendar / Program</h4>
         </Col>
         <Col md="auto">
-          <Button variant="light" onClick={goToPrevious}>
+          <Button
+            variant="light"
+            onClick={() => setCurrentMonth(currentMonth.subtract(1, "month"))}
+          >
             ⬅
           </Button>
           <span className="mx-2 fw-bold">
-            {view === "Month"
-              ? currentMonth.format("MMMM YYYY")
-              : `${currentWeekStart.format("D MMM")} - ${currentWeekStart
-                  .add(6, "day")
-                  .format("D MMM YYYY")}`}
+            {currentMonth.format("MMMM YYYY")}
           </span>
-          <Button variant="light" onClick={goToNext}>
+          <Button
+            variant="light"
+            onClick={() => setCurrentMonth(currentMonth.add(1, "month"))}
+          >
             ➡
           </Button>
         </Col>
