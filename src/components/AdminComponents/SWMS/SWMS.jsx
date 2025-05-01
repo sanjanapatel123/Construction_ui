@@ -1,4 +1,4 @@
-import React, {  use, useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import {
   Container,
   Row,
@@ -9,49 +9,37 @@ import {
   Table,
   Badge,
 } from "react-bootstrap";
-import { FaEdit, FaEye, FaTrash, FaDownload, FaShare } from "react-icons/fa";
 import { getallSwms, deleteswms } from "../../../redux/slices/swmsSlice";
-import { getSingleProject,fetchProjects  } from "../../../redux/slices/projectSlice";
+import { fetchProjects } from "../../../redux/slices/projectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 import { Link } from "react-router-dom";
 
-
 function SWMS() {
-
   const [search, setSearch] = useState("");
 
   const dispatch = useDispatch();
 
-  const { swms , loading ,error } = useSelector((state) => state.swms )
-  //   const { projects}  = useSelector((state) => state.projects.data)
-  // console.log(projects)
+  const { swms, loading, error } = useSelector((state) => state.swms);
 
-   const  projects  = useSelector((state) => state.projects.data);
-    // console.log(projects);
+  const projects = useSelector((state) => state.projects.data);
 
-
-  // console.log("sWMS" ,swms)
   const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(getallSwms());
-    // dispatch(getSingleProject());
-  dispatch(fetchProjects());
-    
-  }, [dispatch]);
-  
 
+    dispatch(fetchProjects());
+  }, [dispatch]);
 
   const SwmsList = Array.isArray(swms) ? swms : [];
 
-  const handleSearchChange = (e) => setSearch(e.target.value)
-
+  const handleSearchChange = (e) => setSearch(e.target.value);
 
   const filteredSwms = SwmsList.filter((swms) =>
-    swms.title.toLowerCase().includes(search.toLowerCase()) 
+    swms.title.toLowerCase().includes(search.toLowerCase())
   );
 
   const templates = [
@@ -111,51 +99,47 @@ function SWMS() {
     },
   ];
 
-// const handleDelete = (id) => {
-//   dispatch(deleteswms(id))
-//     .unwrap()
-//     .then(() => toast.success("SWMS deleted successfully!"))
-//     .catch(() => toast.error("Failed to delete SWMS."));
-// };
+  // const handleDelete = (id) => {
+  //   dispatch(deleteswms(id))
+  //     .unwrap()
+  //     .then(() => toast.success("SWMS deleted successfully!"))
+  //     .catch(() => toast.error("Failed to delete SWMS."));
+  // };
 
+  const handleDelete = (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(deleteswms(id))
+          .then((response) => {
+            // {console.log(response)}
+            if (response.meta.requestStatus === "fulfilled") {
+              // showSuccessToast("SWMS deleted successfully!");
+              dispatch(getallSwms());
+              navigate("/swms");
+            } else {
+              // showErrorToast("Failed to delete SWMS!");
+            }
+          })
+          .catch(() => {
+            showErrorToast("Something went wrong!");
+          });
+      }
+    });
+  };
 
-const handleDelete = (id) => {
-  Swal.fire({
-    title: "Are you sure?",
-    text: "You won't be able to revert this!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, delete it!",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      dispatch(deleteswms(id))
-        .then((response) => {
-          // {console.log(response)}
-          if (response.meta.requestStatus === "fulfilled") {
-            // showSuccessToast("SWMS deleted successfully!");
-            dispatch(getallSwms());
-            navigate("/swms");
-          } else {
-            // showErrorToast("Failed to delete SWMS!");
-          }
-        })
-        .catch(() => {
-          showErrorToast("Something went wrong!");
-        });
-    }
-  });
-};
-
-const getProjectName = (projectId) => {
-  const project = projects.find((p) => p.id === projectId);
-  // console.log("getproject",project);
-  return project ? project.name : "Unknown Project";
-};
- 
-
-
+  const getProjectName = (projectId) => {
+    const project = projects.find((p) => p.id === projectId);
+    // console.log("getproject",project);
+    return project ? project.name : "Unknown Project";
+  };
 
   const handleUseTemplate = (title) => {
     navigate(`/template`, { state: { title } });
@@ -218,37 +202,40 @@ const getProjectName = (projectId) => {
       </Row>
 
       <Card className="mb-5 border-0 shadow-sm">
-      <Card.Header className="bg-white py-3 border-0">
-  <div className="row align-items-center g-3">
-    {/* Title */}
-    <div className="col-12 col-md-6">
-      <h5 className="mb-0 fw-semibold text-center text-md-start">SWMS Overview</h5>
-    </div>
+        <Card.Header className="bg-white py-3 border-0">
+          <div className="row align-items-center g-3">
+            {/* Title */}
+            <div className="col-12 col-md-6">
+              <h5 className="mb-0 fw-semibold text-center text-md-start">
+                SWMS Overview
+              </h5>
+            </div>
 
-    {/* Search Input */}
-    <div className="col-12 col-md-6">
-      <div className="d-flex justify-content-center justify-content-md-end">
-        <Form.Control
-          type="text"
-          placeholder="Search SWMS..."
-          className="form-control-sm ps-4"
-          style={{ width: "100%", maxWidth: "240px", backgroundColor: "#f4f5f7" }}
-        />
-      </div>
-    </div>
-  </div>
-</Card.Header>
-
+            {/* Search Input */}
+            <div className="col-12 col-md-6">
+              <div className="d-flex justify-content-center justify-content-md-end">
+                <Form.Control
+                  type="text"
+                  placeholder="Search SWMS..."
+                  className="form-control-sm ps-4"
+                  style={{
+                    width: "100%",
+                    maxWidth: "240px",
+                    backgroundColor: "#f4f5f7",
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </Card.Header>
 
         <Card.Body className="p-2">
-  <div className="table-responsive">
-    <table className="table table-hover align-middle mb-0">
-      <thead className="bg-light">
+          <div className="table-responsive">
+            <table className="table table-hover align-middle mb-0">
+              <thead className="bg-light">
+                {/* Earliear recievde in ui  , Changed according to form. */}
 
-
-         {/* Earliear recievde in ui  , Changed according to form. */}
-
-        {/* <tr>
+                {/* <tr>
           <th className="ps-4">SWMS Name</th>
           <th>Company Name</th>
           <th>Principal Contractor</th>
@@ -256,79 +243,81 @@ const getProjectName = (projectId) => {
           <th className="pe-4">Actions</th>
         </tr> */}
 
-        <tr>
-        <th className="ps-4">SWMS Name</th>
-        <th>Project</th>
-        <th>Work Area </th>
-        <th>Date Created</th>
-        <th className="pe-4">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-  {loading ? (
-    <tr>
-      <td colSpan="5" className="text-center py-3">Loading...</td>
-    </tr>
-  ) : filteredSwms.length > 0 ? (
-    filteredSwms.map((item, index) => (
-      <tr key={index}>
-        <td className="ps-4">
-          <div className="d-flex align-items-center gap-3">
-            <div>
-              <div className="fw-medium">{item?.title}</div>
-            </div>
+                <tr>
+                  <th className="ps-4">SWMS Name</th>
+                  <th>Project</th>
+                  <th>Work Area </th>
+                  <th>Date Created</th>
+                  <th className="pe-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="5" className="text-center py-3">
+                      Loading...
+                    </td>
+                  </tr>
+                ) : filteredSwms.length > 0 ? (
+                  filteredSwms.map((item, index) => (
+                    <tr key={index}>
+                      <td className="ps-4">
+                        <div className="d-flex align-items-center gap-3">
+                          <div>
+                            <div className="fw-medium">{item?.title}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>{item?.project?.name || item.project}</td>
+                      <td>{item?.workArea}</td>
+                      <td>{new Date(item?.createdAt).toLocaleString()}</td>
+                      <td className="pe-4">
+                        <div className="d-flex gap-3">
+                          <Link to={`/view-swms/${item?._id}`}>
+                            <Button variant="link" className="text-primary p-0">
+                              <i className="fa-solid fa-eye"></i>
+                            </Button>
+                          </Link>
+                          <Button variant="link" className="text-primary p-0">
+                            <i className="fa-solid fa-download"></i>
+                          </Button>
+                          <button
+                            className="text-danger btn p-0"
+                            onClick={() => handleDelete(item?._id)}
+                          >
+                            <i className="fa-solid fa-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center py-3">
+                      No SWMS found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-        </td>
-        <td>{( item?.project?.name || item.project)}</td>
-        <td>{item?.workArea}</td>
-        <td>{new Date(item?.createdAt).toLocaleString()}</td>
-        <td className="pe-4">
-          <div className="d-flex gap-3">
-            <Link to={`/view-swms/${item?._id}`}>
-              <Button variant="link" className="text-primary p-0">
-                <i className="fa-solid fa-eye"></i>
-              </Button>
-            </Link>
-            <Button variant="link" className="text-primary p-0">
-              <i className="fa-solid fa-download"></i>
+
+          {/* Pagination */}
+          <div className="d-flex justify-content-end my-3">
+            <Button size="sm" variant="outline-secondary" className="me-2">
+              Previous
             </Button>
-            <button className="text-danger btn p-0" onClick={() => handleDelete(item?._id)}>
-              <i className="fa-solid fa-trash"></i>
-            </button>
+            <Button size="sm" variant="primary" className="ms-2">
+              1
+            </Button>
+            <Button size="sm" variant="outline-secondary" className="ms-2">
+              2
+            </Button>
+            <Button size="sm" variant="outline-secondary" className="ms-2">
+              Next
+            </Button>
           </div>
-        </td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td colSpan="5" className="text-center py-3">No SWMS found</td>
-    </tr>
-  )}
-</tbody>
-
-      
-     
-      
-    </table>
-  </div>
-
-  {/* Pagination */}
-  <div className="d-flex justify-content-end my-3">
-    <Button size="sm" variant="outline-secondary" className="me-2">
-      Previous
-    </Button>
-    <Button size="sm" variant="primary" className="ms-2">
-      1
-    </Button>
-    <Button size="sm" variant="outline-secondary" className="ms-2">
-      2
-    </Button>
-    <Button size="sm" variant="outline-secondary" className="ms-2">
-      Next
-    </Button>
-  </div>
-</Card.Body>
-
+        </Card.Body>
       </Card>
       <h5 className="mb-3 mt-3" style={{ fontSize: "1rem", fontWeight: "500" }}>
         Pre-Populated Templates

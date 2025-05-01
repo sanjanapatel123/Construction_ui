@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
-
+import { fetchUsers } from "../../../redux/slices/userSlice";
 import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchProjects } from "../../../redux/slices/projectSlice"; // Adjust the import path as necessary
 import { apiUrl } from "../../../utils/config";
 
-const EditProjectModal = ({ show, handleClose, project, refreshData }) => {
+const EditProjectModal = ({ show, handleClose, project }) => {
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
@@ -22,6 +22,12 @@ const EditProjectModal = ({ show, handleClose, project, refreshData }) => {
   };
 
   const dispatch = useDispatch();
+
+  const users = useSelector((state) => state.users.data);
+
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, [dispatch]);
 
   const handleUpdate = async () => {
     try {
@@ -39,6 +45,7 @@ const EditProjectModal = ({ show, handleClose, project, refreshData }) => {
       toast.error("Failed to update project!");
     }
   };
+  console.log(users);
 
   return (
     <Modal show={show} onHide={handleClose} centered>
@@ -57,14 +64,20 @@ const EditProjectModal = ({ show, handleClose, project, refreshData }) => {
             />
           </Form.Group>
 
-          <Form.Group controlId="manager" className="mb-2">
-            <Form.Label>Manager</Form.Label>
-            <Form.Control
-              type="text"
-              name="manager"
-              value={formData.assignedTo || ""}
+          <Form.Group controlId="assignedTo" className="mb-2">
+            <Form.Label>Assigned To</Form.Label>
+            <Form.Select
+              name="assignedTo"
+              value={formData.assignedTo} // should be the user ID
               onChange={handleChange}
-            />
+            >
+              <option value="">Select User</option>
+              {users.map((user) => (
+                <option key={user._id} value={user._id}>
+                  {user.firstName} {user.lastName}
+                </option>
+              ))}
+            </Form.Select>
           </Form.Group>
 
           <Form.Group controlId="startDate" className="mb-2">

@@ -45,10 +45,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         { title: "Incident Reports", path: "/incidentReports" },
         { title: "Site Entry", path: "/siteEntryTable" },
         { title: "Site Review", path: "/siteReview" },
+        { title: "ComplianceReport", path: "/ComplianceReport" },
         { title: "Audit Equipment", path: "/audit-equipment" },
         { title: "Safety Equipment", path: "/safety-equipment" },
       ],
     },
+
     {
       title: "Quality Compliance",
       icon: <MdOutlineHighQuality className="menu-icon" />,

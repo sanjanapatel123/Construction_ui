@@ -7,12 +7,12 @@ import Swal from 'sweetalert2'
 function SiteEntryTable() {
   const dispatch= useDispatch()
   const {entries}= useSelector((state)=>state.entries)
-  
+
   console.log(entries)
   useEffect(()=>{
     dispatch(fetchSiteEntries())
   } ,[])
- 
+
   const HandleDelete = (id) => {
     Swal.fire({
       title: 'Are you sure?',
@@ -53,7 +53,7 @@ function SiteEntryTable() {
             <i className="fa-solid fa-plus me-2"></i>Site Entry
           </button>
         </Link>
-      </div> 
+      </div>
 
       {/* Table */}
       <div className="table-responsive shadow-sm bg-white rounded p-2">
@@ -95,11 +95,11 @@ function SiteEntryTable() {
         </td>
       </tr>
     ))
-  ) : (   
+  ) : (
     <tr>
       <td colSpan="9" className="text-center py-3">
         No site entries found.
-      </td> 
+      </td>
     </tr>
   )}
 </tbody>
@@ -125,3 +125,4 @@ function SiteEntryTable() {
 }
 
 export default SiteEntryTable;
+

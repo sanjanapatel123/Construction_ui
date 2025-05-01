@@ -85,7 +85,7 @@ import EditToolboxTalk from "./components/AdminComponents/ToolboxTalks/EditToolb
 import RFIs from "./components/AdminComponents/RFIs/RFIs";
 import EditUser from "./components/AdminComponents/UserManagement/EditUser";
 import ViewUser from "./components/AdminComponents/UserManagement/ViewUser";
-
+import ComplianceReport from "./components/AdminComponents/ComplianceReport/ComplianceReport";
 
 function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
@@ -163,7 +163,10 @@ function App() {
             <Route path="/AddEquipment" element={<AddEquipment />} />
             <Route path="/AddEquipment/:id" element={<AddEquipment />} />
 
-            <Route path="/equipment-details/:id" element={<EquipmentDetailsPage />} />
+            <Route
+              path="/equipment-details/:id"
+              element={<EquipmentDetailsPage />}
+            />
 
             {/* <Route path="/AddServices" element={<AddServices/>} /> */}
             <Route path="/messenger" element={<Messenger />} />
@@ -246,7 +249,10 @@ function App() {
             <Route path="/edit-toolbox/:id" element={<EditToolboxTalk />} />
             <Route path="/edit-user/:id" element={<EditUser />} />
             <Route path="/users/view/:id" element={<ViewUser />} />
-
+            <Route
+              path="/ComplianceReport"
+              element={<ComplianceReport></ComplianceReport>}
+            ></Route>
 
             <Route
               path="/Calendar_createnewtask"
@@ -303,8 +309,11 @@ function App() {
             <Route path="/AddToolRegistry" element={<AddToolRegistry />} />
             <Route path="/AddSafety" element={<SafetyEquipment />} />
             <Route path="/AddSafety/:id" element={<SafetyEquipment />} />
-           <Route path="/view-service" element={<ViewServicePage />} />
-           <Route path="/safety-equipment/:id" element={<SafetyEquipmentDetails />} />
+            <Route path="/view-service" element={<ViewServicePage />} />
+            <Route
+              path="/safety-equipment/:id"
+              element={<SafetyEquipmentDetails />}
+            />
             {/* <Route
               path="/equipment-details"
               element={<EquipmentDetailsPage />}
@@ -320,7 +329,10 @@ function App() {
             <Route path="/messenger" element={<Messenger />} />
             <Route path="/announcements" element={<Announcements />} />
             <Route path="/AddAnnouncements" element={<AddAnnouncements />} />
-            <Route path="/EditAnnouncements/:id" element={<AddAnnouncements />} />
+            <Route
+              path="/EditAnnouncements/:id"
+              element={<AddAnnouncements />}
+            />
 
             <Route path="/rfis" element={<RFIs />} />
             <Route path="/AddRFIs" element={<AddRFIs />} />
