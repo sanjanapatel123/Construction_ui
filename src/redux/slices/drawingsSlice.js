@@ -143,22 +143,22 @@ const drawingsSlice = createSlice({
       state.error = action.payload;
     })
   
-    .addCase(updatedrawings.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
-    .addCase(updatedrawings.fulfilled, (state, action) => {
-      state.loading = false;
-      const index = state.drawings_arr.findIndex(d => d._id === action.payload._id);
-      if (index !== -1) {
-        state.drawings_arr[index] = action.payload;
-        localStorage.setItem("drawings_arr", JSON.stringify(state.drawings_arr));
-      }
-    })
-    .addCase(updatedrawings.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    })
+    // .addCase(updatedrawings.pending, (state) => {
+    //   state.loading = true;
+    //   state.error = null;
+    // })
+    // .addCase(updatedrawings.fulfilled, (state, action) => {
+    //   state.loading = false;
+    //   const index = state.drawings_arr.findIndex(d => d._id === action.payload._id);
+    //   if (index !== -1) {
+    //     state.drawings_arr[index] = action.payload;
+    //     localStorage.setItem("drawings_arr", JSON.stringify(state.drawings_arr));
+    //   }
+    // })
+    // .addCase(updatedrawings.rejected, (state, action) => {
+    //   state.loading = false;
+    //   state.error = action.payload;
+    // })
 
     // Delete
     // .addCase(deleteDrawings.pending, (state) => {

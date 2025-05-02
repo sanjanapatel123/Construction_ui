@@ -1,10 +1,12 @@
 
 import React, { useEffect, useState } from "react";
-import {Modal,Button, InputGroup,FormControl,ListGroup,Row,Col,Form,
+import {
+  Modal, Button, InputGroup, FormControl, ListGroup, Row, Col, Form,
 } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faBuilding,faLayerGroup,faWater, faCogs, faSearch,faUpload, faThLarge, faList, faEye, faEdit, faTrash,
- faCloudUploadAlt,
+import {
+  faBuilding, faLayerGroup, faWater, faCogs, faSearch, faUpload, faThLarge, faList, faEye, faEdit, faTrash,
+  faCloudUploadAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import ViewDocument from "./ViewDocument";
 import { useDispatch, useSelector } from "react-redux";
@@ -101,17 +103,32 @@ function DrawingRegister() {
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  
+  const dispatch = useDispatch()
 
-  const { data:users } = useSelector((state) => state.users);
 
+  const handleFolderClick = (folder) => {
+    setActiveFolder(folder);
+  };
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // All User name
+  const { data: users } = useSelector((state) => state.users);
   useEffect(() => {
     dispatch(fetchUsers());
   }, []);
 
 
-  const dispatch = useDispatch()
-  const filteredDocuments = documentsData.filter(
+  // All Drawing list
+  const { drawings_arr } = useSelector((state) => state.drawings);
+  console.log("Drawings:", drawings_arr.drawingRegisters);
+  useEffect(() => {
+    dispatch(fetchDrawings());
+  }, [dispatch]);
+
+  // filter Folders
+  const filteredDocuments = drawings_arr.drawingRegisters.filter(
     (doc) =>
       doc.folderId === activeFolder.id &&
       (doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -119,48 +136,38 @@ function DrawingRegister() {
         doc.assignedTo.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const handleFolderClick = (folder) => {
-    setActiveFolder(folder);
-  };
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
+  const toggleUploadModal = (isEdit = false, doc = null) => {
+    if (isEdit && doc) {
+      setIsEditing(true);
+      setEditingId(doc._id);
+      setFormData({
+        documentTitle: doc.documentTitle || "",
+        documentType: doc.documentType || "",
+        folder: doc.folder || "",
+        assignedTo: doc.assignedTo?._id || "",
+        comments: doc.comments || "",
+        existingImage: doc.image || [],
+        image: [],
+        status: doc.status || "",
+      });
+    } else {
+      setIsEditing(false);
+      setEditingId(null);
 
- 
-const toggleUploadModal = (isEdit = false, doc = null) => {
-  if (isEdit && doc) {
-    setIsEditing(true);
-    setEditingId(doc._id);
-    setFormData({
-      documentTitle: doc.documentTitle || "",
-      documentType: doc.documentType || "",
-      folder: doc.folder || "",
-      assignedTo: doc.assignedTo?._id || "",
-      comments: doc.comments || "",
-      // Store the existing image URL or array
-      existingImage: doc.image || [],
-      // Set image to null initially - if user doesn't upload a new file, we'll use existingImage
-      image: [],
-      status: doc.status || "",
-    });
-  } else {
-    setIsEditing(false);
-    setEditingId(null);
-    
-    setFormData({
-      documentTitle: "",
-      documentType: "",
-      folder: "",
-      assignedTo: "",
-      comments: "",
-      existingImage: [],
-      image: [],
-      status: "",
-    });
-  }
-  setShowUploadModal(!showUploadModal);
-};
+      setFormData({
+        documentTitle: "",
+        documentType: "",
+        folder: "",
+        assignedTo: "",
+        comments: "",
+        existingImage: [],
+        image: [],
+        status: "",
+      });
+    }
+    setShowUploadModal(!showUploadModal);
+  };
   const openViewModal = (doc) => {
     setSelectedDoc(doc);
   };
@@ -182,15 +189,6 @@ const toggleUploadModal = (isEdit = false, doc = null) => {
     }
   };
 
-  // All Drawing list
-  const { drawings_arr } = useSelector((state) => state.drawings);
-  console.log("Drawings:", drawings_arr.drawingRegisters);
-  useEffect(() => {
-    dispatch(fetchDrawings());
-  }, [dispatch]);
-
-
-
   // add 
   const [formData, setFormData] = useState({
     documentTitle: "",
@@ -201,9 +199,7 @@ const toggleUploadModal = (isEdit = false, doc = null) => {
     image: null,
     status: "",
   });
-
   const { documentTitle, documentType, folder, assignedTo, comments, image, status } = formData;
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
@@ -211,37 +207,28 @@ const toggleUploadModal = (isEdit = false, doc = null) => {
       [name]: value,
     }));
   };
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFormData((prevState) => ({
+        ...prevState,
+        image: e.target.files[0],
+      }));
+    } else {
+      setFormData((prevState) => ({
+        ...prevState,
+        image: null,
+      }));
+    }
+  };
 
- 
-const handleFileChange = (e) => {
-  if (e.target.files && e.target.files.length > 0) {
-    setFormData((prevState) => ({
-      ...prevState,
-      image: e.target.files[0],
-    }));
-  } else {
-    // If the file selection was canceled or cleared
-    setFormData((prevState) => ({
-      ...prevState,
-      image: null,
-    }));
-  }
-};
- 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
     if (isEditing) {
-      
       const updateFormData = { ...formData };
-
       if (!updateFormData.image) {
         delete updateFormData.image;
       }
-      
-      
       delete updateFormData.existingImage;
-      
       dispatch(updatedrawings({
         id: editingId,
         updatedForm: updateFormData
@@ -253,10 +240,8 @@ const handleFileChange = (e) => {
         toast.error(error?.response?.data?.message || "Failed to update document!");
       });
     } else {
-
       const newFormData = { ...formData };
-      delete newFormData.existingImage; 
-      
+      delete newFormData.existingImage;
       dispatch(addDrawings(newFormData)).unwrap().then(() => {
         toast.success("Document uploaded successfully!");
         setShowUploadModal(false);
@@ -266,6 +251,9 @@ const handleFileChange = (e) => {
       });
     }
   };
+
+
+  // dlete list 
   const handleDelete = (id) => {
     console.log(id);
     Swal.fire({
@@ -302,7 +290,7 @@ const handleFileChange = (e) => {
     <div className="d-flex flex-column flex-md-row h-100">
       <div className="col-12 col-md-3 bg-white p-3">
         <h3 className="h3">
-          <FontAwesomeIcon icon={activeFolder.icon} /> Drawing Register
+          <FontAwesomeIcon icon={activeFolder.icon} />Drawing Register
         </h3>
         <p className="text-muted">Document Management System</p>
         <InputGroup className="mb-3">
@@ -315,7 +303,6 @@ const handleFileChange = (e) => {
             onChange={handleSearchChange}
           />
         </InputGroup>
-
         <h5>Folders</h5>
         <ListGroup>
           {folders.map((folder) => (
@@ -370,7 +357,7 @@ const handleFileChange = (e) => {
                 <Col key={drawing._id}>
                   <div className="card shadow-sm">
                     <div className="card-body">
-                   
+
                       <img
                         src={drawing.image?.[0]}
                         alt="Uploaded Image"
@@ -378,17 +365,17 @@ const handleFileChange = (e) => {
                         style={{ height: "150px" }}
                       />
 
-                     
+
                       <h5 className="card-title">
                         {drawing.documentTitle}
                       </h5>
 
-               
+
                       <small>
                         Folder: {drawing?.folder}
                       </small>
 
-                    
+
                       <p className="card-text">
                         Type: {drawing?.documentType}
                       </p>
@@ -396,8 +383,8 @@ const handleFileChange = (e) => {
                       <span className={`badge ${getStatusColorClass(drawing?.status)}`}>
                         {drawing.status}
                       </span>
-                      
-                     
+
+
                       <div className="d-flex justify-content-between mt-2">
                         <small>Assigned To: {drawing.assignedTo?.firstName}</small>
                         <small>Last Updated: {new Date(drawing.updatedAt).toLocaleDateString()}</small>
@@ -407,7 +394,7 @@ const handleFileChange = (e) => {
                         Comments: {drawing.comments}
                       </p>
 
-                   
+
                       {/* <div className="d-flex justify-content-end mt-2">
                         <button
                           className="btn btn-link p-0 me-2"
@@ -478,14 +465,14 @@ const handleFileChange = (e) => {
                         >
                           <FontAwesomeIcon icon={faEye} />
                         </button>
-                        <button 
+                        <button
                           className="btn btn-link p-0 me-2"
                           onClick={() => handleEdit(doc)}
                         >
                           <FontAwesomeIcon icon={faEdit} />
                         </button>
-                        <button 
-                          className="btn btn-link p-0" 
+                        <button
+                          className="btn btn-link p-0"
                           onClick={() => handleDelete(doc._id)}
                         >
                           <FontAwesomeIcon icon={faTrash} />

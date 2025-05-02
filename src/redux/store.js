@@ -30,7 +30,7 @@ import calendarReducer from "./slices/calendarSlice";
 import auditReducer from "./slices/auditSlice";
 import userReducer from "./slices/userSlice";
 import drawingsReducer from "./slices/drawingsSlice";
-
+import PlansRequest from './slices/Superadmin/planPackageSlice.js';
 
 export const store = configureStore({
   reducer: {
@@ -54,12 +54,13 @@ export const store = configureStore({
        safetyequipments: safetyEquipmentSlice,
       // annotations: annotationReducer,
       document: documentSlice,
-
         toolboxTalks: toolboxTalkReducer,
       task : taskManagementSlice,
       calendar : calendarReducer,
       audit : auditReducer,
         users: userReducer,
         drawings: drawingsReducer,
-  }
+        Plan:PlansRequest
+      }
+
 });
