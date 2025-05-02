@@ -89,6 +89,8 @@ import ViewUser from "./components/AdminComponents/UserManagement/ViewUser";
 import AuditEquipmentView from "./components/AdminComponents/AuditEquipment/AuditEquipmentView";
 
 import ComplianceReport from "./components/AdminComponents/ComplianceReport/ComplianceReport";
+import DefectDetails from "./components/AdminComponents/DefectList/DefectDetails";
+import ViewITPDetails from "./components/AdminComponents/ITPs/ViewITPDetails";
 
 function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
@@ -220,9 +222,15 @@ function App() {
             <Route path="/AddnewInduction" element={<AddnewInduction />} />
             <Route path="/swms" element={<SWMS />} />
             <Route path="/audit-equipment" element={<AuditEquipment />} />
-            <Route path="/edit-audit-equipment/:id" element={<AuditEquipment />} />
-            <Route path="/audit-equipmentview/:id" element={<AuditEquipmentView />} />
-            <Route path="/auditreport" element={<AuditReports  />} />
+            <Route
+              path="/edit-audit-equipment/:id"
+              element={<AuditEquipment />}
+            />
+            <Route
+              path="/audit-equipmentview/:id"
+              element={<AuditEquipmentView />}
+            />
+            <Route path="/auditreport" element={<AuditReports />} />
             <Route path="/safety-equipment" element={<SafetyEquipment />} />
             <Route path="/submit-report" element={<SubmitReport />} />
             <Route path="/AddnewSms" element={<AddnewSms />} />
@@ -318,6 +326,8 @@ function App() {
             <Route path="/AddSafety" element={<SafetyEquipment />} />
             <Route path="/AddSafety/:id" element={<SafetyEquipment />} />
             <Route path="/view-service" element={<ViewServicePage />} />
+            <Route path="/defects/:id" element={<DefectDetails />} />
+            <Route path="/itps/view/:id" element={<ViewITPDetails />} />
             <Route
               path="/safety-equipment/:id"
               element={<SafetyEquipmentDetails />}

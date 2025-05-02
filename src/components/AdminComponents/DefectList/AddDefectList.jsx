@@ -7,6 +7,7 @@ import { apiUrl } from "../../../utils/config";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProjects } from "../../../redux/slices/projectSlice"; // Adjust the import path as necessary
 import { Modal } from "react-bootstrap";
+import { fetchUsers } from "../../../redux/slices/userSlice"; // Adjust the import path as necessary
 
 function AddDefectList() {
   const navigate = useNavigate();
@@ -25,25 +26,59 @@ function AddDefectList() {
 
   const dispatch = useDispatch();
   const { data: projects, loading } = useSelector((state) => state.projects);
-  const [categories, setCategories] = useState([
-    "Plumbing",
-    "Electrical",
-    "HVAC",
-  ]);
+  const [categories, setCategories] = useState([]);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [newCategory, setNewCategory] = useState("");
 
-  // console.log("Projects →", projects);
+  const users = useSelector((state) => state.users.data);
+
+  const [image, setImage] = useState(null);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axiosInstance.get(`${apiUrl}/category`);
+      // console.log("Categories:", response.data);
+      const categoryList = response.data?.data || [];
+      setCategories(categoryList);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      toast.error("Failed to fetch categories.");
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchProjects()); // Fetch projects when component mounts
+    fetchCategories(); // Fetch categories when component mounts
+    dispatch(fetchUsers()); // Fetch users when component mounts
   }, [dispatch]);
-
-  const [image, setImage] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddCategory = async () => {
+    const trimmed = newCategory.trim();
+    if (!trimmed || categories.includes(trimmed)) {
+      toast.warn("Category is either empty or already exists.");
+      return;
+    }
+
+    try {
+      const response = await axiosInstance.post(`${apiUrl}/category`, {
+        category: trimmed,
+      });
+
+      setCategories((prev) => [...prev, trimmed]);
+      setFormData((prev) => ({ ...prev, category: trimmed }));
+      toast.success("Category added successfully!");
+    } catch (error) {
+      console.error("Category add error:", error);
+      toast.error(error.response?.data?.message || "Failed to add category.");
+    } finally {
+      setNewCategory("");
+      setShowCategoryModal(false);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -172,11 +207,12 @@ function AddDefectList() {
               className="form-select"
               onChange={handleChange}
               value={formData.category}
+              // onClick={fetchCategories}
             >
               <option value="">Select Category</option>
               {categories.map((cat, index) => (
-                <option key={index} value={cat}>
-                  {cat}
+                <option key={cat._id} value={cat._id}>
+                  {cat.category}
                 </option>
               ))}
             </select>
@@ -206,18 +242,7 @@ function AddDefectList() {
             >
               Cancel
             </Button>
-            <Button
-              variant="primary"
-              onClick={() => {
-                const trimmed = newCategory.trim();
-                if (trimmed && !categories.includes(trimmed)) {
-                  setCategories((prev) => [...prev, trimmed]);
-                  setFormData((prev) => ({ ...prev, category: trimmed }));
-                }
-                setNewCategory("");
-                setShowCategoryModal(false);
-              }}
-            >
+            <Button variant="primary" onClick={handleAddCategory}>
               Save
             </Button>
           </Modal.Footer>
@@ -225,15 +250,21 @@ function AddDefectList() {
 
         <div className="row g-3 mt-2">
           <div className="col-md-6">
-            <label className="form-label">Assigned To</label>
-            <input
-              type="text"
+           <label className="form-label">Assigned To</label>
+            <select
               name="assigned"
-              className="form-control"
-              placeholder="Enter assignee"
-              onChange={handleChange}
+              className="form-select"
               value={formData.assigned}
-            />
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select User</option>
+              {users.map((user) => (
+                <option key={user._id} value={user._id}>
+                  {user.name || `${user.firstName} ${user.lastName}`}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="col-md-6">
             <label className="form-label">Priority</label>

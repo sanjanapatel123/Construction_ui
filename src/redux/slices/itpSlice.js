@@ -3,8 +3,6 @@ import { toast } from 'react-toastify';
 import { apiUrl } from '../../utils/config'; // Adjust the import path as necessary
 import axiosInstance from '../../utils/axiosInstance';
 
-// const apiUrl = 'https://xt2cpwt7-8000.inc1.devtunnels.ms/api';
-
 // Thunk to fetch all ITPs
 export const fetchITPs = createAsyncThunk('itps/fetchITPs', async (_, { rejectWithValue }) => {
   try {
@@ -18,20 +16,18 @@ export const fetchITPs = createAsyncThunk('itps/fetchITPs', async (_, { rejectWi
 });
 
 
-export const fetchITPDetails = createAsyncThunk(
-  'itps/fetchITPDetails',
+export const fetchITPById = createAsyncThunk(
+  'itps/fetchITPById',
   async (id, { rejectWithValue }) => {
-    // console.log("Fetching ITP details for ID:", id); // Log the ID being fetched
     try {
       const response = await axiosInstance.get(`${apiUrl}/itps/${id}`);
-      console.log("Response from API:", response.data); // Log the response data
-      return response.data.data;
+      return response.data; // return full object
     } catch (error) {
-      toast.error("Failed to fetch ITP details");
       return rejectWithValue(error?.response?.data?.message || "Failed to fetch ITP details");
     }
   }
 );
+
 
 
 export const deleteITP = createAsyncThunk('itps/deleteITP', async (projectId, { dispatch, rejectWithValue }) => {
@@ -52,8 +48,7 @@ const itpSlice = createSlice({
     data: [],
     loading: false,
     error: null,
-    selectedITP: null,
-    deleteSuccessMsg: '',
+     selectedITP: null
   },
   reducers: {
       clearSelectedITP: (state) => {
@@ -74,17 +69,7 @@ const itpSlice = createSlice({
       .addCase(fetchITPs.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      }) .addCase(fetchITPDetails.pending, (state) => {
-        state.loading = true;
       })
-      .addCase(fetchITPDetails.fulfilled, (state, action) => {
-        state.loading = false;
-        state.selectedITP = action.payload;
-      })
-      .addCase(fetchITPDetails.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      }) 
        .addCase(deleteITP.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -99,6 +84,19 @@ const itpSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      .addCase(fetchITPById.pending, (state) => {
+  state.loading = true;
+  state.error = null;
+})
+.addCase(fetchITPById.fulfilled, (state, action) => {
+  state.loading = false;
+  state.selectedITP = action.payload;
+})
+.addCase(fetchITPById.rejected, (state, action) => {
+  state.loading = false;
+  state.error = action.payload;
+})
+
      
   }
 });

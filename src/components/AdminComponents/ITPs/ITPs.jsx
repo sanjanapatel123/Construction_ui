@@ -1,12 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
-import {
-  fetchITPs,
-  fetchITPDetails,
-  deleteITP,
-  clearSelectedITP,
-} from "../../../redux/slices/itpSlice";
-import ITPDetailsModal from "./ITPDetailsModal";
+import { fetchITPs, deleteITP } from "../../../redux/slices/itpSlice";
 import {
   LineChart,
   Line,
@@ -64,29 +58,15 @@ const ITPs = () => {
       onTimeRate: 93,
     },
   };
-  const [showModal, setShowModal] = useState(false);
-  const [selectedITP, setSelectedITP] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const dispatch = useDispatch();
   const { data: itps, loading, error } = useSelector((state) => state.itps);
 
   // console.log("ITPs", itps);
 
-  const openModal = () => {
-    console.log("Modal opened");
-    setShowEditModal(true);
-  };
-
   useEffect(() => {
     dispatch(fetchITPs());
   }, [dispatch]);
-
-  const handleViewDetails = (itpId) => {
-    console.log("ITP ID:", itpId);
-    dispatch(fetchITPDetails(itpId));
-    setShowModal(true);
-  };
-  // console.log("ITPs", selectedITP);
 
   const handleDelete = (id) => {
     dispatch(deleteITP(id));
@@ -397,15 +377,15 @@ const ITPs = () => {
                   </td>
                   <td className="pe-4">
                     <div className="d-flex gap-2">
-                      <button
+                      <Link
+                        to={`/itps/view/${item._id}`}
                         className="btn btn-sm text-primary p-0"
-                        onClick={() => handleViewDetails(item._id)}
                       >
                         <i
                           className="fas fa-eye text-info "
                           style={{ fontSize: "15px" }}
                         ></i>
-                      </button>
+                      </Link>
                       <button
                         className="btn btn-sm text-primary p-0"
                         onClick={() => {
@@ -433,10 +413,6 @@ const ITPs = () => {
               ))}
             </tbody>
           </table>
-          <ITPDetailsModal
-            show={showModal}
-            handleClose={() => setShowModal(false)}
-          />
           <EditITPModal
             show={showEditModal}
             handleClose={() => setShowEditModal(false)}
