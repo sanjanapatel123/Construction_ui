@@ -30,10 +30,12 @@ import calendarReducer from "./slices/calendarSlice";
 import auditReducer from "./slices/auditSlice";
 import userReducer from "./slices/userSlice";
 import drawingsReducer from "./slices/drawingsSlice";
+import authReducer from './slices/authSlice.js';
 
 
 export const store = configureStore({
   reducer: {
+      auth: authReducer,
       projects: projectReducer,
       diaries: diaryReducer,
       timesheets: timesheetReducer,

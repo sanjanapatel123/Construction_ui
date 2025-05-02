@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
 
-const Dashboard = () => {
+const SuperAdminDashboard = () => {
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -104,4 +104,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default SuperAdminDashboard;

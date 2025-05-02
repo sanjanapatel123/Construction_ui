@@ -27,8 +27,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [openMenuIndex, setOpenMenuIndex] = useState(null);
   const [activeMenuIndex, setActiveMenuIndex] = useState(null);
   const [activeSubmenuPath, setActiveSubmenuPath] = useState(null);
-  const [roledata, setRoleData] = useState("admin");
 
+  const [roledata, setRoleData] = useState(() => localStorage.getItem("role"));
+
+  console.log(roledata);
+
+
+
+   
   const menuItems = [
     {
       title: "Dashboard",

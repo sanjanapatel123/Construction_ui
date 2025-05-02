@@ -1,43 +1,71 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {  loginUser } from "../../redux/slices/authSlice";
+import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
 
 const Login = () => {
   const navigate = useNavigate();
+const dispatch = useDispatch();
   // State for email, password, and selected role
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+
+    // const { login, loading, error } = useSelector((state) => state.auth);
   const [selectedRole, setSelectedRole] = useState("");
 
+  const [credentials, setCredentials] = useState({
+    email: '',
+    password: '',
+  });
+
 // Dummy credentials for different roles
-const roleCredentials = {
-  admin: { email: "admin@example.com", password: "admin123" },
-  superadmin: { email: "superadmin@example.com", password: "superadmin123" },
-  supervisor: { email: "supervisor@example.com", password: "manager123" },
-  worker: { email: "worker@example.com", password: "employee123" },
-};
+// const roleCredentials = {
+//   admin: { email: "admin@example.com", password: "admin123" },
+//   superadmin: { email: "superadmin@example.com", password: "superadmin123" },
+//   supervisor: { email: "supervisor@example.com", password: "manager123" },
+//   worker: { email: "worker@example.com", password: "employee123" },
+// };
 
-  // Handle role selection and fill dummy credentials
-  const handleRoleSelect = (role) => {
-    const credentials = roleCredentials[role];
-    setEmail(credentials.email);
-    setPassword(credentials.password);
-    setSelectedRole(role);
-  };
+//   // Handle role selection and fill dummy credentials
+//   const handleRoleSelect = (role) => {
+//     const credentials = roleCredentials[role];
+//     setEmail(credentials.email);
+//     setPassword(credentials.password);
+//     setSelectedRole(role);
+//   };
 
-  const handleLogin = (e) => {
+  // const handleLogin = (e) => {
+  //   e.preventDefault();
+  //   if (selectedRole) {
+  //     localStorage.setItem("userRole", selectedRole);
+  //     alert(`Logged in as ${selectedRole}`);
+  //     // Navigate based on role
+  //     if (selectedRole === "superadmin") {
+  //       navigate("/super-admin-dashboard");
+  //     } else {
+  //       navigate("/dashboard");
+  //     }
+  //   } else {
+  //     alert("Please select a role before logging in.");
+  //   }
+  // };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (selectedRole) {
-      localStorage.setItem("userRole", selectedRole);
-      alert(`Logged in as ${selectedRole}`);
-      // Navigate based on role
-      if (selectedRole === "superadmin") {
-        navigate("/super-admin-dashboard");
-      } else {
-        navigate("/dashboard");
-      }
-    } else {
-      alert("Please select a role before logging in.");
-    }
+    dispatch(loginUser(credentials))
+      .unwrap()
+      .then((data) => {
+        // On successful login
+        toast.success(data.message || 'Login successful!');
+        navigate('/dashboard'); 
+      })
+      .catch((err) => {
+        console.log("login page errror",err)
+        toast.error(err || 'Login failed!');
+        // toast.error(err || 'Login failed!');
+      });
   };
   
 
@@ -69,19 +97,24 @@ const roleCredentials = {
           </div>                                  
 
           {/* Login Form */}
-          <form onSubmit={handleLogin}>
+          <form onSubmit={handleSubmit}>
             <div className="form-floating mb-3">
               <input  type="email"  className="form-control"
-                id="email" placeholder="name@example.com" value={email}
-                onChange={(e) => setEmail(e.target.value)} required/>
+                id="email" placeholder="name@example.com" 
+                value={credentials.email}
+                  onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
+                  required
+                />
               <label htmlFor="email">Email address</label>
             </div>
             <div className="form-floating mb-3">
               <input type="password" className="form-control"
                 id="password"  placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required/>
+                value={credentials.password}
+                onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+                required
+
+                />
               <label htmlFor="password">Password</label>
             </div>
             <div className="d-flex justify-content-between mb-4">

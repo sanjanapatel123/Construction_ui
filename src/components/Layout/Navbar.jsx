@@ -57,8 +57,8 @@ const Navbar = ({ toggleSidebar }) => {
                 </Link>
               </li>
               <li><hr className="dropdown-divider"/></li>
-              <li>
-                <Link to="/" className="dropdown-item text-danger">
+              <li onClick={()=>localStorage.clear()}>
+                <Link to="/" className="dropdown-item text-danger" >
                   <i className="fas fa-sign-out-alt"></i>
                   <span>Logout</span>
                 </Link>
