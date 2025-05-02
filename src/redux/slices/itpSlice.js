@@ -3,13 +3,12 @@ import { toast } from 'react-toastify';
 import { apiUrl } from '../../utils/config'; // Adjust the import path as necessary
 import axiosInstance from '../../utils/axiosInstance';
 
-// const apiUrl = 'https://xt2cpwt7-8000.inc1.devtunnels.ms/api';
-
 // Thunk to fetch all ITPs
 export const fetchITPs = createAsyncThunk('itps/fetchITPs', async (_, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get(`${apiUrl}/itps/`);
-    return response.data;
+    const response = await axiosInstance.get(`${apiUrl}/itps/`)
+    return response.data.data;
+    // Log the response data
   } catch (error) {
    
     return rejectWithValue(error?.response?.data?.message || "Failed to fetch ITPs");
@@ -17,18 +16,18 @@ export const fetchITPs = createAsyncThunk('itps/fetchITPs', async (_, { rejectWi
 });
 
 
-export const fetchITPDetails = createAsyncThunk(
-  'itps/fetchITPDetails',
+export const fetchITPById = createAsyncThunk(
+  'itps/fetchITPById',
   async (id, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`${apiUrl}/itps/${id}`);
-      return response.data;
+      return response.data; // return full object
     } catch (error) {
-      toast.error("Failed to fetch ITP details");
       return rejectWithValue(error?.response?.data?.message || "Failed to fetch ITP details");
     }
   }
 );
+
 
 
 export const deleteITP = createAsyncThunk('itps/deleteITP', async (projectId, { dispatch, rejectWithValue }) => {
@@ -36,7 +35,7 @@ export const deleteITP = createAsyncThunk('itps/deleteITP', async (projectId, { 
     const response = await axiosInstance.delete(`${apiUrl}/itps/${projectId}`);
     toast.success("Itps deleted successfully!");
     dispatch(fetchITPs()); // re-fetch list
-    return response.data;
+    return response.data.data;
   } catch (error) {
     toast.error(error?.response?.data?.message || "Failed to delete Itps!");
     return rejectWithValue(error?.response?.data?.message || "Delete failed");
@@ -48,7 +47,8 @@ const itpSlice = createSlice({
   initialState: {
     data: [],
     loading: false,
-    error: null
+    error: null,
+     selectedITP: null
   },
   reducers: {
       clearSelectedITP: (state) => {
@@ -69,17 +69,7 @@ const itpSlice = createSlice({
       .addCase(fetchITPs.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      }) .addCase(fetchITPDetails.pending, (state) => {
-        state.loading = true;
       })
-      .addCase(fetchITPDetails.fulfilled, (state, action) => {
-        state.loading = false;
-        state.selectedITP = action.payload;
-      })
-      .addCase(fetchITPDetails.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      }) 
        .addCase(deleteITP.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -94,6 +84,19 @@ const itpSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      .addCase(fetchITPById.pending, (state) => {
+  state.loading = true;
+  state.error = null;
+})
+.addCase(fetchITPById.fulfilled, (state, action) => {
+  state.loading = false;
+  state.selectedITP = action.payload;
+})
+.addCase(fetchITPById.rejected, (state, action) => {
+  state.loading = false;
+  state.error = action.payload;
+})
+
      
   }
 });

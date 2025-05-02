@@ -12,6 +12,7 @@ import { apiUrl } from "../../../utils/config";
 import axiosInstance from "../../../utils/axiosInstance";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProjects } from "../../../redux/slices/projectSlice";
+import { fetchUsers } from "../../../redux/slices/userSlice"; // Adjust the import path as necessary
 import { fetchITPs } from "../../../redux/slices/itpSlice";
 import { toast } from "react-toastify";
 
@@ -20,6 +21,9 @@ const AddITPs = () => {
   const { data: projects, loading: projectLoading } = useSelector(
     (state) => state.projects
   );
+
+  const users = useSelector((state) => state.users.data);
+
   const [items, setItems] = useState([
     { description: "", status: "Pass", comments: "" },
   ]);
@@ -37,6 +41,7 @@ const AddITPs = () => {
 
   useEffect(() => {
     dispatch(fetchProjects());
+    dispatch(fetchUsers()); // Fetch users for the inspector dropdown
   }, [dispatch]);
 
   const navigate = useNavigate();
@@ -273,16 +278,19 @@ const AddITPs = () => {
         <div className="row g-3 mb-3">
           <div className="col-md-6">
             <Form.Group controlId="inspector">
-              <Form.Label className="fw-semibold small">Inspector</Form.Label>
+              <Form.Label>Assigned By</Form.Label>
               <Form.Select
                 name="inspector"
                 value={formData.inspector}
                 onChange={handleInputChange}
+                required
               >
-                <option value="">Select assignee</option>
-                <option value="John Doe">John Doe</option>
-                <option value="Jane Smith">Jane Smith</option>
-                <option value="Alex Johnson">Alex Johnson</option>
+                <option value="">Select User</option>
+                {users.map((user) => (
+                  <option key={user._id} value={user._id}>
+                    {user.name || `${user.firstName} ${user.lastName}`}
+                  </option>
+                ))}
               </Form.Select>
             </Form.Group>
           </div>

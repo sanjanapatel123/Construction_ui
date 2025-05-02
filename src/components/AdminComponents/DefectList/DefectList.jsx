@@ -2,39 +2,56 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import DefectDetailsModal from "./DefectDetailsModal";
-import EditDefectModal from "./EditDefectModal";
 import {
   fetchDefects,
   deleteDefectList,
-  fetchDefectDetails,
 } from "../../../redux/slices/defectSlice";
+
 function DefectList() {
-  const [showModal, setShowModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedProject, setSelectedProject] = useState("All");
+  const [selectedStatus, setSelectedStatus] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const dispatch = useDispatch();
   const { defects, loading, error } = useSelector((state) => state.defects);
+  // console.log(defects, "defects");
 
-  const [editModalShow, setEditModalShow] = useState(false);
-  const [selectedDefect, setSelectedDefect] = useState(null);
+  const projectOptions = [
+    "All",
+    ...new Set(defects.map((d) => d.project?.name).filter(Boolean)),
+  ];
 
-  const handleEdit = (defect) => {
-    setSelectedDefect(defect);
-    setEditModalShow(true);
-  };
+  const statusOptions = [
+    "All",
+    ...new Set(defects.map((d) => d.status).filter(Boolean)),
+  ];
 
   useEffect(() => {
     dispatch(fetchDefects());
   }, [dispatch]);
 
-  const handleView = (id) => {
-    dispatch(fetchDefectDetails(id));
-    setShowModal(true);
-  };
-
   const handleDelete = (defectId) => {
     dispatch(deleteDefectList(defectId));
   };
+
+  const filteredDefects = defects
+    .filter((d) => d.title.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter((d) =>
+      selectedProject === "All" ? true : d.project?.name === selectedProject
+    )
+    .filter((d) =>
+      selectedStatus === "All" ? true : d.status === selectedStatus
+    );
+
+  const paginatedDefects = filteredDefects.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const totalPages = Math.ceil(filteredDefects.length / itemsPerPage);
+
   return (
     <div className="container-fluid p-4">
       <div className="bg-white p-4 rounded shadow">
@@ -61,13 +78,40 @@ function DefectList() {
             type="text"
             className="form-control w-auto"
             placeholder="Search Checklists..."
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
           />
-          <select className="form-select w-auto">
-            <option>All Projects</option>
+          <select
+            className="form-select w-auto"
+            value={selectedProject}
+            onChange={(e) => {
+              setSelectedProject(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
+            {projectOptions.map((project, index) => (
+              <option key={index} value={project}>
+                {project}
+              </option>
+            ))}
           </select>
-          <input type="date" className="form-control w-auto" />
-          <select className="form-select w-auto">
-            <option>All Status</option>
+
+          <select
+            className="form-select w-auto"
+            value={selectedStatus}
+            onChange={(e) => {
+              setSelectedStatus(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
+            {statusOptions.map((status, index) => (
+              <option key={index} value={status}>
+                {status}
+              </option>
+            ))}
           </select>
         </div>
         <div
@@ -100,21 +144,23 @@ function DefectList() {
                     {error}
                   </td>
                 </tr>
-              ) : defects.length === 0 ? (
+              ) : paginatedDefects.length === 0 ? (
                 <tr>
                   <td colSpan="8" className="text-center py-4">
                     No defects found.
                   </td>
                 </tr>
               ) : (
-                defects.map((defect) => (
+                paginatedDefects?.map((defect) => (
                   <tr key={defect.id} className="py-3">
                     <td className="ps-4 fw-semibold text-dark py-3">
                       {defect.title}
                     </td>
-                    <td className="text-muted py-3">{defect.project}</td>
+                    <td className="text-muted py-3">{defect.project?.name}</td>
                     <td className="text-muted py-3">{defect.location}</td>
-                    <td className="text-muted py-3">{defect.assigned}</td>
+                    <td className="text-muted py-3">
+                      {defect.assigned?.firstName} {defect.assigned?.lastName}
+                    </td>
                     <td className="py-3">
                       <span
                         className={`badge rounded-pill ${
@@ -141,24 +187,21 @@ function DefectList() {
                         {defect.status}
                       </span>
                     </td>
-                    <td className="text-muted py-3">{defect.date}</td>
+                    <td className="text-muted py-3">
+                      {new Date(defect.date).toLocaleDateString()}
+                    </td>
+
                     <td className="pe-4 py-3">
                       <div className="d-flex gap-2">
-                        <button
-                          className="btn text-primary p-0"
-                          onClick={() => handleEdit(defect)}
-                        >
+                        <button className="btn text-primary p-0">
                           <i className="fa-solid fa-pen-to-square"></i>
                         </button>
-                        <button className="btn text-success p-0">
-                          <i className="fa-solid fa-circle-check"></i>
-                        </button>
-                        <button
+                        <Link
+                          to={`/defects/${defect._id}`}
                           className="btn text-info p-0"
-                          onClick={() => handleView(defect._id)}
                         >
                           <i className="fa-solid fa-eye"></i>
-                        </button>
+                        </Link>
                         <button
                           className="btn text-info p-0"
                           onClick={() => handleDelete(defect._id)}
@@ -173,30 +216,36 @@ function DefectList() {
             </tbody>
           </table>
 
-          <DefectDetailsModal
-            show={showModal}
-            handleClose={() => setShowModal(false)}
-          />
-
-          <EditDefectModal
-            show={editModalShow}
-            handleClose={() => setEditModalShow(false)}
-            defect={selectedDefect}
-            onUpdate={() => dispatch(fetchDefects())}
-          />
-
           {/* Pagination */}
-          <div className="d-flex justify-content-end mt-3 mb-2">
-            <Button size="sm" variant="outline-secondary" className="me-2">
+          <div className="d-flex justify-content-end mt-3 mb-2 gap-2">
+            <Button
+              size="sm"
+              variant="outline-secondary"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+            >
               Previous
             </Button>
-            <Button size="sm" variant="primary" className="ms-2">
-              1
-            </Button>
-            <Button size="sm" variant="outline-secondary" className="ms-2">
-              2
-            </Button>
-            <Button size="sm" variant="outline-secondary" className="ms-2">
+
+            {[...Array(totalPages).keys()].map((num) => (
+              <Button
+                key={num + 1}
+                size="sm"
+                variant={
+                  currentPage === num + 1 ? "primary" : "outline-secondary"
+                }
+                onClick={() => setCurrentPage(num + 1)}
+              >
+                {num + 1}
+              </Button>
+            ))}
+
+            <Button
+              size="sm"
+              variant="outline-secondary"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(currentPage + 1)}
+            >
               Next
             </Button>
           </div>

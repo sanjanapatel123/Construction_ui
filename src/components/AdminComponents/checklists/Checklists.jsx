@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FiEdit, FiUser, FiCheckCircle, FiDownload } from "react-icons/fi";
 import { Button, Modal } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchChecklists,
   fetchChecklistDetails,
   deleteChecklist,
-} from "../../../redux/slices/checklistSlice"; // Adjust the import path as necessary
+} from "../../../redux/slices/checklistSlice";
 import { Spinner } from "react-bootstrap";
 import EditChecklistModal from "./EditChecklistModal";
 import { apiUrl } from "../../../utils/config";
@@ -15,10 +14,26 @@ import { toast } from "react-toastify";
 import axiosInstance from "../../../utils/axiosInstance";
 
 function Checklists() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedProject, setSelectedProject] = useState("All");
+  const [selectedStatus, setSelectedStatus] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
   const dispatch = useDispatch();
   const { checklists, checklistDetails, loading, error } = useSelector(
     (state) => state.checklists
   );
+
+  const projectOptions = [
+    "All",
+    ...new Set(checklists.map((d) => d.project?.name).filter(Boolean)),
+  ];
+
+  const statusOptions = [
+    "All",
+    ...new Set(checklists.map((d) => d.status).filter(Boolean)),
+  ];
 
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -40,6 +55,24 @@ function Checklists() {
   const handleCloseModal = () => {
     setShowModal(false); // Close the modal
   };
+
+  const filteredChecklist = checklists
+    .filter((d) =>
+      d.checklistName?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .filter((d) =>
+      selectedProject === "All" ? true : d.project?.name === selectedProject
+    )
+    .filter((d) =>
+      selectedStatus === "All" ? true : d.status === selectedStatus
+    );
+
+  const paginatedChecklist = filteredChecklist.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const totalPages = Math.ceil(filteredChecklist.length / itemsPerPage);
 
   if (loading) {
     return <Spinner animation="border" />;
@@ -121,19 +154,43 @@ function Checklists() {
                 type="text"
                 className="form-control form-control-sm"
                 placeholder="Search Checklists..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
               />
             </div>
             <div className="col-12 col-sm-6 col-md-3">
-              <select className="form-select form-select-sm">
-                <option>All Projects</option>
+              <select
+                className="form-select form-select-sm"
+                value={selectedProject}
+                onChange={(e) => {
+                  setSelectedProject(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                {projectOptions.map((project, index) => (
+                  <option key={index} value={project}>
+                    {project}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="col-12 col-sm-6 col-md-3">
-              <input type="date" className="form-control form-control-sm" />
-            </div>
-            <div className="col-12 col-sm-6 col-md-3">
-              <select className="form-select form-select-sm">
-                <option>All Status</option>
+              <select
+                className="form-select form-select-sm"
+                value={selectedStatus}
+                onChange={(e) => {
+                  setSelectedStatus(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                {statusOptions.map((status, index) => (
+                  <option key={index} value={status}>
+                    {status}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -152,8 +209,8 @@ function Checklists() {
                 </tr>
               </thead>
               <tbody className="p-2">
-                {checklists.length > 0 ? (
-                  checklists.map((checklist) => (
+                {paginatedChecklist.length > 0 ? (
+                  paginatedChecklist.map((checklist) => (
                     <tr key={checklist.id} className="align-middle py-3">
                       <td className="ps-4 py-3 fw-semibold fs-9">
                         {checklist.checklistName}
@@ -314,17 +371,35 @@ function Checklists() {
             />
 
             {/* Pagination */}
-            <div className="d-flex justify-content-end mt-3 mb-3">
-              <Button size="sm" variant="outline-secondary" className="me-2">
+            <div className="d-flex justify-content-end mt-3 mb-2 gap-2">
+              <Button
+                size="sm"
+                variant="outline-secondary"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage - 1)}
+              >
                 Previous
               </Button>
-              <Button size="sm" variant="primary" className="ms-2">
-                1
-              </Button>
-              <Button size="sm" variant="outline-secondary" className="ms-2">
-                2
-              </Button>
-              <Button size="sm" variant="outline-secondary" className="ms-2">
+
+              {[...Array(totalPages).keys()].map((num) => (
+                <Button
+                  key={num + 1}
+                  size="sm"
+                  variant={
+                    currentPage === num + 1 ? "primary" : "outline-secondary"
+                  }
+                  onClick={() => setCurrentPage(num + 1)}
+                >
+                  {num + 1}
+                </Button>
+              ))}
+
+              <Button
+                size="sm"
+                variant="outline-secondary"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(currentPage + 1)}
+              >
                 Next
               </Button>
             </div>

@@ -9,8 +9,9 @@ export const fetchDefects = createAsyncThunk(
   "defects/fetchDefects",
   async (_, thunkAPI) => {
     try {
-      const response = await axiosInstance.get(`${apiUrl}/defectlists`);
-      return response.data;
+      const response = await axiosInstance.get(`${apiUrl}/defectlists`)
+      console.log("Defects response:", response.data); // Log the response data
+      return response.data.defects; // Adjust this based on your API response structure
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data || "Error fetching defects");
     }
@@ -23,7 +24,8 @@ export const fetchDefectDetails = createAsyncThunk(
   async (id, thunkAPI) => {
     try {
       const response = await axiosInstance.get(`${apiUrl}/defectlists/${id}`);
-      return response.data;
+      console.log("Defect details response:", response.data); // Log the response data
+      return response.data.defect;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data || "Error fetching defect details");
     }
@@ -36,7 +38,8 @@ export const deleteDefectList = createAsyncThunk('DefectList/deleteDefect', asyn
     const response = await axiosInstance.delete(`${apiUrl}/defectlists/${projectId}`);
     toast.success("DefectList deleted successfully!");
     dispatch(fetchDefects()); // re-fetch list
-    return response.data;
+    
+    return response.data.defects;
   } catch (error) {
     toast.error(error?.response?.data?.message || "Failed to delete DefectList!");
     return rejectWithValue(error?.response?.data?.message || "Delete failed");
