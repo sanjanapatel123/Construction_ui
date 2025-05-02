@@ -129,7 +129,7 @@ function App() {
               path="/ComplianceDashboard"
               element={<ComplianceDashboard></ComplianceDashboard>}
             ></Route>
-            <Route
+              <Route
               path="/AddNewWorker"
               element={<AddNewWorker></AddNewWorker>}
             ></Route>
@@ -381,7 +381,6 @@ function App() {
         </div>
       </div>
     </div>
-    // kkk
   );
 }
 function AppWrapper() {
