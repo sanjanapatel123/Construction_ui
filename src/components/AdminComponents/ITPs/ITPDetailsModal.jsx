@@ -2,17 +2,23 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Modal, Button, Table, Badge } from "react-bootstrap";
 import { clearSelectedITP } from "../../../redux/slices/itpSlice";
+import { useParams } from "react-router-dom";
 
 const ITPDetailsModal = ({ show, handleClose }) => {
-  const { selectedITP, loading } = useSelector((state) => state.itps);
+
+  const selectedITP = useParams();
+  
+  // const { selectedITP, loading } = useSelector((state) => state.itps);
   const dispatch = useDispatch();
+
+  console.log(selectedITP, "selectedITP");
 
   const close = () => {
     dispatch(clearSelectedITP());
     handleClose();
   };
 
-  if (loading || !selectedITP) return null;
+  // if (loading || !selectedITP) return null;
 
   const {
     projectName,

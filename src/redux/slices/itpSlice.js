@@ -8,8 +8,9 @@ import axiosInstance from '../../utils/axiosInstance';
 // Thunk to fetch all ITPs
 export const fetchITPs = createAsyncThunk('itps/fetchITPs', async (_, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get(`${apiUrl}/itps/`);
-    return response.data;
+    const response = await axiosInstance.get(`${apiUrl}/itps/`)
+    return response.data.data;
+    // Log the response data
   } catch (error) {
    
     return rejectWithValue(error?.response?.data?.message || "Failed to fetch ITPs");
@@ -20,9 +21,11 @@ export const fetchITPs = createAsyncThunk('itps/fetchITPs', async (_, { rejectWi
 export const fetchITPDetails = createAsyncThunk(
   'itps/fetchITPDetails',
   async (id, { rejectWithValue }) => {
+    // console.log("Fetching ITP details for ID:", id); // Log the ID being fetched
     try {
       const response = await axiosInstance.get(`${apiUrl}/itps/${id}`);
-      return response.data;
+      console.log("Response from API:", response.data); // Log the response data
+      return response.data.data;
     } catch (error) {
       toast.error("Failed to fetch ITP details");
       return rejectWithValue(error?.response?.data?.message || "Failed to fetch ITP details");
@@ -36,7 +39,7 @@ export const deleteITP = createAsyncThunk('itps/deleteITP', async (projectId, { 
     const response = await axiosInstance.delete(`${apiUrl}/itps/${projectId}`);
     toast.success("Itps deleted successfully!");
     dispatch(fetchITPs()); // re-fetch list
-    return response.data;
+    return response.data.data;
   } catch (error) {
     toast.error(error?.response?.data?.message || "Failed to delete Itps!");
     return rejectWithValue(error?.response?.data?.message || "Delete failed");
@@ -48,7 +51,9 @@ const itpSlice = createSlice({
   initialState: {
     data: [],
     loading: false,
-    error: null
+    error: null,
+    selectedITP: null,
+    deleteSuccessMsg: '',
   },
   reducers: {
       clearSelectedITP: (state) => {

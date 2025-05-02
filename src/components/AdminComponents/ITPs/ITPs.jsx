@@ -70,7 +70,8 @@ const ITPs = () => {
   const dispatch = useDispatch();
   const { data: itps, loading, error } = useSelector((state) => state.itps);
 
-  // console.log(itps);
+  // console.log("ITPs", itps);
+
   const openModal = () => {
     console.log("Modal opened");
     setShowEditModal(true);
@@ -81,10 +82,11 @@ const ITPs = () => {
   }, [dispatch]);
 
   const handleViewDetails = (itpId) => {
+    console.log("ITP ID:", itpId);
     dispatch(fetchITPDetails(itpId));
     setShowModal(true);
   };
-  console.log("ITPs", selectedITP);
+  // console.log("ITPs", selectedITP);
 
   const handleDelete = (id) => {
     dispatch(deleteITP(id));
@@ -202,7 +204,7 @@ const ITPs = () => {
       <div className="d-flex justify-content-between">
         <h4 className="fw-semibold mb-4">ITP Analytics Overview</h4>
 
-         <Link to={"/AddITPs"} className="ms-auto">
+        <Link to={"/AddITPs"} className="ms-auto">
           <button
             className="btn  px-3"
             onClick={() => {
@@ -369,7 +371,7 @@ const ITPs = () => {
               </tr>
             </thead>
             <tbody className="p-2">
-              {paginatedData.map((item) => (
+              {paginatedData?.map((item) => (
                 <tr key={item.id}>
                   <td className="ps-4">{item.activity}</td>
                   <td>
@@ -380,15 +382,11 @@ const ITPs = () => {
                       >
                         {item.Inspector}
                       </div> */}
-                      <span> {item.Inspector}</span>
+                      <span> {item?.Inspector?.firstName}</span>
                     </div>
                   </td>
                   <td>{item.criteria}</td>
-                  <td
-                    className={item.Date.includes("20") ? "text-warning" : ""}
-                  >
-                    {item.Date}
-                  </td>
+                  <td>{new Date(item.Date).toLocaleDateString()}</td>
                   <td className="text-muted">{item.additionalNotes}</td>
                   <td>
                     <span

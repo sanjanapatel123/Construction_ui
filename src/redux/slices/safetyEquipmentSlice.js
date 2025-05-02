@@ -20,7 +20,7 @@ export const fetchsafetyEquipment = createAsyncThunk(
   "safety/fetchSafetyEquipment",
   async (_, thunkAPI) => {
     try {
-      const response = await axiosInstance.get(`https://hrb5wx2v-8000.inc1.devtunnels.ms/api/safety`);
+      const response = await axiosInstance.get(`${apiUrl}/safety`);
       console.log(response.data);
       return response.data;
     } catch (error) {
@@ -34,7 +34,7 @@ export const updatesafetyEquipment = createAsyncThunk(
   'safety/updateSafetyEquipment',
   async ({ id, updatedForm }, thunkAPI) => {
     try {
-      const response = await axiosInstance.patch(`https://hrb5wx2v-8000.inc1.devtunnels.ms/api/safety/${id}`, updatedForm, {
+      const response = await axiosInstance.patch(`${apiUrl}/safety/${id}`, updatedForm, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -65,7 +65,7 @@ export const fetchSingleSafetyEquipment = createAsyncThunk(
   "safety/fetchSingleSafetyEquipment",
   async (id, thunkAPI) => {
     try {
-      const response = await axiosInstance.get(`https://hrb5wx2v-8000.inc1.devtunnels.ms/api/safety/${id}`);
+      const response = await axiosInstance.get(`${apiUrl}/safety/${id}`);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data || error.message || "error fetching single safetyEquipment");
