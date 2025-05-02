@@ -212,8 +212,3 @@ function UploadNew() {
 }
 
 export default UploadNew
-
-
-
-
-

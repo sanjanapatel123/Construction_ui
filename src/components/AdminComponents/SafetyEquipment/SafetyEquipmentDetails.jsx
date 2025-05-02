@@ -53,7 +53,7 @@ const SafetyEquipmentDetails = () => {
   }
 
   return (
-    <Container className="mt-5">
+    <Container className="">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Safety Equipment Details</h2>
         <Button
@@ -71,10 +71,10 @@ const SafetyEquipmentDetails = () => {
               <b>Assignment ID:</b> {equipment.assignmentId}
             </h5>
             <p>
-              <b>Assigned By:</b> {equipment.assignedBy}
+              <b>Assigned By:</b> {equipment.assignedBy?.firstName} {equipment.assignedBy?.lastName}
             </p>
             <p>
-              <b>Assigned To:</b> {equipment.assignedTo}
+              <b>Assigned To:</b> {equipment?.assignedTo?.firstName} {equipment.assignedBy?.lastName}
             </p>
             <p>
               <b>Assignment Date:</b> {equipment.assignmentDate?.slice(0, 10)}

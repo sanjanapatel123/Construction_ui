@@ -29,6 +29,7 @@ import calendarReducer from "./slices/calendarSlice";
 
 import auditReducer from "./slices/auditSlice";
 import userReducer from "./slices/userSlice";
+import drawingsReducer from "./slices/drawingsSlice";
 
 
 export const store = configureStore({
@@ -53,10 +54,12 @@ export const store = configureStore({
        safetyequipments: safetyEquipmentSlice,
       // annotations: annotationReducer,
       document: documentSlice,
+
         toolboxTalks: toolboxTalkReducer,
       task : taskManagementSlice,
       calendar : calendarReducer,
       audit : auditReducer,
         users: userReducer,
+        drawings: drawingsReducer,
   }
 });
