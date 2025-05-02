@@ -1,32 +1,14 @@
+
 import React, { useEffect, useState } from "react";
-import {
-  Modal,
-  Button,
-  InputGroup,
-  FormControl,
-  ListGroup,
-  Row,
-  Col,
-  Form,
+import {Modal,Button, InputGroup,FormControl,ListGroup,Row,Col,Form,
 } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBuilding,
-  faLayerGroup,
-  faWater,
-  faCogs,
-  faSearch,
-  faUpload,
-  faThLarge,
-  faList,
-  faEye,
-  faEdit,
-  faTrash,
-  faCloudUploadAlt,
+import {faBuilding,faLayerGroup,faWater, faCogs, faSearch,faUpload, faThLarge, faList, faEye, faEdit, faTrash,
+ faCloudUploadAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import ViewDocument from "./ViewDocument";
 import { useDispatch, useSelector } from "react-redux";
-import { addDrawings, deleteDrawings, fetchDrawings, fetchSingleDrawings } from "../../../redux/slices/drawingsSlice";
+import { addDrawings, deleteDrawings, fetchDrawings, fetchSingleDrawings, updatedrawings, } from "../../../redux/slices/drawingsSlice";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { fetchUsers } from "../../../redux/slices/userSlice";
@@ -117,12 +99,15 @@ function DrawingRegister() {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
   const [selectedDoc, setSelectedDoc] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  
 
   const { data:users } = useSelector((state) => state.users);
 
-useEffect(() => {
+  useEffect(() => {
     dispatch(fetchUsers());
-  }, []);
+  }, []);
 
 
   const dispatch = useDispatch()
@@ -142,10 +127,40 @@ useEffect(() => {
     setSearchTerm(e.target.value);
   };
 
-  const toggleUploadModal = () => {
-    setShowUploadModal(!showUploadModal);
-  };
-
+ 
+const toggleUploadModal = (isEdit = false, doc = null) => {
+  if (isEdit && doc) {
+    setIsEditing(true);
+    setEditingId(doc._id);
+    setFormData({
+      documentTitle: doc.documentTitle || "",
+      documentType: doc.documentType || "",
+      folder: doc.folder || "",
+      assignedTo: doc.assignedTo?._id || "",
+      comments: doc.comments || "",
+      // Store the existing image URL or array
+      existingImage: doc.image || [],
+      // Set image to null initially - if user doesn't upload a new file, we'll use existingImage
+      image: [],
+      status: doc.status || "",
+    });
+  } else {
+    setIsEditing(false);
+    setEditingId(null);
+    
+    setFormData({
+      documentTitle: "",
+      documentType: "",
+      folder: "",
+      assignedTo: "",
+      comments: "",
+      existingImage: [],
+      image: [],
+      status: "",
+    });
+  }
+  setShowUploadModal(!showUploadModal);
+};
   const openViewModal = (doc) => {
     setSelectedDoc(doc);
   };
@@ -187,7 +202,7 @@ useEffect(() => {
     status: "",
   });
 
-  const { documentTitle, documentType, folder, assignedTo, comments, imagem, status } = formData;
+  const { documentTitle, documentType, folder, assignedTo, comments, image, status } = formData;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -197,26 +212,60 @@ useEffect(() => {
     }));
   };
 
-  const handleFileChange = (e) => {
+ 
+const handleFileChange = (e) => {
+  if (e.target.files && e.target.files.length > 0) {
     setFormData((prevState) => ({
       ...prevState,
       image: e.target.files[0],
     }));
-  };
-
+  } else {
+    // If the file selection was canceled or cleared
+    setFormData((prevState) => ({
+      ...prevState,
+      image: null,
+    }));
+  }
+};
+ 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
+    
+    if (isEditing) {
+      
+      const updateFormData = { ...formData };
 
-    dispatch(addDrawings(formData)).unwrap().then(() => {
-      toast.success("Document uploaded successfully!");
-      setShowUploadModal(false);
-      dispatch(fetchDrawings());
-    }).catch((error) => {
-      toast.error(error?.response?.data?.message || "Failed to upload document!");
-    })
+      if (!updateFormData.image) {
+        delete updateFormData.image;
+      }
+      
+      
+      delete updateFormData.existingImage;
+      
+      dispatch(updatedrawings({
+        id: editingId,
+        updatedForm: updateFormData
+      })).unwrap().then(() => {
+        toast.success("Document updated successfully!");
+        setShowUploadModal(false);
+        dispatch(fetchDrawings());
+      }).catch((error) => {
+        toast.error(error?.response?.data?.message || "Failed to update document!");
+      });
+    } else {
+
+      const newFormData = { ...formData };
+      delete newFormData.existingImage; 
+      
+      dispatch(addDrawings(newFormData)).unwrap().then(() => {
+        toast.success("Document uploaded successfully!");
+        setShowUploadModal(false);
+        dispatch(fetchDrawings());
+      }).catch((error) => {
+        toast.error(error?.response?.data?.message || "Failed to upload document!");
+      });
+    }
   };
-
   const handleDelete = (id) => {
     console.log(id);
     Swal.fire({
@@ -245,6 +294,9 @@ useEffect(() => {
     dispatch(fetchSingleDrawings(_id))
   }
 
+  const handleEdit = (doc) => {
+    toggleUploadModal(true, doc);
+  }
 
   return (
     <div className="d-flex flex-column flex-md-row h-100">
@@ -281,7 +333,7 @@ useEffect(() => {
         <Button
           variant="primary"
           className="mt-3 w-100"
-          onClick={toggleUploadModal}
+          onClick={() => toggleUploadModal(false)}
         >
           <FontAwesomeIcon icon={faUpload} className="me-2" /> Upload New
           Drawing
@@ -308,54 +360,77 @@ useEffect(() => {
         </div>
 
         <div className="mb-3">
-          Showing {filteredDocuments.length} documents in {activeFolder.name}
+          Showing {drawings_arr?.drawingRegisters?.length || 0} documents in {activeFolder.name}
         </div>
 
         {viewMode === "grid" ? (
           <Row xs={1} md={2} lg={3} className="g-3">
             {drawings_arr?.drawingRegisters?.length > 0 &&
-              drawings_arr.drawingRegisters.map((Drawings) => (
-                <Col key={Drawings._id}>
+              drawings_arr.drawingRegisters.map((drawing) => (
+                <Col key={drawing._id}>
                   <div className="card shadow-sm">
                     <div className="card-body">
-                      {/* Drawing Image */}
+                   
                       <img
-                        src={Drawings.image?.[0]}
+                        src={drawing.image?.[0]}
                         alt="Uploaded Image"
                         className="img-fluid"
                         style={{ height: "150px" }}
                       />
 
-                      {/* Document Title */}
+                     
                       <h5 className="card-title">
-                        {Drawings.documentTitle}
+                        {drawing.documentTitle}
                       </h5>
 
-                      {/* Folder Name */}
+               
                       <small>
-                        Folder: {Drawings.folder}
+                        Folder: {drawing?.folder}
                       </small>
 
-                      {/* Document Type */}
+                    
                       <p className="card-text">
-                        Type: {Drawings.documentType}
+                        Type: {drawing?.documentType}
                       </p>
 
-                      {/* Status Badge */}
-                      <span className={`badge ${getStatusColorClass(Drawings.status)}`}>
-                        {Drawings.status}
+                      <span className={`badge ${getStatusColorClass(drawing?.status)}`}>
+                        {drawing.status}
                       </span>
                       
-                      {/* Assigned User Name */}
+                     
                       <div className="d-flex justify-content-between mt-2">
-                        <small>Assigned To: {Drawings.assignedTo?.firstName}</small>
-                        <small>Last Name: {Drawings.lastName}</small>
+                        <small>Assigned To: {drawing.assignedTo?.firstName}</small>
+                        <small>Last Updated: {new Date(drawing.updatedAt).toLocaleDateString()}</small>
                       </div>
 
-                      {/* Comments */}
                       <p className="card-text mt-2">
-                        Comments: {Drawings.comments}
+                        Comments: {drawing.comments}
                       </p>
+
+                   
+                      {/* <div className="d-flex justify-content-end mt-2">
+                        <button
+                          className="btn btn-link p-0 me-2"
+                          onClick={() => {
+                            openViewModal(drawing);
+                            handleViewDocument(drawing._id);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faEye} />
+                        </button>
+                        <button 
+                          className="btn btn-link p-0 me-2"
+                          onClick={() => handleEdit(drawing)}
+                        >
+                          <FontAwesomeIcon icon={faEdit} />
+                        </button>
+                        <button 
+                          className="btn btn-link p-0"
+                          onClick={() => handleDelete(drawing._id)}
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                      </div> */}
                     </div>
                   </div>
                 </Col>
@@ -378,15 +453,19 @@ useEffect(() => {
                 {drawings_arr?.drawingRegisters?.length > 0 &&
                   drawings_arr.drawingRegisters.map((doc) => (
                     <tr key={doc._id} className="bg-white py-3">
-                      <img src={doc.image?.[0]} alt="Uploaded Image" className="img-fluid" style={{ height: "60px" }} />
+                      <td className="ps-4 py-3 d-flex align-items-center">
+                        <img src={doc.image?.[0]} alt="Uploaded Image" className="me-2" style={{ height: "60px", width: "60px" }} />
+                        {/* <div>
+                          <strong>{doc.documentTitle}</strong>
+                          <div><small>{doc.documentType}</small></div>
+                        </div> */}
+                      </td>
                       <td className="py-3">
                         <span className={`badge ${getStatusColorClass(doc.status)}`}>
                           {doc.status}
                         </span>
                       </td>
-                      <td className="ps-4 py-3">{doc.assignedTo?.firstName}</td>
-                      {/* <td className="py-3">{doc.assignedTo}</td> */}
-                      {/* <td className="py-3">{new Date(doc.updatedAt).toLocaleString()}</td> */}
+                      <td className="py-3">{doc.assignedTo?.firstName}</td>
                       <td className="py-3">{new Date(doc.updatedAt).toLocaleDateString()}</td>
                       <td className="py-3">{doc.comments}</td>
                       <td className="pe-4 py-3">
@@ -399,10 +478,16 @@ useEffect(() => {
                         >
                           <FontAwesomeIcon icon={faEye} />
                         </button>
-                        <button className="btn btn-link p-0 me-2">
+                        <button 
+                          className="btn btn-link p-0 me-2"
+                          onClick={() => handleEdit(doc)}
+                        >
                           <FontAwesomeIcon icon={faEdit} />
                         </button>
-                        <button className="btn btn-link p-0" onClick={() => handleDelete(doc._id)}>
+                        <button 
+                          className="btn btn-link p-0" 
+                          onClick={() => handleDelete(doc._id)}
+                        >
                           <FontAwesomeIcon icon={faTrash} />
                         </button>
                       </td>
@@ -420,12 +505,12 @@ useEffect(() => {
 
       <Modal
         show={showUploadModal}
-        onHide={toggleUploadModal}
+        onHide={() => toggleUploadModal(false)}
         centered
         size="lg"
       >
         <Modal.Header closeButton>
-          <Modal.Title>Upload New Drawing</Modal.Title>
+          <Modal.Title>{isEditing ? "Update Drawing" : "Upload New Drawing"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
@@ -437,10 +522,11 @@ useEffect(() => {
                 className="text-muted"
               />
               <p className="mt-3">
-                Drag and drop your files here or click to browse
+                {isEditing ? "Upload a new file or keep the existing one" : "Drag and drop your files here or click to browse"}
               </p>
               <Form.Group controlId="formFile" className="mb-3">
                 <Form.Control type="file" onChange={handleFileChange} />
+                {isEditing && <small className="text-muted">Leave empty to keep the current file</small>}
               </Form.Group>
             </div>
 
@@ -479,8 +565,8 @@ useEffect(() => {
                 <option value="">Select folder</option>
                 <option value="Architectural Drawing">Architectural Drawing</option>
                 <option value="Structural Drawing">Structural Drawing</option>
-                <option value="Site Plans">Hydraulic Drawings</option>
-                <option value="Site Plans">Mechanical Drawings</option>
+                <option value="Hydraulic Drawings">Hydraulic Drawings</option>
+                <option value="Mechanical Drawings">Mechanical Drawings</option>
               </Form.Select>
             </Form.Group>
 
@@ -493,58 +579,26 @@ useEffect(() => {
               >
                 <option value="">Select status</option>
                 <option value="Approved">Approved</option>
-                <option value="Not Approved">completed</option>
+                <option value="Not Approved">Not Approved</option>
                 <option value="Pending">Pending</option>
               </Form.Select>
             </Form.Group>
 
-            {/* <Form.Group className="mb-3">
+            <Form.Group className="mb-3">
               <Form.Label>Assigned To</Form.Label>
-              <Form.Control
-                type="text"
+              <Form.Select
                 name="assignedTo"
                 value={assignedTo}
                 onChange={handleInputChange}
-                placeholder="Enter name"
-              />
-            </Form.Group> */}
-            {/* <div className="row mb-3">
-          <div className="col-md-6">
-            <label className="form-label">Assignee</label>
-            <select
-              className="form-select"
-              name="assignee"
-              value={formData.assignee}
-              onChange={handleInputChange}
-            >
+              >
                 <option value="" disabled>Select assignee</option>
-            {
-              users?.map((user) => (
-                
-                <option key={user._id} value={user._id}> {user.firstName} {user.lastName
-}</option>
-              ))
-            }
-
-              
-            </select>
-</div>
-</div> */}
-<Form.Group className="mb-3">
-  <Form.Label>Assigned To</Form.Label>
-  <Form.Select
-    name="assignedTo"
-    value={assignedTo}
-    onChange={handleInputChange}
-  >
-    <option value="" disabled>Select assignee</option>
-    {users?.map((user) => (
-      <option key={user._id} value={user._id}>
-        {user.firstName} {user.lastName}
-      </option>
-    ))}
-  </Form.Select>
-</Form.Group>
+                {users?.map((user) => (
+                  <option key={user._id} value={user._id}>
+                    {user.firstName} {user.lastName}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Comments</Form.Label>
@@ -558,25 +612,21 @@ useEffect(() => {
               />
             </Form.Group>
 
-
             <Modal.Footer>
-              <Button variant="secondary" onClick={toggleUploadModal}>
+              <Button variant="secondary" onClick={() => toggleUploadModal(false)}>
                 Close
               </Button>
-              <Button variant="primary" type="submit">Submit</Button>
+              <Button variant="primary" type="submit">
+                {isEditing ? "Update" : "Upload"}
+              </Button>
             </Modal.Footer>
           </Form>
-
         </Modal.Body>
-        {/* <Modal.Footer>
-          <Button variant="secondary" onClick={toggleUploadModal}>
-            Close
-          </Button>
-          <Button variant="primary">Upload</Button>
-        </Modal.Footer> */}
       </Modal>
     </div>
   );
 }
 
 export default DrawingRegister;
+
+

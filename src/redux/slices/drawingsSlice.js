@@ -52,25 +52,21 @@ export const fetchSingleDrawings = createAsyncThunk(
   }
 );
 
-// Update an existing drawings
 export const updatedrawings = createAsyncThunk(
-  "drawingss/updatedrawings",
-  async ({ _id, updatedData }, thunkAPI) => {
+  'drawings/updateDrawings',
+  async ({ id, updatedForm }, thunkAPI) => {
     try {
-      const response = await axiosInstance.patch(`${apiUrl}/drawings/${_id}`, updatedData,
-        {
-          headers: { "Content-Type": "multipart/form-data" }
-        }
-      );
+      const response = await axiosInstance.patch(`${apiUrl}/drawings/${id}`, updatedForm, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return response.data;
     } catch (error) {
-      return thunkAPI.rejectWithValue(
-        error.response?.data || error.message || "Error updating drawings"
-      );
+      return thunkAPI.rejectWithValue(error.response?.data || error.message || "Error updating drawing");
     }
   }
 );
-
 // Delete a drawings
 export const deleteDrawings = createAsyncThunk(
   "drawingss/deleteDrawings",
@@ -93,12 +89,7 @@ const initialState = {
   loading: false,
   error: null,
 };
-// Initial State
-// const initialState = {
-//   drawings_arr: [],
-//   loading: false,
-//   error: null,
-// };
+
 
 // Slice
 const drawingsSlice = createSlice({
@@ -151,7 +142,7 @@ const drawingsSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     })
-    // Update
+  
     .addCase(updatedrawings.pending, (state) => {
       state.loading = true;
       state.error = null;

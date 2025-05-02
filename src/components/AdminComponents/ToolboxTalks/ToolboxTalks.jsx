@@ -14,6 +14,11 @@ function ToolboxTalks() {
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
 
+  const [searchText, setSearchText] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
   const [recording, setRecording] = useState(false);
   const [transcription, setTranscription] = useState("");
   const [summary, setSummary] = useState("");
@@ -69,6 +74,14 @@ function ToolboxTalks() {
     } catch (err) {
       console.error("Failed to start recording:", err);
     }
+  };
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const recordedBlob = { blob: file }; // mimic structure expected by onStop
+    onStop(recordedBlob);
   };
 
   const stopRecording = () => {
@@ -143,6 +156,24 @@ function ToolboxTalks() {
       }
     };
   }, []);
+
+  const filteredTalks = talks.filter((talk) => {
+    const matchesSearch =
+      talk.title.toLowerCase().includes(searchText.toLowerCase()) ||
+      talk.description?.toLowerCase().includes(searchText.toLowerCase());
+
+    const matchesStatus =
+      selectedStatus === "All" || talk.status === selectedStatus;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  const totalPages = Math.ceil(filteredTalks.length / itemsPerPage);
+  const paginatedTalks = filteredTalks.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <div>
       <h3 className="mt-2 mb-0">Toolbox Talk</h3>
@@ -195,21 +226,32 @@ function ToolboxTalks() {
             </div>
 
             {/* Filters */}
+
             <div className="d-flex gap-2 flex-wrap mb-3">
               <input
                 type="text"
                 className="form-control"
                 placeholder="Search talks..."
                 style={{ maxWidth: "200px" }}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
               />
-              <select className="form-select" style={{ maxWidth: "160px" }}>
-                <option>All Projects</option>
-              </select>
-              <input
-                type="date"
-                className="form-control"
+              <select
+                className="form-select"
                 style={{ maxWidth: "160px" }}
-              />
+                value={selectedStatus}
+                onChange={(e) => {
+                  setSelectedStatus(e.target.value);
+                  setCurrentPage(1); // reset pagination on filter
+                }}
+              >
+                <option value="All">All Status</option>
+                {[...new Set(talks.map((t) => t.status))].map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Tabs */}
@@ -262,7 +304,7 @@ function ToolboxTalks() {
                       <td colSpan="5">Error: {error}</td>
                     </tr>
                   )}
-                  {talks.map((talk) => (
+                  {paginatedTalks?.map((talk) => (
                     <tr key={talk._id}>
                       <td>
                         {talk.title}
@@ -305,20 +347,38 @@ function ToolboxTalks() {
                 </tbody>
               </table>
             </div>
-            <div className="d-flex justify-content-end mb-3">
-              <Button size="sm" variant="outline-secondary" className="me-2">
+
+            <div className="d-flex justify-content-end mb-3 gap-2">
+              <Button
+                size="sm"
+                variant="outline-secondary"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((prev) => prev - 1)}
+              >
                 Previous
               </Button>
-              <Button size="sm" variant="primary" className="ms-2">
-                1
-              </Button>
-              <Button size="sm" variant="outline-secondary" className="ms-2">
-                2
-              </Button>
-              <Button size="sm" variant="outline-secondary" className="ms-2">
+              {[...Array(totalPages)].map((_, i) => (
+                <Button
+                  key={i}
+                  size="sm"
+                  variant={
+                    currentPage === i + 1 ? "primary" : "outline-secondary"
+                  }
+                  onClick={() => setCurrentPage(i + 1)}
+                >
+                  {i + 1}
+                </Button>
+              ))}
+              <Button
+                size="sm"
+                variant="outline-secondary"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((prev) => prev + 1)}
+              >
                 Next
               </Button>
             </div>
+            
           </div>
           <div className="tab-pane fade" id="completed">
             <p className="text-muted">No completed talks yet.</p>
@@ -348,6 +408,14 @@ function ToolboxTalks() {
                 <button className="btn btn-outline-dark">
                   Take Attendance
                 </button>
+
+                <input
+                  type="file"
+                  accept="audio/*"
+                  onChange={handleFileUpload}
+                  className="form-control mt-2"
+                  style={{ maxWidth: "300px" }}
+                />
               </div>
 
               <div
