@@ -2,10 +2,13 @@ import React, { useState } from "react";
 import { Button, Form, Table, Container } from "react-bootstrap";
 import axios from "axios";
 import { jsPDF } from "jspdf";
+import { toast } from "react-toastify";
+import { Spinner } from "react-bootstrap"; // Already part of react-bootstrap
 
 const ComplianceReport = () => {
   const [reportText, setReportText] = useState("");
   const [complianceIssues, setComplianceIssues] = useState([]);
+  const [loading, setLoading] = useState(false); // Add this line
 
   const handleReportTextChange = (e) => {
     setReportText(e.target.value);
@@ -19,6 +22,9 @@ const ComplianceReport = () => {
       return;
     }
 
+    setLoading(true); // Set loading to true when submitting
+    setComplianceIssues([]);
+
     try {
       const response = await axios.post(
         "https://constructionaimicroservice-production.up.railway.app/complinces_standards",
@@ -27,10 +33,12 @@ const ComplianceReport = () => {
 
       const aiIssues = response.data.ai_report.compliance_issues || [];
       setComplianceIssues(aiIssues);
-      alert("Compliance issues loaded successfully!");
+      toast.success("Compliance issues loaded successfully!");
     } catch (error) {
       console.error("Error fetching compliance issues:", error);
-      alert("Failed to fetch compliance issues.");
+      toast.error("Failed to fetch compliance issues.");
+    } finally {
+      setLoading(false); // Set loading to false after the request completes
     }
   };
 
@@ -96,11 +104,50 @@ const ComplianceReport = () => {
           Submit
         </Button>
       </Form>
-
+      {/* 
       {complianceIssues.length > 0 && (
         <>
           <h4 className="mt-4">Identified Compliance Issues</h4>
 
+          <div className="table-responsive">
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Issue</th>
+                  <th>Rectification</th>
+                  <th>Section</th>
+                  <th>Standard</th>
+                </tr>
+              </thead>
+              <tbody>
+                {complianceIssues.map((issue, index) => (
+                  <tr key={index}>
+                    <td>{issue.issue}</td>
+                    <td>{issue.rectification}</td>
+                    <td>{issue.section}</td>
+                    <td>{issue.standard}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
+          <Button variant="success" onClick={generatePDF} className="mt-3">
+            Generate PDF
+          </Button>
+        </>
+      )} */}
+
+      {loading && (
+        <div className="mt-4 text-center">
+          <Spinner animation="border" role="status" variant="primary">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        </div>
+      )}
+
+      {!loading && complianceIssues.length > 0 && (
+        <>
+          <h4 className="mt-4">Identified Compliance Issues</h4>
           <div className="table-responsive">
             <Table striped bordered hover>
               <thead>
