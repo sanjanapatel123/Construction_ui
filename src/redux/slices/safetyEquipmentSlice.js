@@ -144,7 +144,7 @@ export const updatesafetyEquipment = createAsyncThunk(
     try {
       const response = await axiosInstance.patch(`${apiUrl}/safety/${id}`, updatedForm, {
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data", 
         },
       });
       return response.data;
