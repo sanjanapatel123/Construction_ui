@@ -1,34 +1,3 @@
-// import axios from 'axios';
-// import  {apiUrl } from './config';
-
-// // Create an Axios instance
-// const axiosInstance = axios.create({
-//   baseURL:apiUrl,
-// });
-
-// // Request Interceptor to attach the token to the headers
-// axiosInstance.interceptors.request.use(
-//   (config) => {
-//     const token = localStorage.getItem('token');
-//     console.log("Sending Request with Token:", token);
-
-//     if (!token && !config.url.includes('/login') && !config.url.includes('/register')) {
-//       // Reject the request if no token
-//       return Promise.reject(new Error('No authentication token found'));
-//     }
-
-//     if (token) {
-//       config.headers['Authorization'] = `Bearer ${token}`;
-//     }
-
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   }
-// );
-
-// export default axiosInstance;
 
 
 import axios from 'axios';
@@ -42,12 +11,14 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
+    console.log("Sending Request with Token:", token);
     const userData = JSON.parse(localStorage.getItem('user'));
-    console.log("Sending Request with Token:", userData);
+    console.log("Sending Request with userData:", userData);
     const userRole = userData?.role;
+    console.log("Sending Request with userRole:", userRole);
 
     // Check if route requires authentication
-    const isAuthRoute = config.url.includes('/login') || config.url.includes('/register');
+    const isAuthRoute = config.url.includes('/') || config.url.includes('/register');
     if (!token && !isAuthRoute) {
       return Promise.reject(new Error('Authentication required'));
     }

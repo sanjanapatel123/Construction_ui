@@ -463,7 +463,7 @@ function PlantMachinery() {
                               : "bg-warning text-dark"
                           }`}
                         >
-                          {tool.category}
+                          {tool.category?.category}
                         </span>
                       </td>
                       <td className="py-3">{tool.manufacturer || "-"}</td>

@@ -129,7 +129,7 @@ export const  loginUser = createAsyncThunk(
 
 
     const initialState= {
-        // user: JSON.parse(localStorage.getItem('user')) || null,
+        user: JSON.parse(localStorage.getItem('user')) || null,
         token: localStorage.getItem('token') || null,
         role: localStorage.getItem('role') || null,
         permissions: JSON.parse(localStorage.getItem('permissions')) || null,

@@ -11,6 +11,7 @@ const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [showPassword, setShowPassword] = useState(false); 
 
     // const { login, loading, error } = useSelector((state) => state.auth);
   const [selectedRole, setSelectedRole] = useState("");
@@ -67,6 +68,9 @@ const dispatch = useDispatch();
         // toast.error(err || 'Login failed!');
       });
   };
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
   
 
   return (
@@ -108,13 +112,23 @@ const dispatch = useDispatch();
               <label htmlFor="email">Email address</label>
             </div>
             <div className="form-floating mb-3">
-              <input type="password" className="form-control"
+              <input   type={showPassword ? 'text' : 'password'}  className="form-control"
                 id="password"  placeholder="Password"
                 value={credentials.password}
                 onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
                 required
 
                 />
+                  <button type="button"
+  className="btn btn-light position-absolute end-0 !top-1/2 translate-middle-y " style={{marginTop: "4px"}}
+  onClick={togglePasswordVisibility}
+>
+  {showPassword ? <i
+                          className="fas fa-eye "
+                          text-secondary
+                        ></i> : <i class="fa fa-eye-slash" aria-hidden="true"></i>}
+</button>
+
               <label htmlFor="password">Password</label>
             </div>
             <div className="d-flex justify-content-between mb-4">
@@ -150,7 +164,7 @@ const dispatch = useDispatch();
   {/* First Row */}
   <div className="col-12">
     <button type="button" className={`btn w-100 text-white ${  selectedRole === "admin" ? "border border-2 border-dark" : "" }`}
-      style={{ backgroundColor: "#0e4966", fontWeight: 500 }}  onClick={() => handleRoleSelect("admin")} >
+      style={{ backgroundColor: "#0e4966", fontWeight: 500 }} >
       Admin
     </button>
   </div>
