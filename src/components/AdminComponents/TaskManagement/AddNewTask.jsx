@@ -92,6 +92,7 @@ useEffect(() => {
     else{
       dispatch(addTask(taskDetails)).unwrap().then(() => {
         toast.success("Task Added Successfully!");
+        dispatch(fetchTasks()); // Refresh the task list after adding a new task
       })
       .catch(() => {
         toast.error("Failed to add task!");
@@ -99,6 +100,7 @@ useEffect(() => {
     }
 
     console.log("Task Saved:", taskDetails);
+    navigate("/TaskDashboard");
   };
 
   const handleSaveCategory = () => {

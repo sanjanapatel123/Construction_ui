@@ -193,9 +193,11 @@ function DefectList() {
 
                     <td className="pe-4 py-3">
                       <div className="d-flex gap-2">
+                        <Link to={`/edit-defect/${defect._id}`}>
                         <button className="btn text-primary p-0">
                           <i className="fa-solid fa-pen-to-square"></i>
                         </button>
+                        </Link>
                         <Link
                           to={`/defects/${defect._id}`}
                           className="btn text-info p-0"

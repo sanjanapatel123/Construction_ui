@@ -28,7 +28,50 @@ export const fetchITPById = createAsyncThunk(
   }
 );
 
+// export const updateITP = createAsyncThunk('itps/updateITP' , async ({id , updatedITP}, thunkAPI) => 
+//    {
+//     try {
+//       const reposnse = await axiosInstance.patch(`${apiUrl}/itps/${id}`, updatedITP, {
+//         headers: { "Content-Type": "multipart/form-data" }
+//       });
+//       return reposnse.data;
+//     } catch (error) {
+//       return thunkAPI.rejectWithValue(error?.response?.data?.message || "Failed to update ITP");
+//     }
+//    }
+// )
 
+export const updateITP = createAsyncThunk(
+  'itps/updateITP',
+  async ({id, updatedITP}, thunkAPI) => {
+    try {
+      // Log the form data for debugging
+      for (let pair of updatedITP.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
+
+      const response = await axiosInstance.patch(
+        `${apiUrl}/itps/${id}`,
+        updatedITP,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          }
+        }
+      );
+      
+      if (!response.data.success) {
+        throw new Error(response.data.message || 'Update failed');
+      }
+      
+      return response.data.itp;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error?.response?.data?.message || "Failed to update ITP"
+      );
+    }
+  }
+);
 
 export const deleteITP = createAsyncThunk('itps/deleteITP', async (projectId, { dispatch, rejectWithValue }) => {
   try {
@@ -93,6 +136,23 @@ const itpSlice = createSlice({
   state.selectedITP = action.payload;
 })
 .addCase(fetchITPById.rejected, (state, action) => {
+  state.loading = false;
+  state.error = action.payload;
+})
+.addCase(updateITP.pending, (state) => {  
+  state.loading = true;
+  state.error = null;
+})
+.addCase(updateITP.fulfilled, (state, action) => {
+  state.loading = false;
+  const updatedITP = action.payload;
+  const index = state.data.findIndex((itp) => itp._id === updatedITP._id);
+  if (index !== -1) {
+    state.data[index] = updatedITP;
+  }
+
+})
+.addCase(updateITP.rejected, (state, action) => {
   state.loading = false;
   state.error = action.payload;
 })

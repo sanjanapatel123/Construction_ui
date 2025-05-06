@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { fetchITPs, deleteITP } from "../../../redux/slices/itpSlice";
+import { fetchUsers } from "../../../redux/slices/userSlice";
+
 import {
   LineChart,
   Line,
@@ -22,6 +24,7 @@ import {
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import EditITPModal from "./EditITPModal";
+import Swal from "sweetalert2";
 
 const pieChartData = [
   { name: "< 24 hrs", value: 40, color: "#3366CC" },
@@ -68,9 +71,42 @@ const ITPs = () => {
     dispatch(fetchITPs());
   }, [dispatch]);
 
-  const handleDelete = (id) => {
-    dispatch(deleteITP(id));
-  };
+ 
+useEffect(() => {
+    dispatch(fetchUsers());
+  }, []);
+
+   const handleDelete = (id) => {
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "You won't be able to revert this!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            dispatch(deleteITP(id))
+        
+              .then(() => {
+                Swal.fire(
+                  'Deleted!',
+                  'The site entry has been deleted.',
+                 
+                );
+                dispatch(fetchsitereview());  // Refresh the table after delete
+              })
+              .catch((error) => {
+                Swal.fire(
+                  'Error!',
+                  'Something went wrong.',
+                  'error'
+                );
+              });
+          }
+        });
+      };
 
   const itemsPerPage = 6;
   const [searchQuery, setSearchQuery] = useState("");
@@ -78,13 +114,16 @@ const ITPs = () => {
   const [selectedStatus, setSelectedStatus] = useState("All Statuses");
   const [selectedAssignee, setSelectedAssignee] = useState("All Assignees");
 
+    const users = useSelector((state) => state.users.data);
+
   const filteredData = useMemo(() => {
     return itps.filter((item) => {
       const matchesSearch =
-        item.projectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.activity.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.Inspector?.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.additionalNotes.toLowerCase().includes(searchQuery.toLowerCase());
       // const matchesStatus =
-      //   selectedStatus === "All Statuses" || item.status === selectedStatus;
+        item.status === selectedStatus;
       const matchesAssignee =
         selectedAssignee === "All Assignees" ||
         item.Inspector === selectedAssignee;
@@ -311,10 +350,10 @@ const ITPs = () => {
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
               >
-                <option>All Statuses</option>
-                <option>Approved</option>
-                <option>Pending</option>
-                <option>Under Review</option>
+                <option value="All Statuses">All Statuses</option>
+                <option value="Approved" >Approved</option>
+                <option value="Pending">Pending</option>
+                <option value="UnderReview">Under Review</option>
               </select>
             </div>
             <div className="col-md-4">
@@ -324,12 +363,11 @@ const ITPs = () => {
                 onChange={(e) => setSelectedAssignee(e.target.value)}
               >
                 <option>All Assignees</option>
-                <option>John Smith</option>
-                <option>Emily Johnson</option>
-                <option>Michael Chen</option>
-                <option>Sarah Williams</option>
-                <option>Robert Davis</option>
-                <option>Jennifer Lee</option>
+                {users.map((user) => (
+                  <option key={user._id} value={user._id}>
+                    {user.name || `${user.firstName} ${user.lastName}`}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -352,7 +390,7 @@ const ITPs = () => {
             </thead>
             <tbody className="p-2">
               {paginatedData?.map((item) => (
-                <tr key={item.id}>
+                <tr key={item._id}>
                   <td className="ps-4">{item.activity}</td>
                   <td>
                     <div className="d-flex align-items-center gap-2">
@@ -386,18 +424,18 @@ const ITPs = () => {
                           style={{ fontSize: "15px" }}
                         ></i>
                       </Link>
+                  
+                  <Link to={`/edititp/${item._id}`} className="btn btn-sm text-primary p-0">
                       <button
                         className="btn btn-sm text-primary p-0"
-                        onClick={() => {
-                          // setSelectedITP(item);
-                          setShowEditModal(true);
-                        }}
+                        
                       >
                         <i
                           className="fas fa-edit text-primary"
                           style={{ fontSize: "15px" }}
                         ></i>
                       </button>
+                      </Link>
                       <button
                         className="btn btn-sm  p-0"
                         onClick={() => handleDelete(item._id)}

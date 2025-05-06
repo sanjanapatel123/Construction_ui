@@ -4,10 +4,13 @@ import { Modal, Button, Form, Dropdown } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchDocuments, addDocument, updateDocument, deleteDocument } from "../../../redux/slices/documentSlice";
 import Swal from "sweetalert2";
+import { fetchUsers } from "../../../redux/slices/userSlice";
+import { toast } from "react-toastify";
 
 function Documents() {
   const dispatch = useDispatch();
   const { documents, loading } = useSelector((state) => state.document);
+   const users = useSelector((state) => state.users.data);
 
   const [activeFolder, setActiveFolder] = useState("contracts");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,6 +27,11 @@ function Documents() {
     image: [],
     folder: activeFolder,
   });
+
+  useEffect(() => {
+    fetchUsers()
+  }, [])
+  
 
   useEffect(() => {
     dispatch(fetchDocuments());
@@ -149,9 +157,11 @@ function Documents() {
     }
 
     if (editingDocument) {
-      dispatch(updateDocument({ id: editingDocument.id, updatedData: documentData }));
+      dispatch(updateDocument({ id: editingDocument.id, updatedData: documentData })).unwrap()
+      toast.success("Document updated successfully!");
     } else {
-      dispatch(addDocument(documentData));
+      dispatch(addDocument(documentData)).unwrap()
+      toast.success("Document submitted successfully!");
     }
 
     setIsModalOpen(false);
@@ -261,7 +271,7 @@ function Documents() {
                             <td>{doc.documentType}</td>
                             <td><span className={getStatusColor(doc.status)}>{doc.status}</span></td>
                             <td>{new Date(doc.dueDate).toLocaleDateString()}</td>
-                            <td>{doc.assignTo}</td>
+                            <td>{doc.assignTo?.firstName} {doc.assignTo?.lastName}</td>
                             <td>
                               <button className="btn btn-sm btn-outline-primary me-2" onClick={() => handleOpenModal(doc)}>
                                 <i className="fas fa-edit"></i>
@@ -307,7 +317,15 @@ function Documents() {
               </Form.Group>
               <Form.Group controlId="assignTo" className="mb-3">
                 <Form.Label>Assign To</Form.Label>
-                <Form.Control type="text" name="assignTo" value={formData.assignTo} onChange={handleInputChange} required />
+                <Form.Select  name="assignTo" value={formData.assignTo} onChange={handleInputChange} required >
+
+                  <option value="">Select User</option>
+                  {users.map((user) => (
+                  <option key={user._id} value={user._id}>
+                    {user.name || `${user.firstName} ${user.lastName}`}
+                  </option>
+                ))}
+                </Form.Select>
               </Form.Group>
               <Form.Group controlId="status" className="mb-3">
                 <Form.Label>Status</Form.Label>

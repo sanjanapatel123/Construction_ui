@@ -28,7 +28,11 @@ export const fetchChecklistDetails = createAsyncThunk(
 export const updateChecklist = createAsyncThunk(
   'checklists/updateChecklist',
   async ({ id, checklistData }) => {
-    const response = await axiosInstance.put(`${apiUrl}/checklists/${id}`, checklistData);
+    const response = await axiosInstance.patch(`${apiUrl}/checklists/${id}`, checklistData, 
+      {
+        headers: { "Content-Type": "multipart/form-data" }
+      }
+    );
     return response.data;
   }
 );
@@ -90,6 +94,18 @@ const checklistSlice = createSlice({
             .addCase(deleteChecklist.rejected, (state, action) => {
               state.loading = false;
               state.error = action.payload;
+            })
+            .addCase(updateChecklist.pending, (state) => {
+              state.loading = true;
+              state.error = null;
+            })
+            .addCase(updateChecklist.fulfilled, (state, action) => {
+              state.loading = false;
+              const index = state.checklists.findIndex((checklist) => checklist._id === action.payload._id);
+              if (index !== -1) {
+                state.checklists[index] = action.payload;
+              }
+              toast.success("Checklist updated successfully!");
             })
   },
 });

@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 import axiosInstance from "../../../utils/axiosInstance";
 
 function Checklists() {
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProject, setSelectedProject] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("All");
@@ -24,6 +25,8 @@ function Checklists() {
   const { checklists, checklistDetails, loading, error } = useSelector(
     (state) => state.checklists
   );
+
+  console.log("Checklists data:", checklists); // Debugging line
 
   const projectOptions = [
     "All",
@@ -95,13 +98,7 @@ function Checklists() {
     }
   };
 
-  const handleEdit = (id) => {
-    dispatch(fetchChecklistDetails(id)).then((res) => {
-      if (res?.payload) {
-        setShowEditModal(true);
-      }
-    });
-  };
+
 
   const handleUpdateChecklist = async (updatedData) => {
     console.log("Updating checklist with data:", updatedData);
@@ -216,10 +213,11 @@ function Checklists() {
                         {checklist.checklistName}
                       </td>
                       <td className="text-muted fs-9 py-3">
-                        {checklist.project}
+                        {checklist.project?.name}
                       </td>
                       <td className="text-muted fs-9 py-3">
-                        {checklist.AssignTo}
+                        {checklist.AssignTo?.firstName}{" "}
+                        {checklist.AssignTo?.lastName}
                       </td>
                       <td className="py-3">
                         <span
@@ -227,27 +225,29 @@ function Checklists() {
                             checklist.status
                           )}`}
                         >
-                          {checklist.status}
+                          {checklist?.status}
                         </span>
                       </td>
-                      <td className="text-muted fs-9 py-3">{checklist.date}</td>
+                      <td className="text-muted fs-9 py-3">{new Date(checklist?.date).toLocaleDateString()}</td>
                       <td className="pe-4 py-3">
                         <div className="d-flex gap-2">
+
+                          <Link to={`/editchecklist/${checklist._id}`} className="text-decoration-none">
                           <button
                             className="btn text-primary p-0"
-                            onClick={() => handleEdit(checklist._id)}
                           >
                             <i className="fa-solid fa-pen-to-square"></i>
                           </button>
+                          </Link>
                           <button
                             className="btn text-info p-0"
                             onClick={() => handleViewDetails(checklist._id)}
                           >
                             <i className="fa-solid fa-eye"></i>
                           </button>
-                          <button className="btn text-success p-0">
+                          {/* <button className="btn text-success p-0">
                             <i className="fa-solid fa-circle-check"></i>
-                          </button>
+                          </button> */}
                           <button
                             className="btn text-dark p-0"
                             onClick={() => handleDelete(checklist._id)}
@@ -291,11 +291,11 @@ function Checklists() {
                       </div>
                       <div className="col-md-6 mb-3">
                         <strong className="text-muted">Assigned To:</strong>
-                        <div className="fs-6">{checklistDetails.AssignTo}</div>
+                        <div className="fs-6">{checklistDetails.AssignTo?.firstName} {checklistDetails.AssignTo?.lastName}</div>
                       </div>
                       <div className="col-md-6 mb-3">
                         <strong className="text-muted">Project:</strong>
-                        <div className="fs-6">{checklistDetails.project}</div>
+                        <div className="fs-6">{checklistDetails.project?.name}</div>
                       </div>
                       <div className="col-md-6 mb-3">
                         <strong className="text-muted">Date:</strong>

@@ -164,10 +164,12 @@ function App() {
             ></Route>
             <Route path="/add-project" element={<AddProject />} />
             <Route path="/AddITPs" element={<AddITPs />} />
+            <Route path="/edititp/:id" element={<AddITPs />} />
             <Route path="/checklists" element={<Checklists />} />
             <Route path="/AddChecklists" element={<AddChecklists />} />
             <Route path="/defects" element={<DefectList />} />
             <Route path="/AddDefectList" element={<AddDefectList />} />
+            <Route path="/edit-defect/:id" element={<AddDefectList />} />
             <Route path="/PlantMachinery" element={<PlantMachinery />} />
             <Route path="/AddToolRegistry" element={<AddToolRegistry />} />
             <Route path="/AddToolRegistry/:id" element={<AddToolRegistry />} />
@@ -252,6 +254,7 @@ function App() {
             <Route path="/AddITPs" element={<AddITPs />} />
             <Route path="/checklists" element={<Checklists />} />
             <Route path="/AddChecklists" element={<AddChecklists />} />
+            <Route path="/editchecklist/:id" element={<AddChecklists />} />
             <Route path="/defects" element={<DefectList />} />
             <Route path="/AddDefectList" element={<AddDefectList />} />
             <Route path="/PlantMachinery" element={<PlantMachinery />} />

@@ -135,6 +135,21 @@ const swmsSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
     })
+    .addCase(updateswms.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+    })
+    .addCase(updateswms.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.swms.findIndex((swms) => swms._id === action.payload._id);
+        if (index !== -1) {
+            state.swms[index] = action.payload;
+        }
+    })
+    .addCase(updateswms.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+    })
     },
 });
 
