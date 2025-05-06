@@ -184,12 +184,12 @@ const SafetyEquipmentList = () => {
                       >
                         <i className="fa fa-eye"></i>
                       </button>
-                      {/* <button
+                      <button
                         className="btn text-primary p-0"
                         onClick={() => navigate(`/AddSafety/${item._id}`)}
                       >
                         <i className="fa-solid fa-pen-to-square"></i>
-                      </button> */}
+                      </button>
 
                       <button
                         className="btn text-dark p-0"

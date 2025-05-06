@@ -10,7 +10,7 @@ import Navbar from "./components/Layout/Navbar";
 import Sidebar from "./components/Layout/Sidebar";
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
-import Dashbord from "./components/AdminComponents/Dashbord/Dashbord";
+import Dashboard from "./components/AdminComponents/Dashbord/Dashbord";
 import Inductions from "./components/AdminComponents/Inductions/Inductions";
 import AddnewInduction from "./components/AdminComponents/Inductions/AddnewInduction";
 import SWMS from "./components/AdminComponents/SWMS/SWMS";
@@ -72,7 +72,7 @@ import AddNewWorker from "./components/AdminComponents/ComplianceDashboard/AddNe
 import SiteEntry from "./components/AdminComponents/SiteEntry/SiteEntry";
 import SiteEntryTable from "./components/AdminComponents/SiteEntry/SiteEntryTable";
 import FullSiteMap from "./components/AdminComponents/Dashbord/FullSiteMap";
-import Dashboard from "./components/SuperAdmin/Dashboard";
+// import Dashboard from "./components/SuperAdmin/SuperAdminDashboard";
 import PlanPackage from "./components/SuperAdmin/PlanPackage";
 import PlanRequest from "./components/SuperAdmin/PlanRequest";
 import UserInfo from "./components/SuperAdmin/UserInfo";
@@ -89,6 +89,10 @@ import ViewUser from "./components/AdminComponents/UserManagement/ViewUser";
 import AuditEquipmentView from "./components/AdminComponents/AuditEquipment/AuditEquipmentView";
 
 import ComplianceReport from "./components/AdminComponents/ComplianceReport/ComplianceReport";
+import ProtectedRoute from "./routes/ProtectedRoutes";
+import SuperAdminDashboard from "./components/SuperAdmin/SuperAdminDashboard";
+import DefectDetails from "./components/AdminComponents/DefectList/DefectDetails";
+import ViewITPDetails from "./components/AdminComponents/ITPs/ViewITPDetails";
 
 function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
@@ -114,7 +118,9 @@ function App() {
             <Route path="/Signup" element={<Register />} />
 
             {/* AdminComponents */}
-            <Route path="/dashboard" element={<Dashbord />} />
+            <Route path="/dashboard" element={
+          <Dashboard />
+       } />
             <Route
               path="/safety-compliance-dashboard"
               element={<SafetyComplianceDashboard />}
@@ -158,10 +164,12 @@ function App() {
             ></Route>
             <Route path="/add-project" element={<AddProject />} />
             <Route path="/AddITPs" element={<AddITPs />} />
+            <Route path="/edititp/:id" element={<AddITPs />} />
             <Route path="/checklists" element={<Checklists />} />
             <Route path="/AddChecklists" element={<AddChecklists />} />
             <Route path="/defects" element={<DefectList />} />
             <Route path="/AddDefectList" element={<AddDefectList />} />
+            <Route path="/edit-defect/:id" element={<AddDefectList />} />
             <Route path="/PlantMachinery" element={<PlantMachinery />} />
             <Route path="/AddToolRegistry" element={<AddToolRegistry />} />
             <Route path="/AddToolRegistry/:id" element={<AddToolRegistry />} />
@@ -211,7 +219,7 @@ function App() {
             <Route path="/AddUserManagement" element={<AddUserManagement />} />
             <Route path="/Settings" element={<Settings />} />
             {/* AdminComponents */}
-            <Route path="/dashboard" element={<Dashbord />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route
               path="/safety-compliance-dashboard"
               element={<SafetyComplianceDashboard />}
@@ -220,9 +228,15 @@ function App() {
             <Route path="/AddnewInduction" element={<AddnewInduction />} />
             <Route path="/swms" element={<SWMS />} />
             <Route path="/audit-equipment" element={<AuditEquipment />} />
-            <Route path="/edit-audit-equipment/:id" element={<AuditEquipment />} />
-            <Route path="/audit-equipmentview/:id" element={<AuditEquipmentView />} />
-            <Route path="/auditreport" element={<AuditReports  />} />
+            <Route
+              path="/edit-audit-equipment/:id"
+              element={<AuditEquipment />}
+            />
+            <Route
+              path="/audit-equipmentview/:id"
+              element={<AuditEquipmentView />}
+            />
+            <Route path="/auditreport" element={<AuditReports />} />
             <Route path="/safety-equipment" element={<SafetyEquipment />} />
             <Route path="/submit-report" element={<SubmitReport />} />
             <Route path="/AddnewSms" element={<AddnewSms />} />
@@ -240,6 +254,7 @@ function App() {
             <Route path="/AddITPs" element={<AddITPs />} />
             <Route path="/checklists" element={<Checklists />} />
             <Route path="/AddChecklists" element={<AddChecklists />} />
+            <Route path="/editchecklist/:id" element={<AddChecklists />} />
             <Route path="/defects" element={<DefectList />} />
             <Route path="/AddDefectList" element={<AddDefectList />} />
             <Route path="/PlantMachinery" element={<PlantMachinery />} />
@@ -290,7 +305,7 @@ function App() {
             <Route path="/AddUserManagement" element={<AddUserManagement />} />
             <Route path="/Settings" element={<Settings />} />
             {/* AdminComponents */}
-            <Route path="/dashboard" element={<Dashbord />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route
               path="/safety-compliance-dashboard"
               element={<SafetyComplianceDashboard />}
@@ -318,6 +333,8 @@ function App() {
             <Route path="/AddSafety" element={<SafetyEquipment />} />
             <Route path="/AddSafety/:id" element={<SafetyEquipment />} />
             <Route path="/view-service" element={<ViewServicePage />} />
+            <Route path="/defects/:id" element={<DefectDetails />} />
+            <Route path="/itps/view/:id" element={<ViewITPDetails />} />
             <Route
               path="/safety-equipment/:id"
               element={<SafetyEquipmentDetails />}
@@ -369,7 +386,7 @@ function App() {
             <Route path="/AddUserManagement" element={<AddUserManagement />} />
             <Route path="/Settings" element={<Settings />} />
             {/* super-admin */}
-            <Route path="/super-admin-dashboard" element={<Dashboard />} />
+            <Route path="/super-admin-dashboard" element={<SuperAdminDashboard />} />
             <Route path="/Plan-Package" element={<PlanPackage />} />
             <Route path="/Plan-request" element={<PlanRequest />} />
             <Route path="/user-info" element={<UserInfo />} />

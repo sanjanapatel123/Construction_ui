@@ -26,7 +26,7 @@ function EditToolboxTalk() {
     const fetchUsers = async () => {
       try {
         const response = await axiosInstance.get(
-          "https://hrb5wx2v-8000.inc1.devtunnels.ms/api/users"
+          `${apiUrl}/users`
         );
         setWorkersList(response.data.data.users);
       } catch (error) {

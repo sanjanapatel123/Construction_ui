@@ -1,114 +1,108 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button } from "react-bootstrap";
-import { apiUrl } from "../../../utils/config"; // Define your API base URL here
-import axiosInstance from "../../../utils/axiosInstance"; // Create axios instance with base URL
+import { apiUrl } from "../../../utils/config";
+import axiosInstance from "../../../utils/axiosInstance";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProjects } from "../../../redux/slices/projectSlice";
-import { fetchChecklists } from "../../../redux/slices/checklistSlice";
+import { fetchChecklists, fetchChecklistDetails, updateChecklist } from "../../../redux/slices/checklistSlice";
+import { fetchUsers } from "../../../redux/slices/userSlice";
 
 function AddChecklists() {
+
+  const { id } = useParams()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const users = useSelector((state) => state.users.data);
+  const { data: projects, loading } = useSelector((state) => state.projects);
+
   const [formData, setFormData] = useState({
     checklistName: "",
     project: "",
     AssignTo: "",
     date: "",
-    checklistItems: [{ checklistItem: "" }],
+    checklistItems: [{ checklistItem: "", checked: false }],
     additionalNotes: "",
-    status: "true",
+    status: "Pending",
   });
 
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { data: projects, loading } = useSelector((state) => state.projects);
-  // console.log("Projects →", projects);
-
   useEffect(() => {
-    dispatch(fetchProjects()); // Fetch projects when component mounts
-  }, [dispatch]);
+    dispatch(fetchUsers());
+    dispatch(fetchProjects());
 
-  // Handle form field changes
+    if (id) {
+      dispatch(fetchChecklistDetails(id)).then((action) => {
+        if (action.payload) {
+          setFormData({
+            checklistName: action.payload.checklistName,
+            project: action.payload.project?._id,
+            AssignTo: action.payload.AssignTo?._id,
+            date: new Date(action.payload.date).toISOString().split("T")[0],
+            checklistItems: action.payload.checklistItems,
+            additionalNotes: action.payload.additionalNotes,
+            status: action.payload.status,
+          });
+        }
+      });
+    }
+  }, [dispatch, id]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  // Handle checklist item changes
   const handleChecklistItemChange = (index, e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     const newItems = [...formData.checklistItems];
-    newItems[index] = { [name]: value };
-    setFormData((prevData) => ({
-      ...prevData,
-      checklistItems: newItems,
-    }));
+    newItems[index] = {
+      ...newItems[index],
+      [name]: type === "checkbox" ? checked : value,
+    };
+    setFormData((prevData) => ({ ...prevData, checklistItems: newItems }));
   };
 
-  // Add another checklist item
   const addChecklistItem = () => {
     setFormData((prevData) => ({
       ...prevData,
-      checklistItems: [...prevData.checklistItems, { checklistItem: "" }],
+      checklistItems: [...prevData.checklistItems, { checklistItem: "", checked: false }],
     }));
   };
 
-  // Remove a checklist item
   const removeChecklistItem = (index) => {
     const newItems = formData.checklistItems.filter((_, i) => i !== index);
-    setFormData((prevData) => ({
-      ...prevData,
-      checklistItems: newItems,
-    }));
+    setFormData((prevData) => ({ ...prevData, checklistItems: newItems }));
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Frontend validation
-    if (
-      !formData.checklistName.trim() ||
-      !formData.project.trim() ||
-      !formData.AssignTo.trim() ||
-      !formData.date.trim() ||
-      formData.checklistItems.some((item) => !item.checklistItem.trim())
-    ) {
-      toast.error("Please fill in all required fields.");
-      return;
-    }
-
-    const cleanFormData = {
-      ...formData,
-      checklistName: formData.checklistName.trim(),
-      project: formData.project.trim(),
-      AssignTo: formData.AssignTo.trim(),
-      date: formData.date.trim(),
-      status: formData.status,
-      additionalNotes: formData.additionalNotes.trim(),
-      checklistItems: formData.checklistItems.map((item) => ({
-        checklistItem: item.checklistItem.trim(),
-      })),
-    };
-
-    console.log("Final Payload →", cleanFormData);
+    const payload = new FormData();
+    payload.append("checklistName", formData.checklistName);
+    payload.append("project", formData.project);
+    payload.append("AssignTo", formData.AssignTo);
+    payload.append("date", formData.date);
+    payload.append("additionalNotes", formData.additionalNotes);
+    payload.append("status", formData.status);
+    payload.append("checklistItems", JSON.stringify(formData.checklistItems));
 
     try {
-      const response = await axiosInstance.post(
-        `${apiUrl}/checklists`,
-        cleanFormData
-      );
-      toast.success("Checklist created successfully!");
-      dispatch(fetchChecklists()); // Fetch updated projects list
+      if (id) {
+        // Update
+        await dispatch(updateChecklist({ id, checklistData: payload })).unwrap();
+        toast.success("Checklist updated successfully!");
+      } else {
+        // Create
+        await axiosInstance.post(`${apiUrl}/checklists`, payload, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        toast.success("Checklist created successfully!");
+      }
       navigate("/checklists");
     } catch (error) {
-      console.error("Submission error:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to create checklist."
-      );
+      toast.error(error?.message || "Failed to process checklist.");
     }
   };
 
@@ -133,7 +127,6 @@ function AddChecklists() {
               <input
                 type="text"
                 className="form-control"
-                placeholder="Enter checklist name"
                 name="checklistName"
                 value={formData.checklistName}
                 onChange={handleChange}
@@ -142,12 +135,9 @@ function AddChecklists() {
             </div>
             <div className="col-md-6">
               <label className="form-label">
-                Project{" "}
-                <Link to={"/add-project"}>
-                  <i
-                    className="fa fa-plus ms-2"
-                    style={{ cursor: "pointer", color: "#0d6efd" }}
-                  ></i>
+                Project
+                <Link to="/add-project">
+                  <i className="fa fa-plus ms-2" style={{ color: "#0d6efd", cursor: "pointer" }}></i>
                 </Link>
               </label>
               {loading ? (
@@ -181,10 +171,12 @@ function AddChecklists() {
                 onChange={handleChange}
                 required
               >
-                <option value="">Select Team Member</option>
-                <option value="User1">User 1</option>
-                <option value="User2">User 2</option>
-                {/* Add more users here */}
+                <option value="">Select</option>
+                {users.map((user) => (
+                  <option key={user._id} value={user._id}>
+                    {user.name || `${user.firstName} ${user.lastName}`}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="col-md-6">
@@ -206,7 +198,7 @@ function AddChecklists() {
               className="form-select"
               name="status"
               value={formData.status}
-              onChange={handleChange} // direct string value
+              onChange={handleChange}
             >
               <option value="">Select Status</option>
               <option value="Approved">Approved</option>
@@ -222,26 +214,33 @@ function AddChecklists() {
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Enter checklist item"
                   name="checklistItem"
                   value={item.checklistItem}
+                  placeholder="Enter checklist item"
                   onChange={(e) => handleChecklistItemChange(index, e)}
                   required
                 />
-                {/* <select className="form-select w-auto" defaultValue="Required">
-                  <option>Required</option>
-                </select> */}
+                <div className="form-check ms-2">
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    name="checked"
+                    checked={item.checked}
+                    onChange={(e) => handleChecklistItemChange(index, e)}
+                    id={`checked-${index}`}
+                  />
+                  <label className="form-check-label" htmlFor={`checked-${index}`}>
+                    Completed
+                  </label>
+                </div>
                 <i
-                  className="fas fa-trash text-danger"
+                  className="fas fa-trash text-danger ms-2"
+                  style={{ cursor: "pointer" }}
                   onClick={() => removeChecklistItem(index)}
                 />
               </div>
             ))}
-            <button
-              type="button"
-              className="btn btn-outline-secondary"
-              onClick={addChecklistItem}
-            >
+            <button type="button" className="btn btn-outline-secondary" onClick={addChecklistItem}>
               <i className="fas fa-plus" /> Add Another Item
             </button>
           </div>
@@ -250,9 +249,9 @@ function AddChecklists() {
             <h5>Additional Notes</h5>
             <textarea
               className="form-control"
-              placeholder="Enter any additional notes or instructions"
-              rows={3}
               name="additionalNotes"
+              rows={3}
+              placeholder="Enter any additional notes or instructions"
               value={formData.additionalNotes}
               onChange={handleChange}
             />
@@ -263,7 +262,7 @@ function AddChecklists() {
               Save as Draft
             </button>
             <Button style={{ backgroundColor: "#0052CC" }} type="submit">
-              Create Checklist
+            {id ? "Update Checklist" : "Create Checklist"}
             </Button>
           </div>
         </form>
@@ -273,3 +272,4 @@ function AddChecklists() {
 }
 
 export default AddChecklists;
+

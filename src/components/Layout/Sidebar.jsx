@@ -27,8 +27,26 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [openMenuIndex, setOpenMenuIndex] = useState(null);
   const [activeMenuIndex, setActiveMenuIndex] = useState(null);
   const [activeSubmenuPath, setActiveSubmenuPath] = useState(null);
-  const [roledata, setRoleData] = useState("admin");
 
+  // const [roledata, setRoleData] = useState(() => localStorage.getItem("role"));
+  const [roledata, setRoleData] = useState(() => {
+    const storedRole = localStorage.getItem("role");
+    return storedRole || null;
+  });
+  
+  // Add useEffect to update roledata when it changes
+  useEffect(() => {
+    const storedRole = localStorage.getItem("role");
+    if (storedRole) {
+      setRoleData(storedRole);
+    }
+  }, []);
+
+  console.log("roleData", roledata);
+
+
+
+   
   const menuItems = [
     {
       title: "Dashboard",
@@ -166,12 +184,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const Role = localStorage.getItem("userRole");
-    if (Role) {
-      setRoleData(Role);
-    }
-  }, []);
+  // useEffect(() => {
+  //   const Role = localStorage.getItem("role");
+  //   if (Role) {
+  //     setRoleData(Role);
+  //   }
+  // }, []);
 
   const toggleMenu = (index) => {
     setOpenMenuIndex(openMenuIndex === index ? null : index);
@@ -184,75 +202,152 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     navigate(path);
   };
 
-  const filteredMenuItems = menuItems.filter((item) => {
-    if (roledata === "admin" ) {
-      const hiddenAdminPaths = [
-        "/super-admin-dashboard",
-        "/Plan-Package",
-        "/Plan-request",
-        "/user-info",
-        "/super-admin-setting",
-      ];
-      return !hiddenAdminPaths.includes(item.path);
-    } else if (roledata === "superadmin") {
-      const superAdminMenuItems = [
-        "/super-admin-dashboard",
-        "/Plan-Package",
-        "/Plan-request",
-        "/user-info",
-        "/super-admin-setting",
-      ];
-      if (superAdminMenuItems.includes(item.path)) {
-        if (item.submenu) {
-          item.submenu = item.submenu.filter((subItem) => true);
-        }
-        return true;
-      }
-      return false;
-    } else if (roledata === "supervisor") {
-      if (item.title === "User Management" || item.title === "Settings" || item.path === "/super-admin-dashboard" || item.path === "/Plan-Package" || item.path === "/Plan-request" || item.path === "/user-info" || item.path === "/super-admin-setting") {
-        return false;
-      }
-      if (item.submenu) {
-        item.submenu = item.submenu.filter((subItem) => {
-          return subItem.title !== "Site Review";
-        });
-      }
-      return true;
-    } else if (roledata === "worker") {
-      if (item.title === "User Management" || item.title === "Settings" || item.path === "/super-admin-dashboard") {
-        return false;
-      }
-      // Worker can only see a specific set of items
-      const workerMenuItems = [
-        "Dashboard",
-        "Active Projects",
-        "Safety Compliance",
-        "SWMS",
-        "Incident Reports",
-        "Toolbox Talks",
-        "Help & Support",
-        "Communication",
-      ];
-      if (workerMenuItems.includes(item.title)) {
-        if (item.submenu) {
-          item.submenu = item.submenu.filter((subItem) => {
-            return [
-              "Dashboard",
-              "SWMS",
-              "Incident Reports",
-              "Messenger",
-              "RFIs",
-            ].includes(subItem.title);
-          });
-        }
-        return true;
-      }
-      return false;
-    }
-    return false;
-  });
+  // const filteredMenuItems = menuItems.filter((item) => {
+  
+  //   if (roledata === "admin" ) {
+  //     const hiddenAdminPaths = [
+  //       "/super-admin-dashboard",
+  //       "/Plan-Package",
+  //       "/Plan-request",
+  //       "/user-info",
+  //       "/super-admin-setting",
+  //     ];
+  //     return !hiddenAdminPaths.includes(item.path);
+  //   } else if (roledata === "superadmin") {
+  //     const superAdminMenuItems = [
+  //       "/super-admin-dashboard",
+  //       "/Plan-Package",
+  //       "/Plan-request",
+  //       "/user-info",
+  //       "/super-admin-setting",
+  //     ];
+  //     if (superAdminMenuItems.includes(item.path)) {
+  //       if (item.submenu) {
+  //         item.submenu = item.submenu.filter((subItem) => true);
+  //       }
+  //       return true;
+  //     }
+  //     return false;
+  //   } else if (roledata === "supervisor") {
+  //     if (item.title === "User Management" || item.title === "Settings" || item.path === "/super-admin-dashboard" || item.path === "/Plan-Package" || item.path === "/Plan-request" || item.path === "/user-info" || item.path === "/super-admin-setting") {
+  //       return false;
+  //     }
+  //     if (item.submenu) {
+  //       item.submenu = item.submenu.filter((subItem) => {
+  //         return subItem.title !== "Site Review";
+  //       });
+  //     }
+  //     return true;
+  //   } else if (roledata === "worker") {
+  //     if (item.title === "User Management" || item.title === "Settings" || item.path === "/super-admin-dashboard") {
+  //       return false;
+  //     }
 
+
+  //     console.log("filteredMenuItems", filteredMenuItems);
+  //     // Worker can only see a specific set of items
+  //     const workerMenuItems = [
+  //       "Dashboard",
+  //       "Active Projects",
+  //       "Safety Compliance",
+  //       "SWMS",
+  //       "Incident Reports",
+  //       "Toolbox Talks",
+  //       "Help & Support",
+  //       "Communication",
+  //     ];
+  //     if (workerMenuItems.includes(item.title)) {
+  //       if (item.submenu) {
+  //         item.submenu = item.submenu.filter((subItem) => {
+  //           return [
+  //             "Dashboard",
+  //             "SWMS",
+  //             "Incident Reports",
+  //             "Messenger",
+  //             "RFIs",
+  //           ].includes(subItem.title);
+  //         });
+  //       }
+  //       return true;
+  //     }
+  //     return false;
+  //   }
+  //   return false;
+  // });
+
+
+  const filteredMenuItems = menuItems.filter((item) => {
+    // Parse the role data since it's stored as a JSON string
+    const userRole = JSON.parse(roledata);
+    
+    switch(userRole) {
+      case "superadmin":
+        // Superadmin can see all superadmin-specific routes
+        const superAdminMenuItems = [
+          "/super-admin-dashboard",
+          "/Plan-Package",
+          "/Plan-request",
+          "/user-info",
+          "/super-admin-setting",
+        ];
+        return superAdminMenuItems.includes(item.path);
+  
+      case "admin":
+        // Admin can see everything except superadmin routes
+        const hiddenAdminPaths = [
+          "/super-admin-dashboard",
+          "/Plan-Package",
+          "/Plan-request",
+          "/user-info",
+          "/super-admin-setting",
+        ];
+        return !hiddenAdminPaths.includes(item.path);
+  
+      case "supervisor":
+        // Supervisor has limited access
+        if (item.title === "User Management" || 
+            item.title === "Settings" || 
+            item.path?.startsWith("/super-admin")) {
+          return false;
+        }
+        
+        // Filter submenu items for supervisor if they exist
+        if (item.submenu) {
+          item.submenu = item.submenu.filter(subItem => 
+            subItem.title !== "Site Review"
+          );
+        }
+        return true;
+  
+      case "worker":
+        // Worker has most limited access
+        const workerAllowedMenus = [
+          "Dashboard",
+          "Safety Compliance",
+          "Communication",
+          "Tasks Management",
+          "Help & Support"
+        ];
+        
+        if (workerAllowedMenus.includes(item.title)) {
+          // Filter submenu items for worker if they exist
+          if (item.submenu) {
+            item.submenu = item.submenu.filter(subItem => 
+              ["Dashboard", "SWMS", "Incident Reports", "Messenger", "RFIs"].includes(subItem.title)
+            );
+          }
+          return true;
+        }
+        return false;
+  
+      default:
+        return false;
+    }
+  });
+  
+  // Add console logs for debugging
+  console.log("Role:", JSON.parse(roledata));
+  console.log("Filtered Menu Items:", filteredMenuItems);
   return (
     <div className={`sidebar ${isOpen ? "expanded" : "collapsed"}`}>
       <div className="sidebar-header">

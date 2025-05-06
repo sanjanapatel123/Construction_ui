@@ -3,7 +3,7 @@ import Chart from "chart.js/auto";
 import { useDispatch, useSelector } from "react-redux";
 import { superadmindashboard } from "../../redux/slices/Superadmin/planPackageSlice";
 
-const Dashboard = () => {
+const SuperAdminDashboard = () => {
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -126,4 +126,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default SuperAdminDashboard;

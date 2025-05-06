@@ -4,6 +4,7 @@ import { addSiteEntry, fetchSiteEntries, updateSiteEntry } from "../../../redux/
 import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { fetchUsers } from "../../../redux/slices/userSlice";
 function SiteEntry() {
   const dispatch= useDispatch()
   const navigate = useNavigate();
@@ -12,11 +13,19 @@ function SiteEntry() {
   const {entries}= useSelector((state)=>state.entries)
   console.log(entries)
 
+      const users = useSelector((state) => state.users.data);
+
+      
+
   useEffect(() => {
     if (id) {
       dispatch(fetchSiteEntries());
     }
   }, [id, dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, []);
 
   useEffect(() => {
     if (id && entries.length > 0) {
@@ -311,8 +320,8 @@ function SiteEntry() {
             <label htmlFor="siteSupervisor" className="form-label">
               Site Supervisor
             </label>
-            <input
-              type="text"
+            <select
+            
               className="form-control"
               id="siteSupervisor"
               name="siteSupervisor"
@@ -320,7 +329,16 @@ function SiteEntry() {
               onChange={handleChange}
               placeholder="Jane Smith"
               required
-            />
+            >
+              <option value="" disabled>Select Site Supervisor</option>
+             {users
+    .filter((user) => user.role?.toLowerCase() === "supervisor")
+    .map((user) => (
+      <option key={user._id} value={user._id}>
+        {user.name || `${user.firstName} ${user.lastName}`}
+      </option>
+    ))}
+              </select>
           </div>
           </div>
           <div className="row">

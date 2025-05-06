@@ -1,17 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Navbar.css";
+import { useSelector } from "react-redux";
 const Navbar = ({ toggleSidebar }) => {
-  const [roledata, setRoleData]= useState("")
-    // console.log(roledata)
-  useEffect(()=>{
-    const Role= localStorage.getItem("userRole")
-     if(Role){
-     setRoleData(Role)
-     }else{
-      setRoleData()
-     }
-  },[])
+
+  const [showPassword, setShowPassword] = useState(false); 
+  const [roledata, setRoleData] = useState(() => {
+    const storedRole = localStorage.getItem("user");
+    return storedRole ? JSON.parse(storedRole) : null;
+  });
+  
+
+  useEffect(() => {
+    const stored = localStorage.getItem("user");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      console.log("Role", parsed.email);
+      setRoleData(parsed);
+    } else {
+      setRoleData(null);
+    }
+  }, []);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+  
+
+  console.log(roledata)
+  console.log("email",roledata.email)
+  
 
   return (
     <>
@@ -29,8 +47,8 @@ const Navbar = ({ toggleSidebar }) => {
           <div className="dropdown profile-dropdown d-none d-md-block">
             <div className="profile-trigger" data-bs-toggle="dropdown" aria-expanded="false">
               <div className="profile-info">
-                <span className="profile-name">admin</span>
-                <span className="profile-role">admin@gmail.com</span>
+                <span className="profile-name">{roledata?.firstName}</span>
+                <span className="profile-role">{roledata?.email}</span>
               </div>
               <div className="profile-avatar">
                 <img src="https://i.ibb.co/6Jc9g6jF/user-11.jpg" alt="profile" />
@@ -57,8 +75,8 @@ const Navbar = ({ toggleSidebar }) => {
                 </Link>
               </li>
               <li><hr className="dropdown-divider"/></li>
-              <li>
-                <Link to="/" className="dropdown-item text-danger">
+              <li onClick={()=>localStorage.clear()}>
+                <Link to="/" className="dropdown-item text-danger" >
                   <i className="fas fa-sign-out-alt"></i>
                   <span>Logout</span>
                 </Link>

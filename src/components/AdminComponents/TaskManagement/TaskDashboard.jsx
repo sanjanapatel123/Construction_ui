@@ -40,12 +40,25 @@ const AllTasks = () => {
 
   const [filter, setFilter] = useState("");
 
-  const filteredTasks = tasks.filter(
-    (task) =>
-      task.taskTitle.toLowerCase().includes(filter.toLowerCase()) ||
-      task.assignTo.toLowerCase().includes(filter.toLowerCase()) ||
-      task.category.toLowerCase().includes(filter.toLowerCase())
-  );
+  const filteredTasks = loading ? (
+    <p> Loading...</p>
+  ) : tasks.filter((task) => {
+    const taskTitle = task?.taskTitle || "";
+    let assignTo = "";
+    if (typeof task?.assignTo === "object" && task?.assignTo !== null) {
+      assignTo = `${task.assignTo.firstName || ""} ${task.assignTo.lastName || ""}`;
+    } else if (typeof task?.assignTo === "string") {
+      assignTo = task?.assignTo;
+    }
+    const category = task?.category || "";
+  
+    return (
+      taskTitle.toLowerCase().includes(filter.toLowerCase()) ||
+      assignTo.toLowerCase().includes(filter.toLowerCase()) ||
+      category.toLowerCase().includes(filter.toLowerCase())
+    );
+  });
+
 
   useEffect(() => {
     dispatch(fetchTasks());
