@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
+import { useDispatch, useSelector } from "react-redux";
+import { superadmindashboard } from "../../redux/slices/Superadmin/planPackageSlice";
 
 const Dashboard = () => {
   const chartRef = useRef(null);
@@ -38,12 +40,18 @@ const Dashboard = () => {
         },
       },
     });
-
     return () => {
       chartRef.current.destroy();
     };
   }, []);
 
+    const dispatch = useDispatch();
+    const { Plans, dashboardData } = useSelector((state) => state.Plan);
+    const stats = dashboardData?.data || {};
+    useEffect(() => {
+      dispatch(superadmindashboard());
+    }, [dispatch]);
+  
   return (
     <div>
       {/* Dashboard Cards */}
@@ -74,7 +82,7 @@ const Dashboard = () => {
         </header>
 
         {/* Dashboard Summary Cards */}
-        <div className="row">
+        {/* <div className="row">
           {[
             { title: "Ongoing Projects", value: "12" },
             { title: "Completed Projects", value: "45" },
@@ -90,7 +98,21 @@ const Dashboard = () => {
               </div>
             </div>
           ))}
+        </div> */}
+        <div className="row">
+        {Object.entries(stats).map(([key, value], index) => (
+      <div className="col-md-3 col-sm-6 col-12 mb-4" key={index}>
+        <div className="card h-100 shadow-sm">
+          <div className="card-body">
+            <h5 className="card-title">
+              {key.replace(`/([A-Z])/g, " $1").replace(/^./, str => str.toUpperCase()`)}
+            </h5>
+            <h3>{value}</h3>
+          </div>
         </div>
+      </div>
+    ))}
+  </div>
       </div>
 
       {/* Graph Analytics Section */}

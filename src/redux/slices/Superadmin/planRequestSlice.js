@@ -4,41 +4,38 @@ import { apiUrl } from '../../../utils/config.js';
 import { toast } from 'react-toastify';
 
 
-export const fetchPlans = createAsyncThunk(
-  'Plans/fetchPlans',
+export const fetchplanRequests = createAsyncThunk(
+  'planRequests/fetchplanRequests',
   async () => {
-    const response = await axiosInstance.get(`${apiUrl}/planPackage`);
+    const response = await axiosInstance.get(`${apiUrl}/planRequest`);
     return response.data; 
   }
 );
 
-
-// Add a new Plans
-export const addPlans = createAsyncThunk(
-  "Plan/addPlans",
-  async (PlansData, thunkAPI) => {
-    console.log(PlansData, "PlansData");
+// Add a new planRequests
+export const addplanRequests = createAsyncThunk(
+  "planRequest/addplanRequests",
+  async (payload, thunkAPI) => {
+    console.log(payload, "planRequestsData");
     try {
-      const response = await axiosInstance.post(`${apiUrl}/planPackage`, PlansData,
-        {
-          headers: { "Content-Type": "multipart/form-data" }
-        }
-      );
+     const response = await axiosInstance.post(`${apiUrl}/planRequest`, payload, {
+  headers: { "Content-Type": "multipart/form-data" },
+});
+
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data || error.message || "Error adding Plans"
+        error.response?.data || error.message || "Error adding planRequests"
       );
     }
   }
 );
 
-
-export const fetchPlanDetails = createAsyncThunk(
-  'Plan/fetchPlanDetails',
+export const fetchplanRequestDetails = createAsyncThunk(
+  'planRequest/fetchplanRequestDetails',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get(`${apiUrl}/planPackage/${id}`);
+      const response = await axiosInstance.get(`${apiUrl}/planRequestPackage/${id}`);
       return response.data;
     } catch (error) {
       toast.error(" details");
@@ -47,13 +44,13 @@ export const fetchPlanDetails = createAsyncThunk(
   }
 );
 
-export const updatePlan = createAsyncThunk(
-    'Plans/updatePlan',
+export const updateplanRequest = createAsyncThunk(
+    'planRequests/updateplanRequest',
     async ({ id, updatedForm }, thunkAPI) => {
         console.log(updatedForm);
         
       try {
-        const response = await axiosInstance.patch(`${apiUrl}/planPackage/${id}`,updatedForm, {
+        const response = await axiosInstance.patch(`${apiUrl}/planRequestPackage/${id}`,updatedForm, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -65,20 +62,20 @@ export const updatePlan = createAsyncThunk(
     });
 
 
-export const deletePlan = createAsyncThunk('Plan/deletePlan', async (_id, { dispatch, rejectWithValue }) => {
+export const deleteplanRequest = createAsyncThunk('planRequest/deleteplanRequest', async (_id, { dispatch, rejectWithValue }) => {
   try {
-    const response = await axiosInstance.delete(`${apiUrl}/planPackage/${_id}`);
+    const response = await axiosInstance.delete(`${apiUrl}/planRequest/${_id}`);
     toast.success("Itps deleted successfully!");
-    dispatch(fetchPlans());
+    dispatch(fetchplanRequests());
     return response.data;
   } catch (error) {
-    toast.error(error?.response?.data?.message || "Failed to delete planPackage!");
+    toast.error(error?.response?.data?.message || "Failed to delete planRequestPackage!");
     return rejectWithValue(error?.response?.data?.message || "Delete failed");
   }
 });
 
 export const superadmindashboard = createAsyncThunk(
-    'Plans/superadmindashboard',
+    'planRequests/superadmindashboard',
     async (_, thunkAPI) => {
       try {
         const response = await axiosInstance.get(`${apiUrl}/superadmindashboard`);
@@ -89,11 +86,27 @@ export const superadmindashboard = createAsyncThunk(
     }
   );
   
+  export const PlanRequestApproveStatus = createAsyncThunk(
+    'planRequests/approveStatus',
+    async ({ _id, approve }, thunkAPI) => {
+      try {
+        const response = await axiosInstance.patch(
+          `${apiUrl}/planRequest/StatusUpdate/${_id}`, 
+          { approve } 
+        );
+        return response.data;
+      } catch (error) {
+        return thunkAPI.rejectWithValue(error?.response?.data || "Approval failed");
+      }
+    }
+  );
+  
+  
 
-const PlanSlice = createSlice({
-  name: 'Plan',
+const planRequestSlice = createSlice({
+  name: 'planRequest',
   initialState: {
-    Plans: [],
+    planRequests: [],
     dashboardData:[],
     loading: false,
     error: null,
@@ -101,39 +114,39 @@ const PlanSlice = createSlice({
   reducers: {},
   extraReducers:(builder) => {
     builder
-      .addCase(fetchPlans.pending, (state) => {
+      .addCase(fetchplanRequests.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchPlans.fulfilled, (state, action) => {
+      .addCase(fetchplanRequests.fulfilled, (state, action) => {
         state.loading = false;
-        state.Plans = action.payload;
+        state.planRequests = action.payload;
       })
-      .addCase(fetchPlans.rejected, (state, action) => {
+      .addCase(fetchplanRequests.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       })
-      .addCase(fetchPlanDetails.pending, (state) => {
+      .addCase(fetchplanRequestDetails.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchPlanDetails.fulfilled, (state, action) => {
+      .addCase(fetchplanRequestDetails.fulfilled, (state, action) => {
         state.loading = false;
-        state.PlanDetails = action.payload;
+        state.planRequestDetails = action.payload;
       })
-      .addCase(fetchPlanDetails.rejected, (state, action) => {
+      .addCase(fetchplanRequestDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       })
-    //    .addCase(deletePlan.pending, (state) => {
+    //    .addCase(deleteplanRequest.pending, (state) => {
     //           state.loading = true;
     //           state.error = null;
     //           state.deleteSuccessMsg = '';
     //         })
-    //         .addCase(deletePlan.fulfilled, (state, action) => {
+    //         .addCase(deleteplanRequest.fulfilled, (state, action) => {
     //           state.loading = false;
     //           state.data = state.data.filter((itp) => itp._id !== action.payload.id);
     //           state.deleteSuccessMsg = action.payload.message;
     //         })
-    //         .addCase(deletePlan.rejected, (state, action) => {
+    //         .addCase(deleteplanRequest.rejected, (state, action) => {
     //           state.loading = false;
     //           state.error = action.payload;
     //         })
@@ -152,4 +165,4 @@ const PlanSlice = createSlice({
   },
 });
 
-export default PlanSlice.reducer;
+export default planRequestSlice.reducer;

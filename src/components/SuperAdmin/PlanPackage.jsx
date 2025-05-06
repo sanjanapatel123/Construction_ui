@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchPlans } from "../../redux/slices/Superadmin/planPackageSlice";
+import { addPlans, deletePlan, fetchPlans, updatePlan } from "../../redux/slices/Superadmin/planPackageSlice";
 import { Modal, Button, Form } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCloudUploadAlt } from "@fortawesome/free-solid-svg-icons";
+import { FaTrash, FaEdit } from "react-icons/fa";
+import { AiOutlineClose } from "react-icons/ai";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const plans = [
   {
@@ -12,7 +16,7 @@ const plans = [
     benefits: [
       "15 Active Projects Allowed",
       "5 Site Engineers Allowed",
-      "Unlimited Material Reports",
+      "Unlimited Material materialReports",
       "500 Daily Site Visit Logs",
       "Priority Email & Call Support",
     ],
@@ -23,7 +27,7 @@ const plans = [
     benefits: [
       "Unlimited Active Projects",
       "Unlimited Site Engineers",
-      "Unlimited Material & Budget Reports",
+      "Unlimited Material & Budget materialReports",
       "Unlimited Site Visit Logs",
       "Dedicated Account Manager",
       "24/7 Priority Support",
@@ -31,9 +35,9 @@ const plans = [
   },
 ];
 
+// All Plan
 const PlanPackage = () => {
   const dispatch = useDispatch();
-
   const { Plans = [] } = useSelector((state) => state.Plan);
 
   useEffect(() => {
@@ -41,24 +45,53 @@ const PlanPackage = () => {
   }, [dispatch]);
 
 
-  // Adding the missing state variables
+// Add plan
+  const [selectedDoc, setSelectedDoc] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
   const [formData, setFormData] = useState({
-    planName: "",
-    duration: "",
+    name: "",
+    pricePerYear: "",
     activeProjects: "",
     siteEngineers: "",
-    reports: "",
-    dailySiteVisits: "",
-    company: ""
+    materialReports: "",
+    siteVisitLogs: "",
+    support: "",
+    dedicatedAccountManager:true
   });
-  
-  const [showUploadModal, setShowUploadModal] = useState(false); 
-  const [isEditing, setIsEditing] = useState(false); 
-  
-  const { planName, duration, activeProjects, siteEngineers, reports, dailySiteVisits, company } = formData;
-  
-  const toggleUploadModal = (val) => setShowUploadModal(val);
-  
+  const { name, pricePerYear, activeProjects, siteEngineers, materialReports, siteVisitLogs, support } = formData;
+  const toggleUploadModal = (isEdit = false, doc = null) => {
+    if (isEdit && doc) {
+      setIsEditing(true);
+      setEditingId(doc._id);
+      setFormData({
+        name: doc.name || "",
+        pricePerYear: doc.pricePerYear || "",
+        activeProjects: doc.features.activeProjects || "",
+        siteEngineers: doc.features.siteEngineers || "",
+        materialReports: doc.features.materialReports || "",
+        siteVisitLogs: doc.features.siteVisitLogs || "",
+        support: doc.features.support || ""
+      });
+    } else {
+      setIsEditing(false);
+      setEditingId(null);
+      setFormData({
+        name: "",
+        pricePerYear: "",
+        activeProjects: "",
+        siteEngineers: "",
+        materialReports: "",
+        siteVisitLogs: "",
+        support: "",
+        dedicatedAccountManager:true
+      });
+    }
+    setShowUploadModal(!showUploadModal);
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -66,14 +99,75 @@ const PlanPackage = () => {
       [name]: value
     });
   };
-  
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Submission logic here
     toggleUploadModal(false);
-    console.log(formData);
+    if (isEditing) {
+      const updateFormData = { ...formData };
+      if (!updateFormData.image) {
+        delete updateFormData.image;
+      }
+      delete updateFormData.existingImage;
+      dispatch(updatePlan({
+        id: editingId,
+        updatedForm: updateFormData
+      }))
+        .unwrap()
+        .then(() => {
+          toast.success("planPackage updated successfully!");
+          setShowUploadModal(false);
+          dispatch(fetchPlans());
+        })
+        .catch((error) => {
+          toast.error(error?.response?.data?.message || "Failed to update planPackage!");
+        });
+    } else {
+      const newFormData = { ...formData };
+      delete newFormData.existingImage;
+
+      dispatch(addPlans(newFormData)) 
+        .unwrap()
+        .then(() => {
+          toast.success("planPackage uploaded successfully!");
+          setShowUploadModal(false);
+          dispatch(fetchPlans());
+        })
+        .catch((error) => {
+          toast.error(error?.response?.data?.message || "Failed to upload planPackage!");
+        });
+    }
+  };
+    
+  const handleEdit = (plan) => {
+    toggleUploadModal(true, plan);
   };
 
+    // dlete list 
+    const handleDelete = (id) => {
+      console.log(id);
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          dispatch(deletePlan(id))
+            .then(() => {
+              Swal.fire("Deleted!", "The planPackage has been deleted.", "success");
+              dispatch(fetchPlans());
+            })
+            .catch(() => {
+              Swal.fire("Error!", "Something went wrong.", "error");
+            });
+        }
+      });
+    };
   return (
     <div className="container p-4">
       <h2 className="text-center mb-4">Construction Plan Packages</h2>
@@ -89,22 +183,37 @@ const PlanPackage = () => {
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
           {Plans.map((plan, index) => (
             <div className="col" key={index}>
-              <div className="card border-0 shadow h-100 p-3 d-flex flex-column">
-                <h2 className="text-center">{plan.planName}</h2>
+              <div className="card border-0 shadow h-100 position-relative p-3 d-flex flex-column">
+                <button
+                  className="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2"
+                  title="Delete"
+                  onClick={()=>handleDelete(plan._id)}
+                >
+                  <AiOutlineClose />
+                </button>
+
+                <h2 className="text-center">{plan.name}</h2>
+
                 <div className="card-body flex-grow-1">
                   <h4 className="fw-bold text-center">
-                    ₹{plan.duration} <span className="fs-5">/Year</span>
+                    ₹{plan.pricePerYear} <span className="fs-5">/Year</span>
                   </h4>
                   <ul className="list-unstyled text-start">
-                    <li>✅ {plan.activeProjects} : Active Projects</li>
-                    <li>✅ {plan.siteEngineers} : Site Engineers</li>
-                    <li>✅ {plan.reports}</li>
-                    <li>✅ {plan.dailySiteVisits} : Daily Visits</li>
-                    <li>✅ {plan.company}</li>
+                    <li>✅ {plan.features.activeProjects} : Active Projects</li>
+                    <li>✅ {plan.features.siteEngineers} : Site Engineers</li>
+                    <li>✅ {plan.features.materialReports}</li>
+                    <li>✅ {plan.features.siteVisitLogs} : Daily Visits</li>
+                    <li>✅ {plan.features.support}</li>
                   </ul>
                 </div>
-                <div className="card-footer bg-white border-0 mt-auto">
-                  <button className="btn btn-primary w-100">Get Started Now</button>
+
+                <div className="card-footer bg-white border-0 mt-auto d-flex align-items-center">
+                  <button className="btn btn-primary flex-grow-1">
+                    Get Started Now
+                  </button>
+                  <button className="btn btn-primary ms-2" onClick={() => handleEdit(plan)}>
+                    <FaEdit />
+                  </button>
                 </div>
               </div>
             </div>
@@ -112,101 +221,100 @@ const PlanPackage = () => {
         </div>
       )}
 
-    <Modal show={showUploadModal} onHide={() => toggleUploadModal(false)} centered size="lg">
-  <Modal.Header closeButton>
-    <Modal.Title>{isEditing ? "Update Plan" : "Upload New Plan"}</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-    <Form onSubmit={handleSubmit}>
-      <Form.Group className="mb-3">
-        <Form.Label>Plan Name</Form.Label>
-        <Form.Control
-          type="text"
-          name="planName"
-          value={planName}
-          onChange={handleInputChange}
-          placeholder="Enter plan name (e.g., Standard Plan)"
-        />
-      </Form.Group>
+      <Modal show={showUploadModal} onHide={() => toggleUploadModal(false)} centered size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>{isEditing ? "Update Plan" : "Upload New Plan"}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label>Plan Name</Form.Label>
+              <Form.Control
+                type="text"
+                name="name"
+                value={name}
+                onChange={handleInputChange}
+                placeholder="Enter plan name (e.g., Standard Plan)"
+              />
+            </Form.Group>
 
-      <Form.Group className="mb-3">
-        {/* <Form.Label>Duration (in months)</Form.Label> */}
-        <Form.Label>Price</Form.Label>
-        <Form.Control
-          type="number"
-          name="duration"
-          value={duration}
-          onChange={handleInputChange}
-          placeholder="Enter plan duration"
-        />
-      </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Price</Form.Label>
+              <Form.Control
+                type="number"
+                name="pricePerYear"
+                value={pricePerYear}
+                onChange={handleInputChange}
+                placeholder="Enter plan pricePerYear"
+              />
+            </Form.Group>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Active Projects</Form.Label>
-        <Form.Control
-          type="number"
-          name="activeProjects"
-          value={activeProjects}
-          onChange={handleInputChange}
-          placeholder="Enter number of active projects"
-        />
-      </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Active Projects</Form.Label>
+              <Form.Control
+                type="number"
+                name="activeProjects"
+                value={activeProjects}
+                onChange={handleInputChange}
+                placeholder="Enter number of active projects"
+              />
+            </Form.Group>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Site Engineers</Form.Label>
-        <Form.Control
-          type="number"
-          name="siteEngineers"
-          value={siteEngineers}
-          onChange={handleInputChange}
-          placeholder="Enter number of site engineers"
-        />
-      </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Site Engineers</Form.Label>
+              <Form.Control
+                type="number"
+                name="siteEngineers"
+                value={siteEngineers}
+                onChange={handleInputChange}
+                placeholder="Enter number of site engineers"
+              />
+            </Form.Group>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Reports</Form.Label>
-        <Form.Control
-          type="text"
-          name="reports"
-          value={reports}
-          onChange={handleInputChange}
-          placeholder="Enter report type (e.g., Monthly Reports)"
-        />
-      </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>materialReports</Form.Label>
+              <Form.Control
+                type="text"
+                name="materialReports"
+                value={materialReports}
+                onChange={handleInputChange}
+                placeholder="Enter report type (e.g., Monthly materialReports)"
+              />
+            </Form.Group>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Daily Site Visits</Form.Label>
-        <Form.Control
-          type="number"
-          name="dailySiteVisits"
-          value={dailySiteVisits}
-          onChange={handleInputChange}
-          placeholder="Enter number of daily site visits"
-        />
-      </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Daily Site Visits</Form.Label>
+              <Form.Control
+                type="number"
+                name="siteVisitLogs"
+                value={siteVisitLogs}
+                onChange={handleInputChange}
+                placeholder="Enter number of daily site visits"
+              />
+            </Form.Group>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Company</Form.Label>
-        <Form.Control
-          type="text"
-          name="company"
-          value={company}
-          onChange={handleInputChange}
-          placeholder="Enter company name"
-        />
-      </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>support</Form.Label>
+              <Form.Control
+                type="text"
+                name="support"
+                value={support}
+                onChange={handleInputChange}
+                placeholder="Enter support name"
+              />
+            </Form.Group>
 
-      <Modal.Footer>
-        <Button variant="secondary" onClick={() => toggleUploadModal(false)}>
-          Close
-        </Button>
-        <Button variant="primary" type="submit">
-          {isEditing ? "Update" : "Upload"}
-        </Button>
-      </Modal.Footer>
-    </Form>
-  </Modal.Body>
-</Modal>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => toggleUploadModal(false)}>
+                Close
+              </Button>
+              <Button variant="primary" type="submit">
+                {isEditing ? "Update" : "Upload"}
+              </Button>
+            </Modal.Footer>
+          </Form>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };

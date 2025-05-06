@@ -30,8 +30,8 @@ import calendarReducer from "./slices/calendarSlice";
 import auditReducer from "./slices/auditSlice";
 import userReducer from "./slices/userSlice";
 import drawingsReducer from "./slices/drawingsSlice";
-import PlansRequest from './slices/Superadmin/planPackageSlice.js';
-
+import planPackageReducer from './slices/Superadmin/planPackageSlice.js';
+import PlanRequestReducer from './slices/Superadmin/planRequestSlice.js';
 export const store = configureStore({
   reducer: {
       projects: projectReducer,
@@ -60,7 +60,8 @@ export const store = configureStore({
       audit : auditReducer,
         users: userReducer,
         drawings: drawingsReducer,
-        Plan:PlansRequest
+        Plan:planPackageReducer,
+        planRequest:PlanRequestReducer
       }
 
 });

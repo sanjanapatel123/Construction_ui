@@ -128,7 +128,7 @@ function DrawingRegister() {
   }, [dispatch]);
 
   // filter Folders
-  const filteredDocuments = drawings_arr.drawingRegisters.filter(
+  const filteredDocuments = folders.filter(
     (doc) =>
       doc.folderId === activeFolder.id &&
       (doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -353,7 +353,7 @@ function DrawingRegister() {
         {viewMode === "grid" ? (
           <Row xs={1} md={2} lg={3} className="g-3">
             {drawings_arr?.drawingRegisters?.length > 0 &&
-              drawings_arr.drawingRegisters.map((drawing) => (
+              drawings_arr?.drawingRegisters?.map((drawing) => (
                 <Col key={drawing._id}>
                   <div className="card shadow-sm">
                     <div className="card-body">
